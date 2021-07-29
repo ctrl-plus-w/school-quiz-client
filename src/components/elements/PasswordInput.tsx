@@ -1,6 +1,6 @@
 import React, { ChangeEvent, MouseEvent, useState } from 'react';
 
-import { EyeIcon, EyeOffIcon } from '@heroicons/react/solid';
+import { EyeIcon, EyeOffIcon } from '@heroicons/react/outline';
 
 interface Props {
   placeholder?: string;
@@ -40,7 +40,7 @@ const PasswordInput = ({ label, placeholder, className, value, setValue }: Props
           />
 
           <button
-            className=" absolute top-1/2 right-0 h-full px-2 transform -translate-y-1/2 flex justify-center items-center"
+            className=" absolute top-1/2 right-0 h-full px-2.5 transform -translate-y-1/2 flex justify-center items-center"
             onClick={switchPasswordVisibility}
           >
             {showPassword ? <EyeIcon className="h-5 w-5 text-gray-600" /> : <EyeOffIcon className="h-5 w-5 text-gray-600" />}
