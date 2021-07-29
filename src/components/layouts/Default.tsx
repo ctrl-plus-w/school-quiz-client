@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import React from 'react';
 
-import { enable } from '../../utils/style.utils';
+import { enable } from '@util/style.utils';
 
 interface Props {
   title: string;

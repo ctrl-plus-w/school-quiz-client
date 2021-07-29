@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import Button from '../components/elements/Button';
-import Input from '../components/elements/Input';
-import PasswordInput from '../components/elements/PasswordInput';
-import Route from '../components/elements/Route';
-import Title from '../components/elements/Title';
+import Button from '@element/Button';
+import Input from '@element/Input';
+import PasswordInput from '@element/PasswordInput';
+import Route from '@element/Route';
+import Title from '@element/Title';
 
-import Layout from '../components/layouts/Default';
-import Form from '../components/modules/Form';
+import Layout from '@layout/Default';
+import Form from '@module/Form';
 
 interface Props {}
 
