@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -8,4 +8,28 @@ html,
 body,
 #__next {
   height: 100%;
+}
+
+.form > .form-control:not(:first-child),
+.form > .button {
+  @apply mt-4;
+}
+
+.link {
+  position: relative;
+}
+
+.link::before {
+  content: '';
+
+  width: 0%;
+  height: 1px;
+
+  @apply absolute top-full left-0 bg-gray-600;
+}
+
+.link:hover::before {
+  width: 100%;
+
+  transition: width 300ms ease-in-out;
 }

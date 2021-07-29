@@ -1,19 +1,22 @@
 import Head from 'next/head';
 import React from 'react';
 
+import { enable } from '../../utils/style.utils';
+
 interface Props {
   title: string;
   children?: React.ReactNode;
+  center?: boolean;
 }
 
-const Layout = (props: Props) => {
+const Layout = ({ title, children, center = false }: Props) => {
   return (
-    <div className="w-full h-full">
+    <div className={`w-full h-full flex flex-col ${enable(center, 'justify-center items-center')}`}>
       <Head>
-        <title>{props.title}</title>
+        <title>{title}</title>
       </Head>
 
-      {props.children}
+      {children}
     </div>
   );
 };
