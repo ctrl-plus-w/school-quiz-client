@@ -19,7 +19,8 @@
       "@layout/*": ["components/layouts/*"],
       "@module/*": ["components/modules/*"],
       "@util/*": ["utils/*"],
-      "@constant/*": ["constants/*"]
+      "@constant/*": ["constants/*"],
+      "@redux/*": ["redux/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
