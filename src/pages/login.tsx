@@ -13,34 +13,30 @@ import Error from '@element/Error';
 import Layout from '@layout/Default';
 
 import Form from '@module/Form';
-
-import { login, selectError, selectToken } from '@redux/features/auth/authSlice';
+import database from 'database/database';
 
 interface IProps {}
 
 const Login = (props: IProps) => {
+  const [error, setError] = useState(false);
   const [_cookie, setCookie] = useCookies(['user']);
 
   const router = useRouter();
-  const dispatch = useDispatch();
-
-  const loginError = useSelector(selectError);
-  const token = useSelector(selectToken);
 
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  useEffect(() => {
-    if (token) {
-      setCookie('user', token, { path: '/', maxAge: 3600, sameSite: true });
-      router.push('/admin-dashboard');
-    }
-  }, [token]);
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    dispatch(login({ username, password }));
+    try {
+      const { data } = await database.post('/auth/login', { username, password });
+
+      setCookie('user', data.token, { path: '/', maxAge: 3600, sameSite: true });
+      router.push('/admin');
+    } catch (err) {
+      if (err) setError(true);
+    }
   };
 
   return (
@@ -53,7 +49,7 @@ const Login = (props: IProps) => {
         <PasswordInput label="Mot de passe" placeholder="****" value={password} setValue={setPassword} />
         <Button submit>Se connecter</Button>
 
-        {loginError && <Error body="Identifiants invalides" />}
+        {error && <Error body="Identifiants invalides" />}
       </Form>
     </Layout>
   );
