@@ -62,23 +62,29 @@ export const authSlice = createSlice({
   reducers: {},
 
   extraReducers: (builder) => {
-    builder.addCase(login.fulfilled, (state, action) => {
-      console.log({ ...state, error: null, ...action.payload });
-      return { ...state, error: null, ...action.payload };
-    });
-
-    builder.addCase(login.pending, (state, _action) => {
-      return { ...state, state: 'PENDING' };
-    });
-
-    builder.addCase(login.rejected, (state, _action) => {
-      return { ...state, state: 'FULFILLED', error: 'Something wrong happened' };
-    });
+    builder
+      .addCase(login.fulfilled, (state, action) => {
+        return { ...state, error: null, ...action.payload };
+      })
+      .addCase(login.pending, (state, _action) => {
+        return { ...state, state: 'PENDING' };
+      })
+      .addCase(login.rejected, (state, _action) => {
+        return { ...state, state: 'FULFILLED', error: 'Something wrong happened' };
+      });
   },
 });
 
 export const selectState = (state: RootState) => state.auth.state;
 
 export const selectError = (state: RootState) => state.auth.error;
+
+export const selectToken = (state: RootState) => state.auth.token;
+
+export const selectUser = (state: RootState) => ({
+  username: state.auth.username,
+  role: state.auth.role,
+  rolePermission: state.auth.rolePermission,
+});
 
 export default authSlice.reducer;
