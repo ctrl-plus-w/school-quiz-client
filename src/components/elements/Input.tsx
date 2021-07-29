@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from 'react';
 
-interface Props {
+interface IProps {
   placeholder?: string;
   label: string;
 
@@ -10,7 +10,7 @@ interface Props {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Input = ({ label, placeholder, className, value, setValue }: Props) => {
+const Input = ({ label, placeholder, className, value, setValue }: IProps) => {
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setValue(e.target.value);
   };

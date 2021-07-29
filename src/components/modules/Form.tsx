@@ -1,11 +1,16 @@
-import React from 'react';
+import React, { FormEvent } from 'react';
 
-interface Props {
+interface IProps {
   children?: React.ReactNode;
+  onSubmit?: (e: FormEvent) => void;
 }
 
-const Form = ({ children }: Props) => {
-  return <div className="form flex flex-col w-80 items-start">{children}</div>;
+const Form = ({ children, onSubmit }: IProps) => {
+  return (
+    <form className="form flex flex-col w-80 items-start" onSubmit={onSubmit}>
+      {children}
+    </form>
+  );
 };
 
 export default Form;

@@ -1,12 +1,14 @@
-import { GetServerSideProps } from 'next';
 import React from 'react';
+
 import Title from '@element/Title';
 
 import Layout from '@layout/Default';
 
-const AdminDashboard = ({}) => {
+interface IProps {}
+
+const AdminDashboard = ({}: IProps) => {
   return (
-    <Layout title="Admin Dashboard">
+    <Layout title="Admin Dashboard" center>
       <Title>Admin Dashboard</Title>
     </Layout>
   );

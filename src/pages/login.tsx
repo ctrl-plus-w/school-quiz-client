@@ -8,9 +8,9 @@ import Title from '@element/Title';
 import Layout from '@layout/Default';
 import Form from '@module/Form';
 
-interface Props {}
+interface IProps {}
 
-const Login = (props: Props) => {
+const Login = (props: IProps) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 

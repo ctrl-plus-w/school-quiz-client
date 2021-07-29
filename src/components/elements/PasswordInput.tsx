@@ -2,7 +2,7 @@ import React, { ChangeEvent, MouseEvent, useState } from 'react';
 
 import { EyeIcon, EyeOffIcon } from '@heroicons/react/outline';
 
-interface Props {
+interface IProps {
   placeholder?: string;
   label: string;
 
@@ -12,7 +12,7 @@ interface Props {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const PasswordInput = ({ label, placeholder, className, value, setValue }: Props) => {
+const PasswordInput = ({ label, placeholder, className, value, setValue }: IProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
