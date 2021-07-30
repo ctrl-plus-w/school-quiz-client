@@ -1,13 +1,14 @@
 import React, { FormEvent } from 'react';
 
 interface IProps {
+  full?: boolean;
   children?: React.ReactNode;
   onSubmit?: (e: FormEvent) => void;
 }
 
-const Form = ({ children, onSubmit }: IProps) => {
+const Form = ({ children, onSubmit, full = false }: IProps) => {
   return (
-    <form className="form flex flex-col w-80 items-start" onSubmit={onSubmit}>
+    <form className={`form flex flex-col ${full ? 'w-full' : 'w-80'} items-start`} onSubmit={onSubmit}>
       {children}
     </form>
   );

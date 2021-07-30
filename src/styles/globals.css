@@ -11,12 +11,18 @@ body,
 }
 
 .form > .form-control:not(:first-child),
-.form > .button {
+.form > .button,
+.form-group > .form-control:not(:first-child),
+.form-group > .button {
   @apply mt-4;
 }
 
 .form > .error {
   @apply mt-6;
+}
+
+div > .form-group:not(:last-child) {
+  @apply mr-32;
 }
 
 .link {
@@ -36,4 +42,10 @@ body,
   width: 100%;
 
   transition: width 300ms ease-in-out;
+}
+
+.checkbox::before {
+  content: '';
+
+  @apply block absolute top-0 left-0 w-full h-full bg-black rounded-sm;
 }

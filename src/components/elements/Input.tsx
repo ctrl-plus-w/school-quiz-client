@@ -16,7 +16,7 @@ const Input = ({ label, placeholder, className, value, setValue }: IProps) => {
   };
 
   return (
-    <div className={`form-control flex flex-col w-full ${className}`}>
+    <div className={`form-control flex flex-col w-80 ${className}`}>
       <label className="text-sm font-semibold uppercase text-gray-900">
         {label}
 
