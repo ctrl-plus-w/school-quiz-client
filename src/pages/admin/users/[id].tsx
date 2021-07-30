@@ -34,13 +34,13 @@ const User: FunctionComponent = ({ user, groups, roles, token }: InferGetServerS
 
   const [gender, setGender] = useState(user.gender === null ? 'undefined' : user.gender ? 'male' : 'female');
   const [roleSlug, setRoleSlug] = useState(user.role?.slug || null);
-  const [userGroups, setUserGroups] = useState<Array<Group>>(user.groups);
+  const [userGroups, setUserGroups] = useState<Array<IBasicModel>>(user.groups.map(({ id, name, slug }: Group) => ({ id, name, slug })));
 
-  const addGroup = (group: Group): void => {
+  const addGroup = (group: IBasicModel): void => {
     setUserGroups((prev) => [...prev, group]);
   };
 
-  const removeGroup = (group: Group): void => {
+  const removeGroup = (group: IBasicModel): void => {
     setUserGroups((prev) => prev.filter((_group) => _group !== group));
   };
 
@@ -119,7 +119,7 @@ const User: FunctionComponent = ({ user, groups, roles, token }: InferGetServerS
 
             <Dropdown label="Role" placeholder="Role" values={getRoleDropdownValues()} value={roleSlug} setValue={setRoleSlug} />
 
-            <TagsInput<Group> label="Groupes" placeholder="Groupes" data={groups} values={userGroups} addValue={addGroup} removeValue={removeGroup} />
+            <TagsInput label="Groupes" placeholder="Groupes" data={groups} values={userGroups} addValue={addGroup} removeValue={removeGroup} />
           </FormGroup>
         </Row>
 

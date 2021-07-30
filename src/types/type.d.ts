@@ -10,6 +10,7 @@ interface IMenu {
 }
 
 interface IBasicModel {
+  id?: number;
   name: string;
   slug: string;
 }
