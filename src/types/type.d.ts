@@ -42,4 +42,18 @@ type Role = {
   updatedAt: Date;
 };
 
+type UINotificationType = 'info' | 'error';
+
+type UINotification = {
+  type: UINotificationType;
+  content: string;
+  id: string;
+};
+
 type DropdownValues = Array<{ name: string; slug: string }>;
+
+type NotificationContextState = {
+  notifications: Array<UINotification>;
+  addNotification: (notifications: UINotification) => void;
+  removeNotification: (notifications: UINotification) => void;
+};

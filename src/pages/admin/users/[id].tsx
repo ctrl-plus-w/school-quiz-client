@@ -1,6 +1,8 @@
-import React, { FormEvent, FunctionComponent, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/dist/client/router';
+
+import { v4 as uuidv4 } from 'uuid';
 
 import Input from '@element/Input';
 import Title from '@element/Title';
@@ -18,12 +20,17 @@ import AdminDashboardModelLayout from '@layout/AdminDashboardModel';
 
 import { getHeaders } from '@util/authentication.utils';
 
-import database from 'database/database';
 import ROLES from '@constant/roles';
 import Loader from '@element/Loader';
 
+import database from 'database/database';
+
+import { NotificationContext } from 'context/NotificationContext/NotificationContext';
+
 const User: FunctionComponent = ({ user, groups, roles, token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
+
+  const { addNotification } = useContext(NotificationContext);
 
   const [loading, setLoading] = useState(false);
 
@@ -94,45 +101,49 @@ const User: FunctionComponent = ({ user, groups, roles, token }: InferGetServerS
       else console.log(err.response);
     } finally {
       setLoading(false);
+      addNotification({ content: 'Utilisateur modifié.', type: 'info', id: uuidv4() });
+
       router.push('/admin/users');
     }
   };
 
   return (
-    <AdminDashboardModelLayout active="Utilisateurs" title="Modifier un utilisateur" path="Utilisateurs > Modifier">
-      <Form full={true} onSubmit={handleSubmit}>
-        <Row>
-          <FormGroup>
-            <Title level={2}>Informations générales</Title>
+    <>
+      <AdminDashboardModelLayout active="Utilisateurs" title="Modifier un utilisateur" path="Utilisateurs > Modifier">
+        <Form full={true} onSubmit={handleSubmit}>
+          <Row>
+            <FormGroup>
+              <Title level={2}>Informations générales</Title>
 
-            <Input label="Nom d'utilisateur" placeholder="johndoe" value={username} setValue={setUsername} />
-            <Input label="Prénom" placeholder="John" value={firstName} setValue={setFirstName} />
-            <Input label="Nom de famille" placeholder="Doe" value={lastName} setValue={setLastName} />
+              <Input label="Nom d'utilisateur" placeholder="johndoe" value={username} setValue={setUsername} />
+              <Input label="Prénom" placeholder="John" value={firstName} setValue={setFirstName} />
+              <Input label="Nom de famille" placeholder="Doe" value={lastName} setValue={setLastName} />
 
-            <PasswordInput label="Mot de passe" placeholder="*****" value={password} setValue={setPassword} />
+              <PasswordInput label="Mot de passe" placeholder="*****" value={password} setValue={setPassword} />
 
-            <Dropdown label="Sexe" placeholder="Indéfini" values={getGenderDropdownValues()} value={gender} setValue={setGender} />
-          </FormGroup>
+              <Dropdown label="Sexe" placeholder="Indéfini" values={getGenderDropdownValues()} value={gender} setValue={setGender} />
+            </FormGroup>
 
-          <FormGroup>
-            <Title level={2}>Informations supplémentaires</Title>
+            <FormGroup>
+              <Title level={2}>Informations supplémentaires</Title>
 
-            <Dropdown label="Role" placeholder="Role" values={getRoleDropdownValues()} value={roleSlug} setValue={setRoleSlug} />
+              <Dropdown label="Role" placeholder="Role" values={getRoleDropdownValues()} value={roleSlug} setValue={setRoleSlug} />
 
-            <TagsInput label="Groupes" placeholder="Groupes" data={groups} values={userGroups} addValue={addGroup} removeValue={removeGroup} />
-          </FormGroup>
-        </Row>
+              <TagsInput label="Groupes" placeholder="Groupes" data={groups} values={userGroups} addValue={addGroup} removeValue={removeGroup} />
+            </FormGroup>
+          </Row>
 
-        <div className="flex mt-auto ml-auto">
-          <LinkButton href="/admin/users" outline={true} className="mr-6">
-            Annuler
-          </LinkButton>
-          <Button submit={true}>Modifier</Button>
-        </div>
-      </Form>
+          <div className="flex mt-auto ml-auto">
+            <LinkButton href="/admin/users" outline={true} className="mr-6">
+              Annuler
+            </LinkButton>
+            <Button submit={true}>Modifier</Button>
+          </div>
+        </Form>
 
-      <Loader show={loading} />
-    </AdminDashboardModelLayout>
+        <Loader show={loading} />
+      </AdminDashboardModelLayout>
+    </>
   );
 };
 
