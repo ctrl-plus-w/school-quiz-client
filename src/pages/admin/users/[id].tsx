@@ -1,4 +1,4 @@
-import React, { FormEvent, useEffect, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -21,9 +21,8 @@ import { getHeaders } from '@util/authentication.utils';
 import database from 'database/database';
 import ROLES from '@constant/roles';
 import Loader from '@element/Loader';
-import { AxiosError } from 'axios';
 
-const User = ({ user, groups, roles, token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const User: FunctionComponent = ({ user, groups, roles, token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);

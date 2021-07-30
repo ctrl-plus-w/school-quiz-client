@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 interface IProps {
   children: string;
@@ -6,7 +6,7 @@ interface IProps {
   small?: boolean;
 }
 
-const Text = ({ children, color = 'black', small = false }: IProps) => {
+const Text: FunctionComponent<IProps> = ({ children, color = 'black', small = false }: IProps) => {
   const getColor = (): string => {
     switch (color) {
       case 'white':

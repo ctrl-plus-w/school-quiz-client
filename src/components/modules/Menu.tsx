@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 import { useRouter } from 'next/dist/client/router';
 import { useCookies } from 'react-cookie';
@@ -8,7 +8,7 @@ interface IProps {
   logoutButton?: boolean;
 }
 
-const Menu = ({ children, logoutButton = false }: IProps) => {
+const Menu: FunctionComponent<IProps> = ({ children, logoutButton = false }: IProps) => {
   const [_cookie, _setCookie, removeCookie] = useCookies(['user']);
 
   const router = useRouter();

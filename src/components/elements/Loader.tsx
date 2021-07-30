@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 interface IProps {
   show: boolean;
 }
 
-const Loader = ({ show }: IProps) => {
+const Loader: FunctionComponent<IProps> = ({ show }: IProps) => {
   return (
     <div className={`z-50 absolute flex justify-center items-center w-full h-full top-0 left-0 bg-white opacity-75 ${show ? 'visible' : 'hidden'}`}>
       <svg className="animate-spin -ml-1 mr-3 h-8 w-8 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

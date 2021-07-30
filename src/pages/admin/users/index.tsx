@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { FunctionComponent } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
@@ -18,7 +18,7 @@ interface IProps {
 
 const cellClassName = 'px-4 py-3 text-gray-500 border-t border-gray-300 text-sm group-hover:bg-gray-200 cursor-pointer';
 
-const AdminDashboard = ({ users }: IProps) => {
+const AdminDashboard: FunctionComponent<IProps> = ({ users }: IProps) => {
   const router = useRouter();
 
   const seeUserProfile = (userId: number): void => {

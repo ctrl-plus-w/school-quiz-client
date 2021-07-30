@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import Link from 'next/link';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -8,7 +8,7 @@ interface IProps {
   links: Array<{ name: string; path: string; active?: boolean }>;
 }
 
-const MenuGroup = ({ title, links = [] }: IProps) => {
+const MenuGroup: FunctionComponent<IProps> = ({ title, links = [] }: IProps) => {
   return (
     <ul className="menu-group flex flex-col mb-10">
       <li className="text-black font-semibold text-base uppercase mb-4">{title}</li>

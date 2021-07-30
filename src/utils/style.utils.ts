@@ -1,1 +1,1 @@
-export const enable = (condition: boolean, className: string) => (condition ? className : '');
+export const enable = (condition: boolean, className: string): string => (condition ? className : '');

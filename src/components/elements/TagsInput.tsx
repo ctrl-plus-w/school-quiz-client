@@ -1,9 +1,9 @@
-import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
+import React, { ChangeEvent, FunctionComponent, KeyboardEvent, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { XIcon } from '@heroicons/react/outline';
 import Helper from './Helper';
 
-interface IProps<T extends IBasicModel> {
+interface IProps {
   label: string;
   placeholder: string;
 
@@ -11,14 +11,14 @@ interface IProps<T extends IBasicModel> {
 
   children?: React.ReactNode;
 
-  data: Array<T>;
+  data: Array<IBasicModel>;
 
-  values: Array<T>;
-  addValue: (instance: T) => void;
-  removeValue: (instance: T) => void;
+  values: Array<IBasicModel>;
+  addValue: (instance: IBasicModel) => void;
+  removeValue: (instance: IBasicModel) => void;
 }
 
-const TagsInput = <T extends IBasicModel>({ className, label, placeholder, values, addValue, removeValue, data }: IProps<T>) => {
+const TagsInput: FunctionComponent<IProps> = ({ className, label, placeholder, values, addValue, removeValue, data }: IProps) => {
   const [tempValue, setTempValue] = useState('');
   const [completion, setCompletion] = useState('');
   const [isValid, setIsValid] = useState(false);

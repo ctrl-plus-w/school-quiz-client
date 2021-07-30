@@ -1,5 +1,5 @@
+import React, { FunctionComponent } from 'react';
 import Head from 'next/head';
-import React from 'react';
 
 import { enable } from '@util/style.utils';
 
@@ -10,7 +10,7 @@ interface IProps {
   center?: boolean;
 }
 
-const Layout = ({ title, children, center = false, display = 'col' }: IProps) => {
+const Layout: FunctionComponent<IProps> = ({ title, children, center = false, display = 'col' }: IProps) => {
   return (
     <div className={`w-full h-full flex flex-${display} ${enable(center, 'justify-center items-center')}`}>
       <Head>

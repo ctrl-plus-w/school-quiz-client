@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 interface IProps {
   children?: React.ReactNode;
@@ -7,7 +7,7 @@ interface IProps {
   className?: string;
 }
 
-const Button = ({ children, className, submit = false, outline = false }: IProps) => {
+const Button: FunctionComponent<IProps> = ({ children, className, submit = false, outline = false }: IProps) => {
   const STYLES = {
     DEFAULT: 'bg-black text-white border border-transparent',
     OUTLINE: 'bg-white text-black border border-black',

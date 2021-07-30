@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import Layout from '@layout/Default';
@@ -32,7 +32,7 @@ const menus: Array<IMenu> = [
   },
 ];
 
-const AdminDashboardLayout = ({ children, active }: IProps) => {
+const AdminDashboardLayout: FunctionComponent<IProps> = ({ children, active }: IProps) => {
   const linkMapper = (links: ILink[]) =>
     links.map(({ name, path }) => ({
       name,

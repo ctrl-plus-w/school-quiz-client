@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { ChevronDownIcon } from '@heroicons/react/outline';
@@ -14,7 +14,7 @@ interface IProps {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Dropdown = ({ className, label, placeholder = 'Dropdown', values, value, setValue }: IProps) => {
+const Dropdown: FunctionComponent<IProps> = ({ className, label, placeholder = 'Dropdown', values, value, setValue }: IProps) => {
   const [isHidden, setHidden] = useState(true);
 
   const onChange = (slug: string): void => {

@@ -1,5 +1,5 @@
+import React, { FunctionComponent } from 'react';
 import Link from 'next/link';
-import React from 'react';
 
 interface IProps {
   children?: React.ReactNode;
@@ -8,7 +8,7 @@ interface IProps {
   outline?: boolean;
 }
 
-const LinkButton = ({ children, href, className, outline = false }: IProps) => {
+const LinkButton: FunctionComponent<IProps> = ({ children, href, className, outline = false }: IProps) => {
   const STYLES = {
     DEFAULT: 'bg-black text-white border border-transparent',
     OUTLINE: 'bg-white text-black border border-black',

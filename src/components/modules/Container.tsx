@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 import Route from '@element/Route';
 import Subtitle from '@element/Subtitle';
@@ -11,7 +11,7 @@ interface IProps {
   path?: string;
 }
 
-const Container = ({ children, title, subtitle, path }: IProps) => {
+const Container: FunctionComponent<IProps> = ({ children, title, subtitle, path }: IProps) => {
   const getSubtitleElement = () => {
     if (subtitle) {
       return typeof subtitle === 'string' ? <Subtitle>{subtitle}</Subtitle> : <Route to={subtitle.path}>{subtitle.name}</Route>;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 import { GetServerSideProps } from 'next';
 
@@ -6,9 +6,7 @@ import AdminDashboardLayout from '@layout/AdminDashboard';
 
 import { getServerSidePropsAdminFunction } from '@util/authentication.utils';
 
-interface IProps {}
-
-const AdminDashboard = ({}: IProps) => {
+const AdminDashboard: FunctionComponent = () => {
   return <AdminDashboardLayout active="Accueil"></AdminDashboardLayout>;
 };
 

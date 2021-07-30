@@ -1,5 +1,5 @@
 import Container from '@module/Container';
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 import AdminDashboardLayout from './AdminDashboard';
 
 interface IProps {
@@ -9,7 +9,7 @@ interface IProps {
   path: string;
 }
 
-const AdminDashboardModelLayout = ({ children, active, title, path }: IProps) => {
+const AdminDashboardModelLayout: FunctionComponent<IProps> = ({ children, active, title, path }: IProps) => {
   return (
     <AdminDashboardLayout active={active}>
       <Container title={title} path={path}>

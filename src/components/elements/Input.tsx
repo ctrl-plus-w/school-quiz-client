@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import React, { ChangeEvent, FunctionComponent } from 'react';
 
 interface IProps {
   placeholder?: string;
@@ -10,7 +10,7 @@ interface IProps {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Input = ({ label, placeholder, className, value, setValue }: IProps) => {
+const Input: FunctionComponent<IProps> = ({ label, placeholder, className, value, setValue }: IProps) => {
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setValue(e.target.value);
   };

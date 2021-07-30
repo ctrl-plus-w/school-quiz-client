@@ -7,7 +7,7 @@ export const getHeaders = (token: string): AxiosRequestConfig => {
   return { headers: { Authorization: `Bearer ${token}` } };
 };
 
-export const getServerSidePropsFunction = (rolePermission: number) => {
+export const getServerSidePropsFunction = (rolePermission: number): GetServerSideProps => {
   return async (context: GetServerSidePropsContext) => {
     try {
       const token = context.req.cookies.user;

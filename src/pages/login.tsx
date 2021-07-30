@@ -1,4 +1,4 @@
-import React, { FormEvent, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { useCookies } from 'react-cookie';
 
@@ -12,11 +12,10 @@ import Error from '@element/Error';
 import Layout from '@layout/Default';
 
 import Form from '@module/Form';
+
 import database from 'database/database';
 
-interface IProps {}
-
-const Login = (props: IProps) => {
+const Login: FunctionComponent = () => {
   const [error, setError] = useState(false);
   const [_cookie, setCookie] = useCookies(['user']);
 

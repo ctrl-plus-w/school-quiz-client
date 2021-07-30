@@ -1,6 +1,8 @@
+import React, { FunctionComponent } from 'react';
+
+import AdminDashboardLayout from '@layout/AdminDashboard';
+
 import Container from '@module/Container';
-import React from 'react';
-import AdminDashboardLayout from './AdminDashboard';
 
 interface IProps {
   children?: React.ReactNode;
@@ -9,7 +11,7 @@ interface IProps {
   subtitle: { name: string; path: string } | string;
 }
 
-const AdminDashboardModelsLayout = ({ children, active, title, subtitle }: IProps) => {
+const AdminDashboardModelsLayout: FunctionComponent<IProps> = ({ children, active, title, subtitle }: IProps) => {
   return (
     <AdminDashboardLayout active={active}>
       <Container title={title} subtitle={subtitle}>

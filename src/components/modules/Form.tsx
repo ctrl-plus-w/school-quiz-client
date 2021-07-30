@@ -1,4 +1,4 @@
-import React, { FormEvent } from 'react';
+import React, { FormEvent, FunctionComponent } from 'react';
 
 interface IProps {
   full?: boolean;
@@ -6,7 +6,7 @@ interface IProps {
   onSubmit?: (e: FormEvent) => void;
 }
 
-const Form = ({ children, onSubmit, full = false }: IProps) => {
+const Form: FunctionComponent<IProps> = ({ children, onSubmit, full = false }: IProps) => {
   return (
     <form className={`form flex flex-col ${full ? 'w-full h-full' : 'w-80'} items-start`} onSubmit={onSubmit}>
       {children}

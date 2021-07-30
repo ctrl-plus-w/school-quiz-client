@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { FunctionComponent } from 'react';
 
 interface IProps {
   level?: number;
@@ -6,7 +6,7 @@ interface IProps {
   color?: 'white' | 'black' | 'red';
 }
 
-const Title = ({ level, children, color = 'black' }: IProps) => {
+const Title: FunctionComponent<IProps> = ({ level, children, color = 'black' }: IProps) => {
   const getColor = (): string => {
     switch (color) {
       case 'black':

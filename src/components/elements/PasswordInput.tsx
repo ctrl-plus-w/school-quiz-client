@@ -1,9 +1,10 @@
-import React, { ChangeEvent, MouseEvent, useState } from 'react';
+import React, { ChangeEvent, FunctionComponent, MouseEvent, useState } from 'react';
 
 import { EyeIcon, EyeOffIcon, CogIcon } from '@heroicons/react/outline';
 
-import PASSWORD from '@constant/password';
 import { generatePassword } from '@util/generate.utils';
+
+import PASSWORD from '@constant/password';
 
 interface IProps {
   placeholder?: string;
@@ -17,7 +18,7 @@ interface IProps {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const PasswordInput = ({ label, placeholder, className, value, setValue, generator = false }: IProps) => {
+const PasswordInput: FunctionComponent<IProps> = ({ label, placeholder, className, value, setValue, generator = false }: IProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
