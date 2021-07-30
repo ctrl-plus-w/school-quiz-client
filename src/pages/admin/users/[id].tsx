@@ -1,30 +1,40 @@
-import React, { FunctionComponent, useState } from 'react';
+import React, { FormEvent, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { useRouter } from 'next/dist/client/router';
 
 import Input from '@element/Input';
 import Title from '@element/Title';
+import Dropdown from '@element/Dropdown';
+import TagsInput from '@element/TagsInput';
+import Button from '@element/Button';
+import LinkButton from '@element/LinkButton';
+import PasswordInput from '@element/PasswordInput';
 
 import Form from '@module/Form';
+import FormGroup from '@module/FormGroup';
+import Row from '@module/Row';
 
 import AdminDashboardModelLayout from '@layout/AdminDashboardModel';
 
 import { getHeaders } from '@util/authentication.utils';
 
-import roles from '@constant/roles';
-
 import database from 'database/database';
-import FormGroup from '@module/FormGroup';
-import Dropdown from '@element/Dropdown';
-import Row from '@module/Row';
-import TagsInput from '@element/TagsInput';
+import ROLES from '@constant/roles';
+import Loader from '@element/Loader';
+import { AxiosError } from 'axios';
 
-const User = ({ user, groups }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const User = ({ user, groups, roles, token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
+
   const [username, setUsername] = useState(user.username);
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
+  const [password, setPassword] = useState('');
 
-  const [gender, setGender] = useState(user.gender === null ? 'null' : user.gender ? 'male' : 'female');
-  const [role, setRole] = useState(user.role.name || 'student');
+  const [gender, setGender] = useState(user.gender === null ? 'undefined' : user.gender ? 'male' : 'female');
+  const [roleSlug, setRoleSlug] = useState(user.role?.slug || null);
   const [userGroups, setUserGroups] = useState<Array<Group>>(user.groups);
 
   const addGroup = (group: Group): void => {
@@ -36,20 +46,62 @@ const User = ({ user, groups }: InferGetServerSidePropsType<typeof getServerSide
   };
 
   const getRoleDropdownValues = (): DropdownValues => {
-    return Object.values(roles).map(({ slug, name }) => ({ name: name.FR, slug }));
+    return roles.map(({ name, slug }: Role) => ({ name, slug }));
   };
 
   const getGenderDropdownValues = (): DropdownValues => {
     return [
       { name: 'Homme', slug: 'male' },
       { name: 'Femme', slug: 'female' },
-      { name: 'Indéfini', slug: 'null' },
+      { name: 'Indéfini', slug: 'undefined' },
     ];
+  };
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    try {
+      setLoading(true);
+
+      if (roleSlug !== user.role.slug) {
+        const role = roles.find(({ slug }: Role) => slug === roleSlug);
+        if (!role) return console.log('Role Id not found');
+
+        await database.put(`/api/users/${user.id}/role`, { roleId: role.id }, getHeaders(token));
+      }
+
+      if (userGroups !== user.groups) {
+        const newGroups = userGroups.filter((group) => !user.groups.includes(group));
+        const newGroupIds = newGroups.map(({ id }) => id);
+
+        await database.post(`/api/users/${user.id}/groups`, { groupIds: newGroupIds }, getHeaders(token));
+      }
+
+      const booleanGender = gender === 'undefined' ? null : gender === 'male' ? true : false;
+
+      const requestBody = {
+        username: username !== user.username ? username : undefined,
+        firstName: firstName !== user.firstName ? firstName : undefined,
+        lastName: lastName !== user.lastName ? lastName : undefined,
+        password: password !== '' ? password : undefined,
+        gender: booleanGender !== user.gender ? booleanGender : undefined,
+      };
+
+      if (Object.values(requestBody).some((value) => value !== undefined)) {
+        await database.put(`/api/users/${user.id}`, requestBody, getHeaders(token));
+      }
+    } catch (err: any) {
+      if (err.response && err.response.status === 403) return router.push('/login');
+      else console.log(err.response);
+    } finally {
+      setLoading(false);
+      router.push('/admin/users');
+    }
   };
 
   return (
     <AdminDashboardModelLayout active="Utilisateurs" title="Modifier un utilisateur" path="Utilisateurs > Modifier">
-      <Form full={true}>
+      <Form full={true} onSubmit={handleSubmit}>
         <Row>
           <FormGroup>
             <Title level={2}>Informations générales</Title>
@@ -58,18 +110,29 @@ const User = ({ user, groups }: InferGetServerSidePropsType<typeof getServerSide
             <Input label="Prénom" placeholder="John" value={firstName} setValue={setFirstName} />
             <Input label="Nom de famille" placeholder="Doe" value={lastName} setValue={setLastName} />
 
+            <PasswordInput label="Mot de passe" placeholder="*****" value={password} setValue={setPassword} />
+
             <Dropdown label="Sexe" placeholder="Indéfini" values={getGenderDropdownValues()} value={gender} setValue={setGender} />
           </FormGroup>
 
           <FormGroup>
             <Title level={2}>Informations supplémentaires</Title>
 
-            <Dropdown label="Role" placeholder="Role" values={getRoleDropdownValues()} value={role} setValue={setRole} />
+            <Dropdown label="Role" placeholder="Role" values={getRoleDropdownValues()} value={roleSlug} setValue={setRoleSlug} />
 
             <TagsInput<Group> label="Groupes" placeholder="Groupes" data={groups} values={userGroups} addValue={addGroup} removeValue={removeGroup} />
           </FormGroup>
         </Row>
+
+        <div className="flex mt-auto ml-auto">
+          <LinkButton href="/admin/users" outline={true} className="mr-6">
+            Annuler
+          </LinkButton>
+          <Button submit={true}>Modifier</Button>
+        </div>
       </Form>
+
+      <Loader show={loading} />
     </AdminDashboardModelLayout>
   );
 };
@@ -83,7 +146,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const { data: validatedTokenData } = await database.post('/auth/validateToken', {}, getHeaders(token));
     if (!validatedTokenData.valid) throw new Error();
 
-    if (validatedTokenData.rolePermission !== roles.ADMIN.PERMISSION) throw new Error();
+    if (validatedTokenData.rolePermission !== ROLES.ADMIN.PERMISSION) throw new Error();
   } catch (err) {
     return { redirect: { destination: '/', permanent: false } };
   }
@@ -95,7 +158,10 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const { data: groups } = await database.get('/api/groups', getHeaders(token));
     if (!groups) throw new Error();
 
-    return { props: { user, groups } };
+    const { data: roles } = await database.get('/api/roles', getHeaders(token));
+    if (!roles) throw new Error();
+
+    return { props: { user, groups, roles, token } };
   } catch (err) {
     console.log(err);
     return { props: { user: null, groups: null } };

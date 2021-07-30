@@ -25,7 +25,7 @@ const Container = ({ children, title, subtitle, path }: IProps) => {
   };
 
   return (
-    <div className="flex flex-col py-12 px-12">
+    <div className="relative flex flex-col py-12 px-12 h-full">
       <div>
         {getPathElement()}
         <Title>{title}</Title>

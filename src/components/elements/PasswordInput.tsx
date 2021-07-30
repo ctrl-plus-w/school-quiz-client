@@ -1,6 +1,9 @@
 import React, { ChangeEvent, MouseEvent, useState } from 'react';
 
-import { EyeIcon, EyeOffIcon } from '@heroicons/react/outline';
+import { EyeIcon, EyeOffIcon, CogIcon } from '@heroicons/react/outline';
+
+import PASSWORD from '@constant/password';
+import { generatePassword } from '@util/generate.utils';
 
 interface IProps {
   placeholder?: string;
@@ -8,11 +11,13 @@ interface IProps {
 
   className?: string;
 
+  generator?: boolean;
+
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const PasswordInput = ({ label, placeholder, className, value, setValue }: IProps) => {
+const PasswordInput = ({ label, placeholder, className, value, setValue, generator = false }: IProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -25,10 +30,21 @@ const PasswordInput = ({ label, placeholder, className, value, setValue }: IProp
     setShowPassword((prev) => !prev);
   };
 
+  const setPassword = (e: MouseEvent): void => {
+    e.preventDefault();
+
+    const password = generatePassword(PASSWORD.PASSWORD_LENGTH);
+    setValue(password);
+  };
+
   return (
     <div className={`form-control flex flex-col w-full ${className}`}>
-      <label className="text-sm font-semibold uppercase text-gray-900">
-        {label}
+      <label className="text-sm font-semibold text-gray-900">
+        <div className="flex items-center">
+          <p className="uppercase mr-2">{label}</p>
+
+          {generator && <CogIcon className="h-4 w-4 cursor-pointer hover:text-blue-500 transition duration-300" onClick={setPassword} />}
+        </div>
 
         <div className="relative">
           <input

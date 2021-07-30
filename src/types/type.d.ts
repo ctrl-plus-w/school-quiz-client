@@ -33,4 +33,12 @@ type Group = {
   updatedAt: Date;
 };
 
+type Role = {
+  name: string;
+  slug: string;
+  permission: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 type DropdownValues = Array<{ name: string; slug: string }>;

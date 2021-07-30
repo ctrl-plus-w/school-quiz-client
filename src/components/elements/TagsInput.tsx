@@ -66,7 +66,9 @@ const TagsInput = <T extends IBasicModel>({ className, label, placeholder, value
           <Helper>
             <div className="flex flex-col border border-gray-500 rounded-sm px-2 py-2">
               {data.map((instance) => (
-                <p className="text-black font-normal py-1 px-1">{instance.name}</p>
+                <p className="text-black font-normal py-1 px-1" key={uuidv4()}>
+                  {instance.name}
+                </p>
               ))}
             </div>
           </Helper>

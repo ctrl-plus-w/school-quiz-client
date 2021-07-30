@@ -3,11 +3,21 @@ import React from 'react';
 interface IProps {
   children?: React.ReactNode;
   submit?: boolean;
+  outline?: boolean;
+  className?: string;
 }
 
-const Button = ({ children, submit = false }: IProps) => {
+const Button = ({ children, className, submit = false, outline = false }: IProps) => {
+  const STYLES = {
+    DEFAULT: 'bg-black text-white border border-transparent',
+    OUTLINE: 'bg-white text-black border border-black',
+  };
+
   return (
-    <button className="button flex justify-center items-center bg-black text-white py-2 px-8 w-full" type={submit ? 'submit' : 'button'}>
+    <button
+      className={`button flex justify-center items-center py-2 px-8 w-full rounded-sm ${outline ? STYLES.OUTLINE : STYLES.DEFAULT} ${className}`}
+      type={submit ? 'submit' : 'button'}
+    >
       {children}
     </button>
   );
