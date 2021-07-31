@@ -1,29 +1,35 @@
-import React, { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useEffect, useRef } from 'react';
 
-import { CheckIcon } from '@heroicons/react/outline/';
+import NOTIFICATION from '@constant/notification';
 
 interface IProps {
   children?: React.ReactNode;
   notification: UINotification;
+
   removeNotification: (notification: UINotification) => void;
 }
 
 const Notification: FunctionComponent<IProps> = ({ children, notification, removeNotification }: IProps) => {
-  const [countdown, setCountdown] = useState(30);
+  const NOTIF = useRef(NOTIFICATION[notification.type]).current;
 
   useEffect(() => {
-    if (countdown > 0) setTimeout(() => setCountdown((prev) => prev - 1), 1000);
-    else removeNotification(notification);
-  }, [countdown]);
+    if (removeNotification) {
+      setTimeout(() => {
+        removeNotification(notification);
+      }, 5000);
+    }
+  }, []);
 
   const getColor = () => {
-    switch (notification.type) {
-      case 'error':
-        return 'bg-red-100 border-red-600 text-red-600';
+    return NOTIF.CLASSNAME;
+  };
 
-      default:
-        return 'bg-green-100  border-green-600 text-green-600';
-    }
+  const getIcon = () => {
+    return NOTIF.ICON;
+  };
+
+  const getTitle = () => {
+    return NOTIF.TITLE;
   };
 
   return (
@@ -31,8 +37,12 @@ const Notification: FunctionComponent<IProps> = ({ children, notification, remov
       className={`flex items-center px-3 py-3 mb-4 border ${getColor()} rounded-sm cursor-pointer pointer-events-auto`}
       onClick={() => removeNotification(notification)}
     >
-      <CheckIcon className="w-5 h-5 mr-2 " />
-      <p>{children}</p>
+      {getIcon()}
+
+      <div className="flex flex-col ml-1">
+        <p className="text-sm font-semibold">{getTitle()}</p>
+        <p className="text-sm">{children}</p>
+      </div>
     </div>
   );
 };

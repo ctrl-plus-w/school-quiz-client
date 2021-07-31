@@ -13,42 +13,38 @@ import database from 'database/database';
 import { useRouter } from 'next/dist/client/router';
 
 interface IProps {
-  users: Array<User>;
+  groups: Array<Group>;
 }
 
 const cellClassName = 'px-4 py-3 text-gray-500 border-t border-gray-300 text-sm group-hover:bg-gray-200 cursor-pointer';
 
-const AdminUsersDashboard: FunctionComponent<IProps> = ({ users }: IProps) => {
+const AdminGroupsDashboard: FunctionComponent<IProps> = ({ groups }: IProps) => {
   const router = useRouter();
 
-  const seeUserProfile = (userId: number): void => {
+  const seeGroup = (groupId: number): void => {
     router.push({
-      pathname: '/admin/users/[id]',
-      query: { id: userId },
+      pathname: '/admin/groups/[id]',
+      query: { id: groupId },
     });
   };
 
   return (
-    <AdminDashboardModelsLayout active="Utilisateurs" title="Utilisateurs" subtitle={{ name: 'Créer un utilisateur', path: '/admin/users/create' }}>
+    <AdminDashboardModelsLayout active="Groupes" title="Groupes" subtitle={{ name: 'Créer un groupe', path: '/admin/groups/create' }}>
       <table className="table-auto w-full mt-14">
         <thead>
           <tr>
             <td className="px-4 py-3 text-black border-t border-gray-300 text-sm">ID</td>
-            <td className="px-4 py-3 text-black border-t border-gray-300 text-sm">Nom d&apos;utilisateur</td>
-            <td className="px-4 py-3 text-black border-t border-gray-300 text-sm">Prénom</td>
-            <td className="px-4 py-3 text-black border-t border-gray-300 text-sm">Nom de famille</td>
-            <td className="px-4 py-3 text-black border-t border-gray-300 text-sm">Genre</td>
+            <td className="px-4 py-3 text-black border-t border-gray-300 text-sm">Nom</td>
+            <td className="px-4 py-3 text-black border-t border-gray-300 text-sm">Slug</td>
           </tr>
         </thead>
 
         <tbody>
-          {users.map((user) => (
-            <tr key={uuidv4()} className="group" onClick={() => seeUserProfile(user.id)}>
-              <td className={cellClassName}>{user.id}</td>
-              <td className={cellClassName}>{user.username}</td>
-              <td className={cellClassName}>{user.firstName}</td>
-              <td className={cellClassName}>{user.lastName}</td>
-              <td className={cellClassName}>{typeof user.gender === 'boolean' ? (user.gender ? 'Male' : 'Female') : 'None'}</td>
+          {groups.map((group) => (
+            <tr key={uuidv4()} className="group" onClick={() => seeGroup(group.id)}>
+              <td className={cellClassName}>{group.id}</td>
+              <td className={cellClassName}>{group.name}</td>
+              <td className={cellClassName}>{group.slug}</td>
             </tr>
           ))}
         </tbody>
@@ -67,11 +63,11 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
     if (validatedTokenData.rolePermission !== roles.ADMIN.PERMISSION) throw new Error();
 
-    const { data: users } = await database.get('/api/users', getHeaders(token));
+    const { data: groups } = await database.get('/api/groups', getHeaders(token));
 
     return {
       props: {
-        users,
+        groups,
       },
     };
   } catch (err) {
@@ -84,4 +80,4 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
   }
 };
 
-export default AdminUsersDashboard;
+export default AdminGroupsDashboard;

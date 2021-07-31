@@ -34,6 +34,14 @@ type Group = {
   updatedAt: Date;
 };
 
+type Label = {
+  id: number;
+  name: string;
+  slug: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 type Role = {
   name: string;
   slug: string;
@@ -42,12 +50,12 @@ type Role = {
   updatedAt: Date;
 };
 
-type UINotificationType = 'info' | 'error';
+type UINotificationType = 'INFO' | 'ERROR';
 
 type UINotification = {
   type: UINotificationType;
   content: string;
-  id: string;
+  id?: string;
 };
 
 type DropdownValues = Array<{ name: string; slug: string }>;

@@ -1,4 +1,5 @@
 import React, { FunctionComponent, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 import { contextDefaultValues, NotificationContext } from './NotificationContext';
 
@@ -10,7 +11,7 @@ const NotificationProvider: FunctionComponent<IProps> = ({ children }: IProps) =
   const [notifications, setNotifications] = useState<Array<UINotification>>(contextDefaultValues.notifications);
 
   const addNotification = (notification: UINotification) => {
-    setNotifications((prev) => [...prev, notification]);
+    setNotifications((prev) => [...prev, { ...notification, id: uuidv4() }]);
   };
 
   const removeNotification = (notification: UINotification) => {

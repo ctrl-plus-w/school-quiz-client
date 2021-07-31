@@ -26,6 +26,9 @@ const TagsInput: FunctionComponent<IProps> = ({ className, label, placeholder, v
   const handleInput = (e: KeyboardEvent<HTMLInputElement>): void => {
     if (e.key !== 'Enter') return;
 
+    e.preventDefault();
+    e.stopPropagation();
+
     const instance = data.find(({ name }) => name === tempValue);
     if (!instance) return;
 
@@ -74,10 +77,26 @@ const TagsInput: FunctionComponent<IProps> = ({ className, label, placeholder, v
           </Helper>
         </div>
 
-        <div className="flex border border-gray-500 rounded-sm w-full mt-2 pl-1">
+        <div className="relative flex border border-gray-500 rounded-sm w-full mt-2">
+          <input
+            type="text"
+            className={`${isValid ? 'text-green-600' : ''} appearance-none outline-none w-full px-3 py-2`}
+            placeholder={placeholder}
+            onKeyDown={handleInput}
+            value={tempValue}
+            onChange={onChange}
+          />
+
+          <p className={`absolute top-1/2 left-0 transform -translate-y-1/2 pointer-events-none w-full px-3 py-2`}>
+            <span className="invisible">{tempValue}</span>
+            <span className="text-gray-400 font-normal">{completion}</span>
+          </p>
+        </div>
+
+        <div className="flex flex-wrap w-full">
           {values.map((instance) => (
             <div
-              className="flex items-center py-0.75 pl-2 pr-1.5 my-1 mr-1 bg-gray-300 border border-gray-500 rounded-sm cursor-pointer"
+              className="flex items-center py-0.75 pl-2 pr-1.5 mr-2 mt-2 bg-gray-300 border border-gray-500 rounded-sm cursor-pointer"
               onClick={() => removeValue(instance)}
               key={uuidv4()}
             >
@@ -88,22 +107,6 @@ const TagsInput: FunctionComponent<IProps> = ({ className, label, placeholder, v
               <XIcon className="h-4 w-4 text-gray-700" />
             </div>
           ))}
-
-          <div className="relative w-full border border-transparent pr-2">
-            <input
-              type="text"
-              className={`${isValid ? 'text-green-600' : ''} appearance-none outline-none w-full py-1.75 ${values.length ? 'ml-1' : 'ml-2'}`}
-              placeholder={placeholder}
-              onKeyDown={handleInput}
-              value={tempValue}
-              onChange={onChange}
-            />
-
-            <p className={`absolute top-1/2 left-0 transform -translate-y-1/2 pointer-events-none ${values.length ? 'ml-1' : 'ml-2'}`}>
-              <span className="invisible">{tempValue}</span>
-              <span className="text-gray-400 font-normal">{completion}</span>
-            </p>
-          </div>
         </div>
       </label>
     </div>

@@ -2,8 +2,6 @@ import React, { FormEvent, FunctionComponent, useContext, useState } from 'react
 import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
-import { v4 as uuidv4 } from 'uuid';
-
 import Input from '@element/Input';
 import Title from '@element/Title';
 import Dropdown from '@element/Dropdown';
@@ -71,8 +69,6 @@ const User: FunctionComponent = ({ user, groups, roles, token }: InferGetServerS
 
       if (roleSlug !== user.role.slug) {
         const role = roles.find(({ slug }: Role) => slug === roleSlug);
-        if (!role) return console.log('Role Id not found');
-
         await database.put(`/api/users/${user.id}/role`, { roleId: role.id }, getHeaders(token));
       }
 
@@ -101,7 +97,7 @@ const User: FunctionComponent = ({ user, groups, roles, token }: InferGetServerS
       else console.log(err.response);
     } finally {
       setLoading(false);
-      addNotification({ content: 'Utilisateur modifié.', type: 'info', id: uuidv4() });
+      addNotification({ content: 'Utilisateur modifié.', type: 'INFO' });
 
       router.push('/admin/users');
     }
@@ -119,7 +115,14 @@ const User: FunctionComponent = ({ user, groups, roles, token }: InferGetServerS
               <Input label="Prénom" placeholder="John" value={firstName} setValue={setFirstName} />
               <Input label="Nom de famille" placeholder="Doe" value={lastName} setValue={setLastName} />
 
-              <PasswordInput label="Mot de passe" placeholder="*****" value={password} setValue={setPassword} />
+              <PasswordInput
+                label="Mot de passe"
+                placeholder="*****"
+                value={password}
+                setValue={setPassword}
+                note="Le mot de passe doit faire au minimum 5 charactères"
+                generator={true}
+              />
 
               <Dropdown label="Sexe" placeholder="Indéfini" values={getGenderDropdownValues()} value={gender} setValue={setGender} />
             </FormGroup>
@@ -173,7 +176,6 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
     return { props: { user, groups, roles, token } };
   } catch (err) {
-    console.log(err);
     return { props: { user: null, groups: null } };
   }
 };

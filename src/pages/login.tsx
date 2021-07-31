@@ -7,7 +7,7 @@ import Input from '@element/Input';
 import PasswordInput from '@element/PasswordInput';
 import Route from '@element/Route';
 import Title from '@element/Title';
-import Error from '@element/Error';
+import ErrorModal from '@element/Error';
 
 import Layout from '@layout/Default';
 
@@ -47,7 +47,7 @@ const Login: FunctionComponent = () => {
         <PasswordInput label="Mot de passe" placeholder="****" value={password} setValue={setPassword} />
         <Button submit>Se connecter</Button>
 
-        {error && <Error body="Identifiants invalides" />}
+        {error && <ErrorModal body="Identifiants invalides" />}
       </Form>
     </Layout>
   );

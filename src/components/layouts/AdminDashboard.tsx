@@ -20,6 +20,7 @@ const menus: Array<IMenu> = [
       { name: 'Accueil', path: '/admin' },
       { name: 'Utilisateurs', path: '/admin/users' },
       { name: 'Groupes', path: '/admin/groups' },
+      { name: 'Labels', path: '/admin/labels' },
     ],
   },
   {

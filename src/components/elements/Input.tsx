@@ -26,6 +26,7 @@ const Input: FunctionComponent<IProps> = ({ label, placeholder, className, value
           placeholder={placeholder}
           value={value}
           onChange={onChange}
+          autoComplete="off"
         />
       </label>
     </div>

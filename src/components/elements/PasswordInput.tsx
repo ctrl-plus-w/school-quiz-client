@@ -9,6 +9,7 @@ import PASSWORD from '@constant/password';
 interface IProps {
   placeholder?: string;
   label: string;
+  note?: string;
 
   className?: string;
 
@@ -18,7 +19,7 @@ interface IProps {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const PasswordInput: FunctionComponent<IProps> = ({ label, placeholder, className, value, setValue, generator = false }: IProps) => {
+const PasswordInput: FunctionComponent<IProps> = ({ label, placeholder, className, value, setValue, note, generator = false }: IProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -63,6 +64,12 @@ const PasswordInput: FunctionComponent<IProps> = ({ label, placeholder, classNam
             {showPassword ? <EyeIcon className="h-5 w-5 text-gray-600" /> : <EyeOffIcon className="h-5 w-5 text-gray-600" />}
           </button>
         </div>
+
+        {note && (
+          <div className="w-full mt-0.5">
+            <small className="text-gray-600 text-xs font-medium italic">{note}</small>
+          </div>
+        )}
       </label>
     </div>
   );
