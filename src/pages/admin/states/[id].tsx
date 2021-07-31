@@ -79,7 +79,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
   } catch (err) {
     return {
       redirect: {
-        destination: '/admin/state',
+        destination: '/admin/states',
         permanent: false,
       },
     };
