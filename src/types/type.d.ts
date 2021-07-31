@@ -45,6 +45,14 @@ type Label = {
   updatedAt: Date;
 };
 
+type State = {
+  id: number;
+  name: string;
+  slug: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 type Role = {
   id: number;
   name: string;
