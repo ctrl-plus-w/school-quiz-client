@@ -1,4 +1,4 @@
-import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -26,7 +26,17 @@ const CreateLabel: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePr
 
   const { addNotification } = useContext(NotificationContext);
 
+  const [valid, setValid] = useState(false);
+
   const [name, setName] = useState('');
+
+  useEffect(() => {
+    if (name !== '') {
+      setValid(true);
+    } else {
+      setValid(false);
+    }
+  }, [name]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -42,13 +52,19 @@ const CreateLabel: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePr
       addNotification({ content: 'Label créé.', type: 'INFO' });
       router.push('/admin/labels');
     } catch (err: any) {
-      if (err.response && err.response.status === 403) return router.push('/login');
-      else console.log(err.response);
+      if (!err.response) {
+        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        return router.push('/admin/labels');
+      }
+
+      if (err.response.status === 403) return router.push('/login');
+
+      if (err.response.status === 409) addNotification({ content: 'Ce label existe déja.', type: 'ERROR' });
     }
   };
 
   return (
-    <AdminDashboardModelLayout title="Créer un label" type="create" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Créer un label" type="create" onSubmit={handleSubmit} valid={valid}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 

@@ -1,4 +1,4 @@
-import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -27,6 +27,8 @@ const CreateQuestionType: FunctionComponent<ServerSideProps> = ({ token }: Serve
 
   const { addNotification } = useContext(NotificationContext);
 
+  const [valid, setValid] = useState(false);
+
   const [name, setName] = useState('');
   const [questionType, setQuestionType] = useState('textualQuestion');
 
@@ -47,6 +49,14 @@ const CreateQuestionType: FunctionComponent<ServerSideProps> = ({ token }: Serve
     ];
   };
 
+  useEffect(() => {
+    if (name !== '') {
+      setValid(true);
+    } else {
+      setValid(false);
+    }
+  }, [name]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -61,13 +71,19 @@ const CreateQuestionType: FunctionComponent<ServerSideProps> = ({ token }: Serve
       addNotification({ content: 'Spécification créé.', type: 'INFO' });
       router.push('/admin/questionSpecifications');
     } catch (err: any) {
-      if (err.response && err.response.status === 403) return router.push('/login');
-      else console.log(err.response);
+      if (!err.response) {
+        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        return router.push('/admin/questionSpecifications');
+      }
+
+      if (err.response.status === 403) return router.push('/login');
+
+      if (err.response.status === 409) addNotification({ content: 'Cette spécification existe déja.', type: 'ERROR' });
     }
   };
 
   return (
-    <AdminDashboardModelLayout title="Créer une spécification" type="create" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Créer une spécification" type="create" onSubmit={handleSubmit} valid={valid}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 

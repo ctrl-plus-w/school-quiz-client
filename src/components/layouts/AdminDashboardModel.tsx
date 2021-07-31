@@ -15,13 +15,14 @@ interface IProps {
   children?: React.ReactNode;
 
   title: string;
+  valid?: boolean;
 
   onSubmit: (e: FormEvent) => void;
 
   type: 'edit' | 'create';
 }
 
-const AdminDashboardModelLayout: FunctionComponent<IProps> = ({ children, onSubmit, title, type }: IProps) => {
+const AdminDashboardModelLayout: FunctionComponent<IProps> = ({ children, onSubmit, title, type, valid = true }: IProps) => {
   const router = useRouter();
 
   const getBreadcrumbPath = (): string => {
@@ -48,7 +49,9 @@ const AdminDashboardModelLayout: FunctionComponent<IProps> = ({ children, onSubm
               Annuler
             </LinkButton>
 
-            <Button submit={true}>{type === 'create' ? 'Créer' : 'Modifier'}</Button>
+            <Button submit={true} disabled={!valid}>
+              {type === 'create' ? 'Créer' : 'Modifier'}
+            </Button>
           </div>
         </Form>
       </Container>

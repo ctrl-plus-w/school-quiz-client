@@ -3,6 +3,7 @@ import React, { ChangeEvent, ReactElement } from 'react';
 interface IProps {
   placeholder?: string;
   label: string;
+  note?: string;
 
   className?: string;
 
@@ -10,15 +11,17 @@ interface IProps {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Input = ({ label, placeholder, className, value, setValue }: IProps): ReactElement => {
+const Input = ({ label, placeholder, className, value, setValue, note }: IProps): ReactElement => {
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setValue(e.target.value);
   };
 
   return (
     <div className={`form-control flex flex-col w-80 ${className}`}>
-      <label className="text-sm font-semibold uppercase text-gray-900">
-        {label}
+      <label className="text-sm font-semibold text-gray-900">
+        <div>
+          <p className="uppercase">{label}</p>
+        </div>
 
         <input
           type="text"
@@ -28,6 +31,12 @@ const Input = ({ label, placeholder, className, value, setValue }: IProps): Reac
           onChange={onChange}
           autoComplete="off"
         />
+
+        {note && (
+          <div className="w-full mt-0.5">
+            <small className="text-gray-600 text-xs font-medium italic">{note}</small>
+          </div>
+        )}
       </label>
     </div>
   );

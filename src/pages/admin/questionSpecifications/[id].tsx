@@ -1,4 +1,4 @@
-import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -28,6 +28,8 @@ const QuestionSpecification: FunctionComponent<ServerSideProps> = ({ questionSpe
 
   const { addNotification } = useContext(NotificationContext);
 
+  const [valid, setValid] = useState(false);
+
   const [name, setName] = useState(questionSpecification.name);
   const [questionType, setQuestionType] = useState(questionSpecification.questionType);
 
@@ -48,6 +50,14 @@ const QuestionSpecification: FunctionComponent<ServerSideProps> = ({ questionSpe
     ];
   };
 
+  useEffect(() => {
+    if (name !== questionSpecification.name || questionType !== questionSpecification.questionType) {
+      setValid(true);
+    } else {
+      setValid(false);
+    }
+  }, [name, questionType]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -63,13 +73,19 @@ const QuestionSpecification: FunctionComponent<ServerSideProps> = ({ questionSpe
 
       router.push('/admin/questionSpecifications');
     } catch (err: any) {
-      if (err.response && err.response.status === 403) return router.push('/login');
-      else console.log(err.response);
+      if (!err.response) {
+        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        return router.push('/admin/questionSpecifications');
+      }
+
+      if (err.response.status === 403) return router.push('/login');
+
+      if (err.response.status === 409) addNotification({ content: 'Cette spécification existe déja.', type: 'ERROR' });
     }
   };
 
   return (
-    <AdminDashboardModelLayout title="Modifier une spécification" type="edit" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Modifier une spécification" type="edit" onSubmit={handleSubmit} valid={valid}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 

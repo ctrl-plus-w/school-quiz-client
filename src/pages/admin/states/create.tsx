@@ -1,4 +1,4 @@
-import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -26,29 +26,40 @@ const CreateState: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePr
 
   const { addNotification } = useContext(NotificationContext);
 
+  const [valid, setValid] = useState(false);
+
   const [name, setName] = useState('');
+
+  useEffect(() => {
+    if (name !== '') {
+      setValid(true);
+    } else {
+      setValid(false);
+    }
+  }, []);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
-      if (name === '') {
-        addNotification({ content: 'Veuillez remplire tout les champs', type: 'ERROR' });
-        return;
-      }
-
       await database.post('/api/states', { name }, getHeaders(token));
 
       addNotification({ content: 'État créé.', type: 'INFO' });
       router.push('/admin/states');
     } catch (err: any) {
-      if (err.response && err.response.status === 403) return router.push('/login');
-      else console.log(err.response);
+      if (!err.response) {
+        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        return router.push('/admin/states');
+      }
+
+      if (err.response.status === 403) return router.push('/login');
+
+      if (err.response.status === 409) addNotification({ content: 'Cet état existe déja.', type: 'ERROR' });
     }
   };
 
   return (
-    <AdminDashboardModelLayout  title="Créer un état" type="create" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Créer un état" type="create" onSubmit={handleSubmit} valid={valid}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 

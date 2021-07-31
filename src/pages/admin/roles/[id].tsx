@@ -1,4 +1,4 @@
-import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -28,31 +28,51 @@ const Role: FunctionComponent<ServerSideProps> = ({ role, token }: ServerSidePro
 
   const { addNotification } = useContext(NotificationContext);
 
+  const [valid, setValid] = useState(false);
+
   const [name, setName] = useState(role.name);
   const [permission, setPermission] = useState(role.permission);
+
+  useEffect(() => {
+    if ((name !== role.name || permission !== role.permission) && permission > 0) {
+      setValid(true);
+    } else {
+      setValid(false);
+    }
+  }, [name, permission]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
+      if (permission <= 0) {
+        addNotification({ content: 'La permission ne peut pas être en dessous de 1', type: 'ERROR' });
+        return;
+      }
       await database.put(`/api/roles/${role.id}`, { name, permission }, getHeaders(token));
 
       addNotification({ content: 'Rôle modifié.', type: 'INFO' });
 
       router.push('/admin/roles');
     } catch (err: any) {
-      if (err.response && err.response.status === 403) return router.push('/login');
-      else console.log(err.response);
+      if (!err.response) {
+        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        return router.push('/admin/roles');
+      }
+
+      if (err.response.status === 403) return router.push('/login');
+
+      if (err.response.status === 409) addNotification({ content: 'Ce rôle existe déja.', type: 'ERROR' });
     }
   };
 
   return (
-    <AdminDashboardModelLayout title="Modifier un rôle" type="edit" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Modifier un rôle" type="edit" onSubmit={handleSubmit} valid={valid}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 
         <Input label="Nom" placeholder="En attente" value={name} setValue={setName} />
-        <NumberInput label="Permission" placeholder="5" value={permission} setValue={setPermission} />
+        <NumberInput label="Permission" placeholder="5" value={permission} setValue={setPermission} note="La permission doit être supérieure à 1." />
       </FormGroup>
     </AdminDashboardModelLayout>
   );

@@ -1,4 +1,4 @@
-import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -27,8 +27,18 @@ const CreateRole: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
 
   const { addNotification } = useContext(NotificationContext);
 
+  const [valid, setValid] = useState(false);
+
   const [name, setName] = useState('');
   const [permission, setPermission] = useState(5);
+
+  useEffect(() => {
+    if (name !== '' && permission > 0) {
+      setValid(true);
+    } else {
+      setValid(false);
+    }
+  }, [name, permission]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -44,13 +54,19 @@ const CreateRole: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
       addNotification({ content: 'Rôle créé.', type: 'INFO' });
       router.push('/admin/roles');
     } catch (err: any) {
-      if (err.response && err.response.status === 403) return router.push('/login');
-      else console.log(err.response);
+      if (!err.response) {
+        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        return router.push('/admin/roles');
+      }
+
+      if (err.response.status === 403) return router.push('/login');
+
+      if (err.response.status === 409) addNotification({ content: 'Ce rôle existe déja.', type: 'ERROR' });
     }
   };
 
   return (
-    <AdminDashboardModelLayout title="Créer un rôle" type="create" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Créer un rôle" type="create" onSubmit={handleSubmit} valid={valid}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 

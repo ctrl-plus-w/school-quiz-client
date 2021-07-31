@@ -1,4 +1,4 @@
-import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -28,6 +28,16 @@ const CreateGroup: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePr
 
   const [name, setName] = useState('');
 
+  const [valid, setValid] = useState(false);
+
+  useEffect(() => {
+    if (name !== '') {
+      setValid(true);
+    } else {
+      setValid(false);
+    }
+  }, [name]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
@@ -42,13 +52,19 @@ const CreateGroup: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePr
       addNotification({ content: 'Groupe créé.', type: 'INFO' });
       router.push('/admin/groups');
     } catch (err: any) {
-      if (err.response && err.response.status === 403) return router.push('/login');
-      else console.log(err.response);
+      if (!err.response) {
+        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        return router.push('/admin/groups');
+      }
+
+      if (err.response.status === 403) return router.push('/login');
+
+      if (err.response.status === 409) addNotification({ content: 'Ce groupe existe déja.', type: 'ERROR' });
     }
   };
 
   return (
-    <AdminDashboardModelLayout  title="Créer un groupe" type="create" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Créer un groupe" type="create" onSubmit={handleSubmit} valid={valid}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 

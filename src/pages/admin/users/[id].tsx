@@ -1,4 +1,4 @@
-import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -20,6 +20,8 @@ import database from 'database/database';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 import Row from '@module/Row';
+import { idNameSlugMapper, stringifyGender } from '@util/mapper.utils';
+import { areArraysEquals } from '@util/condition.utils';
 
 type ServerSideProps = {
   user: User;
@@ -33,14 +35,32 @@ const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }
 
   const { addNotification } = useContext(NotificationContext);
 
+  const [valid, setValid] = useState(false);
+
   const [username, setUsername] = useState(user.username);
   const [firstName, setFirstName] = useState(user.firstName);
   const [lastName, setLastName] = useState(user.lastName);
   const [password, setPassword] = useState('');
 
-  const [gender, setGender] = useState(user.gender === null ? 'undefined' : user.gender ? 'male' : 'female');
+  const [gender, setGender] = useState(stringifyGender(user.gender));
   const [roleSlug, setRoleSlug] = useState(user.role?.slug || null);
-  const [userGroups, setUserGroups] = useState<Array<IBasicModel>>(user.groups.map(({ id, name, slug }: Group) => ({ id, name, slug })));
+  const [userGroups, setUserGroups] = useState<Array<IBasicModel>>(user.groups.map(idNameSlugMapper));
+
+  useEffect(() => {
+    if (
+      password !== '' ||
+      username !== user.username ||
+      firstName !== user.firstName ||
+      lastName !== user.lastName ||
+      roleSlug !== (user.role?.slug || null) ||
+      stringifyGender(user.gender) !== gender ||
+      !areArraysEquals(userGroups, user.groups.map(idNameSlugMapper))
+    ) {
+      setValid(true);
+    } else {
+      setValid(false);
+    }
+  }, [username, firstName, lastName, password, gender, roleSlug, userGroups]);
 
   const addGroup = (group: IBasicModel): void => {
     setUserGroups((prev) => [...prev, group]);
@@ -112,7 +132,7 @@ const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }
   };
 
   return (
-    <AdminDashboardModelLayout title="Modifier un utilisateur" type="edit" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Modifier un utilisateur" type="edit" onSubmit={handleSubmit} valid={valid}>
       <Row>
         <FormGroup>
           <Title level={2}>Informations générales</Title>

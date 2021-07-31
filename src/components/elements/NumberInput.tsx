@@ -3,6 +3,7 @@ import React, { ChangeEvent, ReactElement } from 'react';
 interface IProps {
   placeholder?: string;
   label: string;
+  note?: string;
 
   className?: string;
 
@@ -10,15 +11,17 @@ interface IProps {
   setValue: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const NumberInput = ({ label, placeholder, className, value, setValue }: IProps): ReactElement => {
+const NumberInput = ({ label, placeholder, className, value, setValue, note }: IProps): ReactElement => {
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setValue(parseInt(e.target.value));
   };
 
   return (
     <div className={`form-control flex flex-col w-80 ${className}`}>
-      <label className="text-sm font-semibold uppercase text-gray-900">
-        {label}
+      <label className="text-sm font-semibold text-gray-900">
+        <div>
+          <p className="uppercase">{label}</p>
+        </div>
 
         <input
           type="number"
@@ -29,7 +32,11 @@ const NumberInput = ({ label, placeholder, className, value, setValue }: IProps)
           autoComplete="off"
         />
 
-        <div></div>
+        {note && (
+          <div className="w-full mt-0.5">
+            <small className="text-gray-600 text-xs font-medium italic">{note}</small>
+          </div>
+        )}
       </label>
     </div>
   );

@@ -18,7 +18,7 @@ const Container: FunctionComponent<IProps> = ({ children, title, subtitle, bread
   const getSubtitleElement = () => {
     if (subtitle) {
       return typeof subtitle === 'string' ? (
-        <Subtitle className="mt-2">{subtitle}</Subtitle>
+        <Subtitle className="flex-grow-0 mt-2">{subtitle}</Subtitle>
       ) : (
         <Route to={subtitle.path} className="mt-2">
           {subtitle.name}
@@ -47,7 +47,7 @@ const Container: FunctionComponent<IProps> = ({ children, title, subtitle, bread
 
   return (
     <div className="relative flex flex-col py-12 px-12 h-full">
-      <div className="flex flex-col">
+      <div className="flex flex-col items-start">
         {getBreadcrumbElement()}
         <Title>{title}</Title>
         {getSubtitleElement()}

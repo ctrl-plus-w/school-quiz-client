@@ -1,4 +1,4 @@
-import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -28,12 +28,22 @@ const CreateUser: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
 
   const { addNotification } = useContext(NotificationContext);
 
+  const [valid, setValid] = useState(false);
+
   const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
 
   const [gender, setGender] = useState<'male' | 'female' | 'undefined'>('undefined');
+
+  useEffect(() => {
+    if (username !== '' || firstName !== '' || lastName !== '' || password !== '') {
+      setValid(true);
+    } else {
+      setValid(false);
+    }
+  }, [username, firstName, lastName, password]);
 
   const getGenderDropdownValues = (): DropdownValues => {
     return [
@@ -74,7 +84,7 @@ const CreateUser: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
         return router.push('/admin/users');
       }
 
-      if (err.response.status === 406) return router.push('/login');
+      if (err.response.status === 403) return router.push('/login');
 
       if (err.response.status === 422) addNotification({ content: 'Un des champs est invalide.', type: 'ERROR' });
 
@@ -85,7 +95,7 @@ const CreateUser: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
   };
 
   return (
-    <AdminDashboardModelLayout title="Créer un utilisateur" type="create" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Créer un utilisateur" type="create" onSubmit={handleSubmit} valid={valid}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 
