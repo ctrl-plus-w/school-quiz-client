@@ -3,27 +3,29 @@ import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
 import AdminDashboardModelsLayout from '@layout/AdminDashboardModels';
 
-import { getHeaders } from '@util/authentication.utils';
-
-import roles from '@constant/roles';
-
-import database from 'database/database';
 import Table from '@module/Table';
 
+import { getHeaders } from '@util/authentication.utils';
+
+import ROLES from '@constant/roles';
+
+import database from 'database/database';
+
 interface ServerSideProps {
-  labels: Array<Label>;
+  roles: Array<Role>;
 }
 
-const AdminLabelsDashboard: FunctionComponent<ServerSideProps> = ({ labels }: ServerSideProps) => {
+const AdminRolesDashboard: FunctionComponent<ServerSideProps> = ({ roles }: ServerSideProps) => {
   return (
-    <AdminDashboardModelsLayout title="Labels" subtitle="Créer un label">
-      <Table<Label, keyof Label>
+    <AdminDashboardModelsLayout title="Rôles" subtitle="Créer un état">
+      <Table<Role, keyof Role>
         attributes={[
           ['ID', 'id'],
           ['Nom', 'name'],
+          ['Permission', 'permission'],
           ['Slug', 'slug'],
         ]}
-        data={labels}
+        data={roles}
       />
     </AdminDashboardModelsLayout>
   );
@@ -37,12 +39,12 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const { data: validatedTokenData } = await database.post('/auth/validateToken', {}, getHeaders(token));
     if (!validatedTokenData.valid) throw new Error();
 
-    if (validatedTokenData.rolePermission !== roles.ADMIN.PERMISSION) throw new Error();
+    if (validatedTokenData.rolePermission !== ROLES.ADMIN.PERMISSION) throw new Error();
 
-    const { data: labels } = await database.get('/api/labels', getHeaders(token));
-    if (!labels) throw new Error();
+    const { data: roles } = await database.get('/api/roles', getHeaders(token));
+    if (!roles) throw new Error();
 
-    const props: ServerSideProps = { labels };
+    const props: ServerSideProps = { roles };
 
     return { props };
   } catch (err) {
@@ -55,4 +57,4 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
   }
 };
 
-export default AdminLabelsDashboard;
+export default AdminRolesDashboard;

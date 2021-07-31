@@ -48,7 +48,7 @@ const CreateState: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePr
   };
 
   return (
-    <AdminDashboardModelLayout active="États" title="Créer un état" type="create" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout  title="Créer un état" type="create" onSubmit={handleSubmit}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 

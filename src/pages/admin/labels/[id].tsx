@@ -45,7 +45,7 @@ const Label: FunctionComponent<ServerSideProps> = ({ label, token }: ServerSideP
   };
 
   return (
-    <AdminDashboardModelLayout active="Labels" title="Modifier un label" type="edit" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Modifier un label" type="edit" onSubmit={handleSubmit}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 

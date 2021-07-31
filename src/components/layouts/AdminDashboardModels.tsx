@@ -7,16 +7,15 @@ import { useRouter } from 'next/dist/client/router';
 
 interface IProps {
   children?: React.ReactNode;
-  active: string;
   title: string;
   subtitle: string;
 }
 
-const AdminDashboardModelsLayout: FunctionComponent<IProps> = ({ children, active, title, subtitle }: IProps) => {
+const AdminDashboardModelsLayout: FunctionComponent<IProps> = ({ children, title, subtitle }: IProps) => {
   const router = useRouter();
 
   return (
-    <AdminDashboardLayout active={active}>
+    <AdminDashboardLayout>
       <Container title={title} subtitle={{ name: subtitle, path: `${router.pathname}/create` }}>
         {children}
       </Container>

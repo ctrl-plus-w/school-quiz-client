@@ -7,7 +7,7 @@ import AdminDashboardLayout from '@layout/AdminDashboard';
 import { getServerSidePropsAdminFunction } from '@util/authentication.utils';
 
 const AdminDashboard: FunctionComponent = () => {
-  return <AdminDashboardLayout active="Accueil"></AdminDashboardLayout>;
+  return <AdminDashboardLayout></AdminDashboardLayout>;
 };
 
 export const getServerSideProps: GetServerSideProps = getServerSidePropsAdminFunction;

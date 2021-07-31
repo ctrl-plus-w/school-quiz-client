@@ -77,7 +77,7 @@ const Group: FunctionComponent<ServerSideProps> = ({ group, labels, token }: Ser
   };
 
   return (
-    <AdminDashboardModelLayout active="Groupes" title="Modifier un groupe" type="edit" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Modifier un groupe" type="edit" onSubmit={handleSubmit}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 

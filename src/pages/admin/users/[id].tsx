@@ -19,6 +19,7 @@ import ROLES from '@constant/roles';
 import database from 'database/database';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
+import Row from '@module/Row';
 
 type ServerSideProps = {
   user: User;
@@ -111,33 +112,35 @@ const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }
   };
 
   return (
-    <AdminDashboardModelLayout active="Utilisateurs" title="Modifier un utilisateur" type="edit" onSubmit={handleSubmit}>
-      <FormGroup>
-        <Title level={2}>Informations générales</Title>
+    <AdminDashboardModelLayout title="Modifier un utilisateur" type="edit" onSubmit={handleSubmit}>
+      <Row>
+        <FormGroup>
+          <Title level={2}>Informations générales</Title>
 
-        <Input label="Nom d'utilisateur" placeholder="johndoe" value={username} setValue={setUsername} />
-        <Input label="Prénom" placeholder="John" value={firstName} setValue={setFirstName} />
-        <Input label="Nom de famille" placeholder="Doe" value={lastName} setValue={setLastName} />
+          <Input label="Nom d'utilisateur" placeholder="johndoe" value={username} setValue={setUsername} />
+          <Input label="Prénom" placeholder="John" value={firstName} setValue={setFirstName} />
+          <Input label="Nom de famille" placeholder="Doe" value={lastName} setValue={setLastName} />
 
-        <PasswordInput
-          label="Mot de passe"
-          placeholder="*****"
-          value={password}
-          setValue={setPassword}
-          note="Le mot de passe doit faire au minimum 5 charactères"
-          generator={true}
-        />
+          <PasswordInput
+            label="Mot de passe"
+            placeholder="*****"
+            value={password}
+            setValue={setPassword}
+            note="Le mot de passe doit faire au minimum 5 charactères"
+            generator={true}
+          />
 
-        <Dropdown label="Sexe" placeholder="Indéfini" values={getGenderDropdownValues()} value={gender} setValue={setGender} />
-      </FormGroup>
+          <Dropdown label="Sexe" placeholder="Indéfini" values={getGenderDropdownValues()} value={gender} setValue={setGender} />
+        </FormGroup>
 
-      <FormGroup>
-        <Title level={2}>Informations supplémentaires</Title>
+        <FormGroup>
+          <Title level={2}>Informations supplémentaires</Title>
 
-        <Dropdown label="Role" placeholder="Role" values={getRoleDropdownValues()} value={roleSlug} setValue={setRoleSlug} />
+          <Dropdown label="Role" placeholder="Role" values={getRoleDropdownValues()} value={roleSlug} setValue={setRoleSlug} />
 
-        <TagsInput label="Groupes" placeholder="Groupes" data={groups} values={userGroups} addValue={addGroup} removeValue={removeGroup} />
-      </FormGroup>
+          <TagsInput label="Groupes" placeholder="Groupes" data={groups} values={userGroups} addValue={addGroup} removeValue={removeGroup} />
+        </FormGroup>
+      </Row>
     </AdminDashboardModelLayout>
   );
 };

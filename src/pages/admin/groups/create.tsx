@@ -48,7 +48,7 @@ const CreateGroup: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePr
   };
 
   return (
-    <AdminDashboardModelLayout active="Groupes" title="Créer un groupe" type="create" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout  title="Créer un groupe" type="create" onSubmit={handleSubmit}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 

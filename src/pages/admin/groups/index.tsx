@@ -17,7 +17,7 @@ type ServerSideProps = {
 
 const AdminGroupsDashboard: FunctionComponent<ServerSideProps> = ({ groups }: ServerSideProps) => {
   return (
-    <AdminDashboardModelsLayout active="Groupes" title="Groupes" subtitle="Créer un groupe">
+    <AdminDashboardModelsLayout  title="Groupes" subtitle="Créer un groupe">
       <Table
         data={groups}
         attributes={[

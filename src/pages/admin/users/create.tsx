@@ -85,7 +85,7 @@ const CreateUser: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
   };
 
   return (
-    <AdminDashboardModelLayout active="Utilisateurs" title="Créer un utilisateur" type="create" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Créer un utilisateur" type="create" onSubmit={handleSubmit}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 

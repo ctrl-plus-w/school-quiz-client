@@ -25,6 +25,16 @@ div > .form-group:not(:last-child) {
   @apply mr-32;
 }
 
+.form-control label input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.form-control label input[type='number']::-webkit-inner-spin-button,
+.form-control label input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+}
+
 .link {
   position: relative;
 }

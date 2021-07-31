@@ -16,28 +16,30 @@ import ROLES from '@constant/roles';
 import database from 'database/database';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
+import NumberInput from '@element/NumberInput';
 
 type ServerSideProps = {
-  state: State;
+  role: Role;
   token: string;
 };
 
-const State: FunctionComponent<ServerSideProps> = ({ state, token }: ServerSideProps) => {
+const Role: FunctionComponent<ServerSideProps> = ({ role, token }: ServerSideProps) => {
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
 
-  const [name, setName] = useState(state.name);
+  const [name, setName] = useState(role.name);
+  const [permission, setPermission] = useState(role.permission);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
-      await database.put(`/api/states/${state.id}`, { name }, getHeaders(token));
+      await database.put(`/api/roles/${role.id}`, { name, permission }, getHeaders(token));
 
-      addNotification({ content: 'État modifié.', type: 'INFO' });
+      addNotification({ content: 'Rôle modifié.', type: 'INFO' });
 
-      router.push('/admin/states');
+      router.push('/admin/roles');
     } catch (err: any) {
       if (err.response && err.response.status === 403) return router.push('/login');
       else console.log(err.response);
@@ -45,11 +47,12 @@ const State: FunctionComponent<ServerSideProps> = ({ state, token }: ServerSideP
   };
 
   return (
-    <AdminDashboardModelLayout title="Modifier un état" type="edit" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Modifier un rôle" type="edit" onSubmit={handleSubmit}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 
         <Input label="Nom" placeholder="En attente" value={name} setValue={setName} />
+        <NumberInput label="Permission" placeholder="5" value={permission} setValue={setPermission} />
       </FormGroup>
     </AdminDashboardModelLayout>
   );
@@ -70,20 +73,20 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
   }
 
   try {
-    const { data: state } = await database.get(`/api/states/${context.query.id}`, getHeaders(token));
-    if (!state) throw new Error();
+    const { data: role } = await database.get(`/api/roles/${context.query.id}`, getHeaders(token));
+    if (!role) throw new Error();
 
-    const props: ServerSideProps = { state, token };
+    const props: ServerSideProps = { role: role, token };
 
     return { props };
   } catch (err) {
     return {
       redirect: {
-        destination: '/admin/states',
+        destination: '/admin/roles',
         permanent: false,
       },
     };
   }
 };
 
-export default State;
+export default Role;

@@ -23,7 +23,7 @@ const AdminUsersDashboard: FunctionComponent<ServerSideProps> = ({ users }: Serv
   };
 
   return (
-    <AdminDashboardModelsLayout active="Utilisateurs" title="Utilisateurs" subtitle="Créer un utilisateur">
+    <AdminDashboardModelsLayout title="Utilisateurs" subtitle="Créer un utilisateur">
       <Table<User, keyof User>
         data={users}
         attributes={[

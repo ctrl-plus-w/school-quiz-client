@@ -6,13 +6,13 @@ interface IProps {
 
   className?: string;
 
-  value: string;
-  setValue: React.Dispatch<React.SetStateAction<string>>;
+  value: number;
+  setValue: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const Input = ({ label, placeholder, className, value, setValue }: IProps): ReactElement => {
+const NumberInput = ({ label, placeholder, className, value, setValue }: IProps): ReactElement => {
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
-    setValue(e.target.value);
+    setValue(parseInt(e.target.value));
   };
 
   return (
@@ -21,16 +21,18 @@ const Input = ({ label, placeholder, className, value, setValue }: IProps): Reac
         {label}
 
         <input
-          type="text"
+          type="number"
           className="block border border-gray-500 rounded-sm w-full py-2 px-3 mt-2 outline-none focus:outline-none"
           placeholder={placeholder}
           value={value}
           onChange={onChange}
           autoComplete="off"
         />
+
+        <div></div>
       </label>
     </div>
   );
 };
 
-export default Input;
+export default NumberInput;

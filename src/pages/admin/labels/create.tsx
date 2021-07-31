@@ -48,7 +48,7 @@ const CreateLabel: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePr
   };
 
   return (
-    <AdminDashboardModelLayout active="Labels" title="Créer un label" type="create" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Créer un label" type="create" onSubmit={handleSubmit}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 

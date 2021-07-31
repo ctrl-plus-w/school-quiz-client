@@ -17,7 +17,7 @@ interface ServerSideProps {
 
 const AdminStatesDashboard: FunctionComponent<ServerSideProps> = ({ states }: ServerSideProps) => {
   return (
-    <AdminDashboardModelsLayout active="États" title="États" subtitle="Créer un état">
+    <AdminDashboardModelsLayout title="États" subtitle="Créer un état">
       <Table<State, keyof State>
         attributes={[
           ['ID', 'id'],

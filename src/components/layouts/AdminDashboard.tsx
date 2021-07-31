@@ -8,18 +8,20 @@ import Menu from '@module/Menu';
 import MenuGroup from '@element/MenuGroup';
 
 import ADMIN_MENUS from '@constant/adminMenu';
+import { useRouter } from 'next/dist/client/router';
 
 interface IProps {
   children?: React.ReactNode;
-  active: string;
 }
 
-const AdminDashboardLayout: FunctionComponent<IProps> = ({ children, active }: IProps) => {
+const AdminDashboardLayout: FunctionComponent<IProps> = ({ children }: IProps) => {
+  const router = useRouter();
+
   const linkMapper = (links: ILink[]) =>
     links.map(({ name, path }) => ({
       name,
       path,
-      active: name === active ? true : false,
+      active: path === '/admin' ? router.pathname === path : router.pathname.startsWith(path),
     }));
 
   return (

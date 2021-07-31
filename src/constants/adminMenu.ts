@@ -8,6 +8,7 @@ const ADMIN_MENUS: Array<IMenu> = [
       { name: 'Groupes', path: '/admin/groups' },
       { name: 'Labels', path: '/admin/labels' },
       { name: 'États', path: '/admin/states' },
+      { name: 'Rôles', path: '/admin/roles' },
     ],
   },
   {

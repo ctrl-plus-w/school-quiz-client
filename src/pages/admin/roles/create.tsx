@@ -16,28 +16,33 @@ import ROLES from '@constant/roles';
 import database from 'database/database';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
+import NumberInput from '@element/NumberInput';
 
 type ServerSideProps = {
-  state: State;
   token: string;
 };
 
-const State: FunctionComponent<ServerSideProps> = ({ state, token }: ServerSideProps) => {
+const CreateRole: FunctionComponent<ServerSideProps> = ({ token }: ServerSideProps) => {
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
 
-  const [name, setName] = useState(state.name);
+  const [name, setName] = useState('');
+  const [permission, setPermission] = useState(5);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
-      await database.put(`/api/states/${state.id}`, { name }, getHeaders(token));
+      if (name === '') {
+        addNotification({ content: 'Veuillez remplire tout les champs', type: 'ERROR' });
+        return;
+      }
 
-      addNotification({ content: 'État modifié.', type: 'INFO' });
+      await database.post('/api/roles', { name, permission }, getHeaders(token));
 
-      router.push('/admin/states');
+      addNotification({ content: 'Rôle créé.', type: 'INFO' });
+      router.push('/admin/roles');
     } catch (err: any) {
       if (err.response && err.response.status === 403) return router.push('/login');
       else console.log(err.response);
@@ -45,11 +50,12 @@ const State: FunctionComponent<ServerSideProps> = ({ state, token }: ServerSideP
   };
 
   return (
-    <AdminDashboardModelLayout title="Modifier un état" type="edit" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Créer un rôle" type="create" onSubmit={handleSubmit}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 
         <Input label="Nom" placeholder="En attente" value={name} setValue={setName} />
+        <NumberInput label="Permission" placeholder="5" value={permission} setValue={setPermission} />
       </FormGroup>
     </AdminDashboardModelLayout>
   );
@@ -65,25 +71,13 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     if (!validatedTokenData.valid) throw new Error();
 
     if (validatedTokenData.rolePermission !== ROLES.ADMIN.PERMISSION) throw new Error();
-  } catch (err) {
-    return { redirect: { destination: '/', permanent: false } };
-  }
 
-  try {
-    const { data: state } = await database.get(`/api/states/${context.query.id}`, getHeaders(token));
-    if (!state) throw new Error();
-
-    const props: ServerSideProps = { state, token };
+    const props: ServerSideProps = { token };
 
     return { props };
   } catch (err) {
-    return {
-      redirect: {
-        destination: '/admin/states',
-        permanent: false,
-      },
-    };
+    return { redirect: { destination: '/', permanent: false } };
   }
 };
 
-export default State;
+export default CreateRole;
