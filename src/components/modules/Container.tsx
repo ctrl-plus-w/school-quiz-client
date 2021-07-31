@@ -17,7 +17,13 @@ interface IProps {
 const Container: FunctionComponent<IProps> = ({ children, title, subtitle, breadcrumb }: IProps) => {
   const getSubtitleElement = () => {
     if (subtitle) {
-      return typeof subtitle === 'string' ? <Subtitle>{subtitle}</Subtitle> : <Route to={subtitle.path}>{subtitle.name}</Route>;
+      return typeof subtitle === 'string' ? (
+        <Subtitle className="mt-2">{subtitle}</Subtitle>
+      ) : (
+        <Route to={subtitle.path} className="mt-2">
+          {subtitle.name}
+        </Route>
+      );
     } else {
       return null;
     }
@@ -41,7 +47,7 @@ const Container: FunctionComponent<IProps> = ({ children, title, subtitle, bread
 
   return (
     <div className="relative flex flex-col py-12 px-12 h-full">
-      <div>
+      <div className="flex flex-col">
         {getBreadcrumbElement()}
         <Title>{title}</Title>
         {getSubtitleElement()}

@@ -45,6 +45,23 @@ type Label = {
   updatedAt: Date;
 };
 
+type VerificationType = {
+  id: number;
+  name: string;
+  slug: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type QuestionSpecification = {
+  id: number;
+  name: string;
+  slug: string;
+  questionType: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 type State = {
   id: number;
   name: string;

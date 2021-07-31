@@ -1,15 +1,18 @@
 import React, { FunctionComponent } from 'react';
 import Link from 'next/link';
 
+import clsx from 'clsx';
+
 interface IProps {
   children?: React.ReactNode;
   to: string;
+  className?: string;
 }
 
-const Route: FunctionComponent<IProps> = ({ children, to }: IProps) => {
+const Route: FunctionComponent<IProps> = ({ children, className, to }: IProps) => {
   return (
     <Link href={to}>
-      <a className="link text-gray-600 font-medium text-base">{children}</a>
+      <a className={clsx(['link text-gray-600 font-medium text-base', className])}>{children}</a>
     </Link>
   );
 };

@@ -9,6 +9,8 @@ const ADMIN_MENUS: Array<IMenu> = [
       { name: 'Labels', path: '/admin/labels' },
       { name: 'États', path: '/admin/states' },
       { name: 'Rôles', path: '/admin/roles' },
+      { name: 'Vérification', path: '/admin/verificationTypes' },
+      { name: 'Spécification', path: '/admin/questionSpecifications' },
     ],
   },
   {

@@ -18,31 +18,26 @@ import database from 'database/database';
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 
 type ServerSideProps = {
-  label: Label;
+  verificationType: VerificationType;
   token: string;
 };
 
-const Label: FunctionComponent<ServerSideProps> = ({ label, token }: ServerSideProps) => {
+const VerificationType: FunctionComponent<ServerSideProps> = ({ verificationType, token }: ServerSideProps) => {
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
 
-  const [name, setName] = useState(label.name);
+  const [name, setName] = useState(verificationType.name);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
-      if (label.name === name) {
-        addNotification({ content: 'Vous devez modifier au moins un des champs.', type: 'ERROR' });
-        return;
-      }
+      await database.put(`/api/verificationTypes/${verificationType.id}`, { name }, getHeaders(token));
 
-      await database.put(`/api/labels/${label.id}`, { name }, getHeaders(token));
+      addNotification({ content: 'Type de vérification modifié.', type: 'INFO' });
 
-      addNotification({ content: 'Label modifié.', type: 'INFO' });
-
-      router.push('/admin/labels');
+      router.push('/admin/verificationTypes');
     } catch (err: any) {
       if (err.response && err.response.status === 403) return router.push('/login');
       else console.log(err.response);
@@ -50,11 +45,11 @@ const Label: FunctionComponent<ServerSideProps> = ({ label, token }: ServerSideP
   };
 
   return (
-    <AdminDashboardModelLayout title="Modifier un label" type="edit" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Modifier un type de vérification" type="edit" onSubmit={handleSubmit}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 
-        <Input label="Nom" placeholder="Premier groupe" value={name} setValue={setName} />
+        <Input label="Nom" placeholder="Automatique" value={name} setValue={setName} />
       </FormGroup>
     </AdminDashboardModelLayout>
   );
@@ -75,10 +70,10 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
   }
 
   try {
-    const { data: label } = await database.get(`/api/labels/${context.query.id}`, getHeaders(token));
-    if (!label) throw new Error();
+    const { data: verificationType } = await database.get(`/api/verificationTypes/${context.query.id}`, getHeaders(token));
+    if (!verificationType) throw new Error();
 
-    const props: ServerSideProps = { label, token };
+    const props: ServerSideProps = { verificationType, token };
 
     return { props };
   } catch (err) {
@@ -91,4 +86,4 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
   }
 };
 
-export default Label;
+export default VerificationType;

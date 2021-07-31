@@ -16,33 +16,50 @@ import ROLES from '@constant/roles';
 import database from 'database/database';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
+import Dropdown from '@element/Dropdown';
 
 type ServerSideProps = {
-  label: Label;
   token: string;
 };
 
-const Label: FunctionComponent<ServerSideProps> = ({ label, token }: ServerSideProps) => {
+const CreateQuestionType: FunctionComponent<ServerSideProps> = ({ token }: ServerSideProps) => {
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
 
-  const [name, setName] = useState(label.name);
+  const [name, setName] = useState('');
+  const [questionType, setQuestionType] = useState('textualQuestion');
+
+  const getQuestionTypeDropdownValues = (): DropdownValues => {
+    return [
+      {
+        name: 'Numérique',
+        slug: 'numericQuestion',
+      },
+      {
+        name: 'Textuelle',
+        slug: 'textualQuestion',
+      },
+      {
+        name: 'À choix',
+        slug: 'choiceQuestion',
+      },
+    ];
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
-      if (label.name === name) {
-        addNotification({ content: 'Vous devez modifier au moins un des champs.', type: 'ERROR' });
+      if (name === '') {
+        addNotification({ content: 'Veuillez remplire tout les champs', type: 'ERROR' });
         return;
       }
 
-      await database.put(`/api/labels/${label.id}`, { name }, getHeaders(token));
+      await database.post('/api/questionSpecifications', { name, questionType }, getHeaders(token));
 
-      addNotification({ content: 'Label modifié.', type: 'INFO' });
-
-      router.push('/admin/labels');
+      addNotification({ content: 'Spécification créé.', type: 'INFO' });
+      router.push('/admin/questionSpecifications');
     } catch (err: any) {
       if (err.response && err.response.status === 403) return router.push('/login');
       else console.log(err.response);
@@ -50,11 +67,19 @@ const Label: FunctionComponent<ServerSideProps> = ({ label, token }: ServerSideP
   };
 
   return (
-    <AdminDashboardModelLayout title="Modifier un label" type="edit" onSubmit={handleSubmit}>
+    <AdminDashboardModelLayout title="Créer une spécification" type="create" onSubmit={handleSubmit}>
       <FormGroup>
         <Title level={2}>Informations générales</Title>
 
-        <Input label="Nom" placeholder="Premier groupe" value={name} setValue={setName} />
+        <Input label="Nom" placeholder="Nombre entier" value={name} setValue={setName} />
+
+        <Dropdown
+          label="Type de question"
+          placeholder="Textuelle"
+          values={getQuestionTypeDropdownValues()}
+          value={questionType}
+          setValue={setQuestionType}
+        />
       </FormGroup>
     </AdminDashboardModelLayout>
   );
@@ -70,25 +95,13 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     if (!validatedTokenData.valid) throw new Error();
 
     if (validatedTokenData.rolePermission !== ROLES.ADMIN.PERMISSION) throw new Error();
-  } catch (err) {
-    return { redirect: { destination: '/', permanent: false } };
-  }
 
-  try {
-    const { data: label } = await database.get(`/api/labels/${context.query.id}`, getHeaders(token));
-    if (!label) throw new Error();
-
-    const props: ServerSideProps = { label, token };
+    const props: ServerSideProps = { token };
 
     return { props };
   } catch (err) {
-    return {
-      redirect: {
-        destination: '/admin/labels',
-        permanent: false,
-      },
-    };
+    return { redirect: { destination: '/', permanent: false } };
   }
 };
 
-export default Label;
+export default CreateQuestionType;
