@@ -1,6 +1,4 @@
 import React, { FunctionComponent } from 'react';
-import { useRouter } from 'next/dist/client/router';
-import { v4 as uuidv4 } from 'uuid';
 
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
@@ -11,49 +9,31 @@ import { getHeaders } from '@util/authentication.utils';
 import roles from '@constant/roles';
 
 import database from 'database/database';
+import Table from '@module/Table';
 
 type ServerSideProps = {
   users: Array<User>;
   token: string;
 };
 
-const cellClassName = 'px-4 py-3 text-gray-500 border-t border-gray-300 text-sm group-hover:bg-gray-200 cursor-pointer';
-
 const AdminUsersDashboard: FunctionComponent<ServerSideProps> = ({ users }: ServerSideProps) => {
-  const router = useRouter();
-
-  const seeUserProfile = (userId: number): void => {
-    router.push({
-      pathname: '/admin/users/[id]',
-      query: { id: userId },
-    });
+  const genderMapper = (value: boolean | null): string => {
+    if (value === null) return 'Indéfini';
+    return value ? 'Homme ' : 'Femme';
   };
 
   return (
-    <AdminDashboardModelsLayout active="Utilisateurs" title="Utilisateurs" subtitle={{ name: 'Créer un utilisateur', path: '/admin/users/create' }}>
-      <table className="table-auto w-full mt-14">
-        <thead>
-          <tr>
-            <td className="px-4 py-3 text-black border-t border-gray-300 text-sm">ID</td>
-            <td className="px-4 py-3 text-black border-t border-gray-300 text-sm">Nom d&apos;utilisateur</td>
-            <td className="px-4 py-3 text-black border-t border-gray-300 text-sm">Prénom</td>
-            <td className="px-4 py-3 text-black border-t border-gray-300 text-sm">Nom de famille</td>
-            <td className="px-4 py-3 text-black border-t border-gray-300 text-sm">Genre</td>
-          </tr>
-        </thead>
-
-        <tbody>
-          {users.map((user) => (
-            <tr key={uuidv4()} className="group" onClick={() => seeUserProfile(user.id)}>
-              <td className={cellClassName}>{user.id}</td>
-              <td className={cellClassName}>{user.username}</td>
-              <td className={cellClassName}>{user.firstName}</td>
-              <td className={cellClassName}>{user.lastName}</td>
-              <td className={cellClassName}>{typeof user.gender === 'boolean' ? (user.gender ? 'Male' : 'Female') : 'None'}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <AdminDashboardModelsLayout active="Utilisateurs" title="Utilisateurs" subtitle="Créer un utilisateur">
+      <Table<User, keyof User>
+        data={users}
+        attributes={[
+          ['ID', 'id'],
+          ["Nom d'utilisateur", 'username'],
+          ['Prénom', 'firstName'],
+          ['Nom de famille', 'lastName'],
+          ['Genre', 'gender', genderMapper],
+        ]}
+      />
     </AdminDashboardModelsLayout>
   );
 };
