@@ -7,31 +7,12 @@ import Menu from '@module/Menu';
 
 import MenuGroup from '@element/MenuGroup';
 
+import ADMIN_MENUS from '@constant/adminMenu';
+
 interface IProps {
   children?: React.ReactNode;
   active: string;
 }
-
-const menus: Array<IMenu> = [
-  {
-    title: 'Général',
-
-    links: [
-      { name: 'Accueil', path: '/admin' },
-      { name: 'Utilisateurs', path: '/admin/users' },
-      { name: 'Groupes', path: '/admin/groups' },
-      { name: 'Labels', path: '/admin/labels' },
-    ],
-  },
-  {
-    title: 'Paramètres',
-
-    links: [
-      { name: 'Site', path: '/admin/website' },
-      { name: 'Profile', path: '/admin/profile' },
-    ],
-  },
-];
 
 const AdminDashboardLayout: FunctionComponent<IProps> = ({ children, active }: IProps) => {
   const linkMapper = (links: ILink[]) =>
@@ -44,7 +25,7 @@ const AdminDashboardLayout: FunctionComponent<IProps> = ({ children, active }: I
   return (
     <Layout title="Admin Dashboard" display="row">
       <Menu logoutButton={true}>
-        {menus.map(({ title, links }) => (
+        {ADMIN_MENUS.map(({ title, links }) => (
           <MenuGroup title={title} links={linkMapper(links)} key={uuidv4()} />
         ))}
       </Menu>
