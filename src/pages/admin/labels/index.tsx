@@ -11,13 +11,13 @@ import roles from '@constant/roles';
 
 import database from 'database/database';
 
-interface IProps {
+interface ServerSideProps {
   labels: Array<Label>;
 }
 
 const cellClassName = 'px-4 py-3 text-gray-500 border-t border-gray-300 text-sm group-hover:bg-gray-200 cursor-pointer';
 
-const AdminLabelsDashboard: FunctionComponent<IProps> = ({ labels }: IProps) => {
+const AdminLabelsDashboard: FunctionComponent<ServerSideProps> = ({ labels }: ServerSideProps) => {
   const router = useRouter();
 
   const seeLabel = (groupId: number): void => {
@@ -65,11 +65,9 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const { data: labels } = await database.get('/api/labels', getHeaders(token));
     if (!labels) throw new Error();
 
-    return {
-      props: {
-        labels,
-      },
-    };
+    const props: ServerSideProps = { labels };
+
+    return { props };
   } catch (err) {
     return {
       redirect: {

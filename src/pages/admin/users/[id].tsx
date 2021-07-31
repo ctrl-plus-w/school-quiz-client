@@ -1,5 +1,5 @@
 import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
-import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
 import Input from '@element/Input';
@@ -25,7 +25,14 @@ import database from 'database/database';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 
-const User: FunctionComponent = ({ user, groups, roles, token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+type ServerSideProps = {
+  user: User;
+  groups: Array<Group>;
+  roles: Array<Role>;
+  token: string;
+};
+
+const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }: ServerSideProps) => {
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
@@ -67,16 +74,27 @@ const User: FunctionComponent = ({ user, groups, roles, token }: InferGetServerS
     try {
       setLoading(true);
 
-      if (roleSlug !== user.role.slug) {
+      if (user.role && roleSlug !== user.role.slug) {
         const role = roles.find(({ slug }: Role) => slug === roleSlug);
-        await database.put(`/api/users/${user.id}/role`, { roleId: role.id }, getHeaders(token));
+        if (role) await database.put(`/api/users/${user.id}/role`, { roleId: role.id }, getHeaders(token));
       }
 
       if (userGroups !== user.groups) {
-        const newGroups = userGroups.filter((group) => !user.groups.includes(group));
+        const oldGroups = user.groups.filter((group) => !userGroups.some((_group) => _group.slug === group.slug));
+        const oldGroupIds = oldGroups.map(({ id }) => id);
+
+        if (oldGroupIds.length > 0) {
+          for (const oldGroupId of oldGroupIds) {
+            await database.delete(`/api/users/${user.id}/groups/${oldGroupId}`, getHeaders(token));
+          }
+        }
+
+        const newGroups = userGroups.filter((group) => !user.groups.some((_group) => _group.slug === group.slug));
         const newGroupIds = newGroups.map(({ id }) => id);
 
-        await database.post(`/api/users/${user.id}/groups`, { groupIds: newGroupIds }, getHeaders(token));
+        if (newGroupIds.length > 0) {
+          await database.post(`/api/users/${user.id}/groups`, { groupIds: newGroupIds }, getHeaders(token));
+        }
       }
 
       const booleanGender = gender === 'undefined' ? null : gender === 'male' ? true : false;
@@ -174,9 +192,16 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const { data: roles } = await database.get('/api/roles', getHeaders(token));
     if (!roles) throw new Error();
 
-    return { props: { user, groups, roles, token } };
+    const props: ServerSideProps = { user, groups, roles, token };
+
+    return { props };
   } catch (err) {
-    return { props: { user: null, groups: null } };
+    return {
+      redirect: {
+        destination: '/admin/users',
+        permanent: false,
+      },
+    };
   }
 };
 

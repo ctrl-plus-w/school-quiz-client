@@ -12,13 +12,13 @@ import roles from '@constant/roles';
 import database from 'database/database';
 import { useRouter } from 'next/dist/client/router';
 
-interface IProps {
+type ServerSideProps = {
   groups: Array<Group>;
-}
+};
 
 const cellClassName = 'px-4 py-3 text-gray-500 border-t border-gray-300 text-sm group-hover:bg-gray-200 cursor-pointer';
 
-const AdminGroupsDashboard: FunctionComponent<IProps> = ({ groups }: IProps) => {
+const AdminGroupsDashboard: FunctionComponent<ServerSideProps> = ({ groups }: ServerSideProps) => {
   const router = useRouter();
 
   const seeGroup = (groupId: number): void => {
@@ -65,11 +65,9 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
     const { data: groups } = await database.get('/api/groups', getHeaders(token));
 
-    return {
-      props: {
-        groups,
-      },
-    };
+    const props: ServerSideProps = { groups };
+
+    return { props };
   } catch (err) {
     return {
       redirect: {

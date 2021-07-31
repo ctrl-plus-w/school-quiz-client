@@ -1,5 +1,5 @@
 import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
-import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
 import Input from '@element/Input';
@@ -21,7 +21,11 @@ import database from 'database/database';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 
-const CreateLabel: FunctionComponent = ({ token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+type ServerSideProps = {
+  token: string;
+};
+
+const CreateLabel: FunctionComponent<ServerSideProps> = ({ token }: ServerSideProps) => {
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
@@ -88,7 +92,9 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
     if (validatedTokenData.rolePermission !== ROLES.ADMIN.PERMISSION) throw new Error();
 
-    return { props: { token } };
+    const props: ServerSideProps = { token };
+
+    return { props };
   } catch (err) {
     return { redirect: { destination: '/', permanent: false } };
   }

@@ -1,8 +1,6 @@
 import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
-import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
-
-import { v4 as uuidv4 } from 'uuid';
 
 import Input from '@element/Input';
 import Title from '@element/Title';
@@ -23,7 +21,12 @@ import database from 'database/database';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 
-const Label: FunctionComponent = ({ label, token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+type ServerSideProps = {
+  label: Label;
+  token: string;
+};
+
+const Label: FunctionComponent<ServerSideProps> = ({ label, token }: ServerSideProps) => {
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
@@ -92,9 +95,16 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const { data: label } = await database.get(`/api/labels/${context.query.id}`, getHeaders(token));
     if (!label) throw new Error();
 
-    return { props: { label, token } };
+    const props: ServerSideProps = { label, token };
+
+    return { props };
   } catch (err) {
-    return { props: { label: null, token } };
+    return {
+      redirect: {
+        destination: '/admin/labels',
+        permanent: false,
+      },
+    };
   }
 };
 

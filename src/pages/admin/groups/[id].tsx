@@ -1,8 +1,6 @@
 import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
-import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
-
-import { v4 as uuidv4 } from 'uuid';
 
 import Input from '@element/Input';
 import Title from '@element/Title';
@@ -24,7 +22,13 @@ import database from 'database/database';
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 import TagsInput from '@element/TagsInput';
 
-const Group: FunctionComponent = ({ group, labels, token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+type ServerSideProps = {
+  group: Group;
+  labels: Array<Label>;
+  token: string;
+};
+
+const Group: FunctionComponent<ServerSideProps> = ({ group, labels, token }: ServerSideProps) => {
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
@@ -49,24 +53,36 @@ const Group: FunctionComponent = ({ group, labels, token }: InferGetServerSidePr
     try {
       setLoading(true);
 
-      if (groupLabels !== group.labels) {
-        const newLabels = groupLabels.filter((label) => !group.labels.includes(label));
-        const newLabelsIds = newLabels.map(({ id }) => id);
+      if (group.labels && groupLabels !== group.labels) {
+        const oldLabels = group.labels.filter(({ id }) => !groupLabels.some(({ id: _id }) => id === _id));
+        const oldLabelsId = oldLabels.map(({ id }) => id);
 
-        await database.post(`/api/groups/${group.id}/labels`, { labelIds: newLabelsIds }, getHeaders(token));
+        if (oldLabelsId.length > 0) {
+          for (const oldLabelId of oldLabelsId) {
+            await database.delete(`/api/groups/${group.id}/labels/${oldLabelId}`, getHeaders(token));
+          }
+        }
+
+        const newLabels = groupLabels.filter(({ id }) => !group.labels.some(({ id: _id }) => id === _id));
+        const newLabelsId = newLabels.map(({ id }) => id);
+
+        if (newLabelsId.length > 0) {
+          await database.post(`/api/groups/${group.id}/labels`, { labelIds: newLabelsId }, getHeaders(token));
+        }
       }
 
       if (name !== group.name) {
         await database.put(`/api/groups/${group.id}`, { name }, getHeaders(token));
       }
+
+      addNotification({ content: 'Groupe modifié.', type: 'INFO' });
+
+      router.push('/admin/groups');
     } catch (err: any) {
       if (err.response && err.response.status === 403) return router.push('/login');
       else console.log(err.response);
     } finally {
       setLoading(false);
-      addNotification({ content: 'Groupe modifié.', type: 'INFO' });
-
-      router.push('/admin/groups');
     }
   };
 
@@ -118,9 +134,16 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const { data: labels } = await database.get('/api/labels', getHeaders(token));
     if (!labels) throw new Error();
 
-    return { props: { group, labels, token } };
+    const props: ServerSideProps = { group, labels, token };
+
+    return { props };
   } catch (err) {
-    return { props: { group: null, labels: null, token } };
+    return {
+      redirect: {
+        destination: '/admin/groups',
+        permanent: false,
+      },
+    };
   }
 };
 

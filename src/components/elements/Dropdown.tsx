@@ -10,7 +10,7 @@ interface IProps {
   className?: string;
 
   values: Array<{ name: string; slug: string }>;
-  value: string;
+  value: string | null;
   setValue: React.Dispatch<React.SetStateAction<any>>;
 }
 

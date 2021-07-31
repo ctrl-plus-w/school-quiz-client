@@ -1,4 +1,5 @@
 import React, { FunctionComponent } from 'react';
+import { useRouter } from 'next/dist/client/router';
 import { v4 as uuidv4 } from 'uuid';
 
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
@@ -10,15 +11,15 @@ import { getHeaders } from '@util/authentication.utils';
 import roles from '@constant/roles';
 
 import database from 'database/database';
-import { useRouter } from 'next/dist/client/router';
 
-interface IProps {
+type ServerSideProps = {
   users: Array<User>;
-}
+  token: string;
+};
 
 const cellClassName = 'px-4 py-3 text-gray-500 border-t border-gray-300 text-sm group-hover:bg-gray-200 cursor-pointer';
 
-const AdminUsersDashboard: FunctionComponent<IProps> = ({ users }: IProps) => {
+const AdminUsersDashboard: FunctionComponent<ServerSideProps> = ({ users }: ServerSideProps) => {
   const router = useRouter();
 
   const seeUserProfile = (userId: number): void => {
@@ -69,11 +70,9 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
     const { data: users } = await database.get('/api/users', getHeaders(token));
 
-    return {
-      props: {
-        users,
-      },
-    };
+    const props: ServerSideProps = { token, users };
+
+    return { props };
   } catch (err) {
     return {
       redirect: {

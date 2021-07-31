@@ -1,8 +1,6 @@
 import React, { FormEvent, FunctionComponent, useContext, useState } from 'react';
-import { GetServerSideProps, GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
-
-// import { v4 as uuidv4 } from 'uuid';
 
 import Input from '@element/Input';
 import Title from '@element/Title';
@@ -10,6 +8,7 @@ import Dropdown from '@element/Dropdown';
 import Button from '@element/Button';
 import LinkButton from '@element/LinkButton';
 import PasswordInput from '@element/PasswordInput';
+import Loader from '@element/Loader';
 
 import Form from '@module/Form';
 import FormGroup from '@module/FormGroup';
@@ -19,13 +18,16 @@ import AdminDashboardModelLayout from '@layout/AdminDashboardModel';
 import { getHeaders } from '@util/authentication.utils';
 
 import ROLES from '@constant/roles';
-import Loader from '@element/Loader';
 
 import database from 'database/database';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 
-const CreateUser: FunctionComponent = ({ token }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+type ServerSideProps = {
+  token: string;
+};
+
+const CreateUser: FunctionComponent<ServerSideProps> = ({ token }: ServerSideProps) => {
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
@@ -141,7 +143,9 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
     if (validatedTokenData.rolePermission !== ROLES.ADMIN.PERMISSION) throw new Error();
 
-    return { props: { token } };
+    const props: ServerSideProps = { token };
+
+    return { props };
   } catch (err) {
     return { redirect: { destination: '/', permanent: false } };
   }

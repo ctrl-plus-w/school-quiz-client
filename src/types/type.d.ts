@@ -22,6 +22,8 @@ type User = {
   lastName: string;
   password: string;
   gender: boolean | null;
+  groups: Array<Group>;
+  role?: Role;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -30,6 +32,7 @@ type Group = {
   id: number;
   name: string;
   slug: string;
+  labels: Array<Label>;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -43,6 +46,7 @@ type Label = {
 };
 
 type Role = {
+  id: number;
   name: string;
   slug: string;
   permission: number;
