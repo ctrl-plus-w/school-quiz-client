@@ -5,12 +5,8 @@ import { useRouter } from 'next/dist/client/router';
 import Input from '@element/Input';
 import Title from '@element/Title';
 import Dropdown from '@element/Dropdown';
-import Button from '@element/Button';
-import LinkButton from '@element/LinkButton';
 import PasswordInput from '@element/PasswordInput';
-import Loader from '@element/Loader';
 
-import Form from '@module/Form';
 import FormGroup from '@module/FormGroup';
 
 import AdminDashboardModelLayout from '@layout/AdminDashboardModel';
@@ -31,8 +27,6 @@ const CreateUser: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
-
-  const [loading, setLoading] = useState(false);
 
   const [username, setUsername] = useState('');
   const [firstName, setFirstName] = useState('');
@@ -60,8 +54,6 @@ const CreateUser: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
     e.preventDefault();
 
     try {
-      setLoading(true);
-
       if (username === '' || firstName === '' || lastName === '' || password === '') {
         addNotification({ content: 'Veuillez remplire tout les champs', type: 'ERROR' });
         return;
@@ -89,46 +81,30 @@ const CreateUser: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
       if (err.response.status === 409) addNotification({ content: 'Cet utilisateur existe déja.', type: 'ERROR' });
 
       console.log(err.response);
-      // if(err.response.status ===)
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <>
-      <AdminDashboardModelLayout active="Utilisateurs" title="Créer un utilisateur" path="Utilisateurs > Créer">
-        <Form full={true} onSubmit={handleSubmit}>
-          <FormGroup>
-            <Title level={2}>Informations générales</Title>
+    <AdminDashboardModelLayout active="Utilisateurs" title="Créer un utilisateur" type="create" onSubmit={handleSubmit}>
+      <FormGroup>
+        <Title level={2}>Informations générales</Title>
 
-            <Input label="Nom d'utilisateur" placeholder="johndoe" value={username} setValue={setUsername} />
-            <Input label="Prénom" placeholder="John" value={firstName} setValue={setFirstName} />
-            <Input label="Nom de famille" placeholder="Doe" value={lastName} setValue={setLastName} />
+        <Input label="Nom d'utilisateur" placeholder="johndoe" value={username} setValue={setUsername} />
+        <Input label="Prénom" placeholder="John" value={firstName} setValue={setFirstName} />
+        <Input label="Nom de famille" placeholder="Doe" value={lastName} setValue={setLastName} />
 
-            <PasswordInput
-              label="Mot de passe"
-              placeholder="*****"
-              value={password}
-              setValue={setPassword}
-              note="Le mot de passe doit faire au minimum 5 charactères"
-              generator={true}
-            />
+        <PasswordInput
+          label="Mot de passe"
+          placeholder="*****"
+          value={password}
+          setValue={setPassword}
+          note="Le mot de passe doit faire au minimum 5 charactères"
+          generator={true}
+        />
 
-            <Dropdown label="Sexe" placeholder="Indéfini" values={getGenderDropdownValues()} value={gender} setValue={setGender} />
-          </FormGroup>
-
-          <div className="flex mt-auto ml-auto">
-            <LinkButton href="/admin/users" outline={true} className="mr-6">
-              Annuler
-            </LinkButton>
-            <Button submit={true}>Créer</Button>
-          </div>
-        </Form>
-
-        <Loader show={loading} />
-      </AdminDashboardModelLayout>
-    </>
+        <Dropdown label="Sexe" placeholder="Indéfini" values={getGenderDropdownValues()} value={gender} setValue={setGender} />
+      </FormGroup>
+    </AdminDashboardModelLayout>
   );
 };
 

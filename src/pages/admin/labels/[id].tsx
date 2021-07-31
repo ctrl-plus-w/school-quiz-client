@@ -4,11 +4,7 @@ import { useRouter } from 'next/dist/client/router';
 
 import Input from '@element/Input';
 import Title from '@element/Title';
-import Button from '@element/Button';
-import LinkButton from '@element/LinkButton';
-import Loader from '@element/Loader';
 
-import Form from '@module/Form';
 import FormGroup from '@module/FormGroup';
 
 import AdminDashboardModelLayout from '@layout/AdminDashboardModel';
@@ -31,49 +27,31 @@ const Label: FunctionComponent<ServerSideProps> = ({ label, token }: ServerSideP
 
   const { addNotification } = useContext(NotificationContext);
 
-  const [loading, setLoading] = useState(false);
-
   const [name, setName] = useState(label.name);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
-      setLoading(true);
-
       await database.put(`/api/labels/${label.id}`, { name }, getHeaders(token));
-    } catch (err: any) {
-      if (err.response && err.response.status === 403) return router.push('/login');
-      else console.log(err.response);
-    } finally {
-      setLoading(false);
+
       addNotification({ content: 'Label modifié.', type: 'INFO' });
 
       router.push('/admin/labels');
+    } catch (err: any) {
+      if (err.response && err.response.status === 403) return router.push('/login');
+      else console.log(err.response);
     }
   };
 
   return (
-    <>
-      <AdminDashboardModelLayout active="Labels" title="Modifier un label" path="Labels > Modifier">
-        <Form full={true} onSubmit={handleSubmit}>
-          <FormGroup>
-            <Title level={2}>Informations générales</Title>
+    <AdminDashboardModelLayout active="Labels" title="Modifier un label" type="edit" onSubmit={handleSubmit}>
+      <FormGroup>
+        <Title level={2}>Informations générales</Title>
 
-            <Input label="Nom" placeholder="Premier groupe" value={name} setValue={setName} />
-          </FormGroup>
-
-          <div className="flex mt-auto ml-auto">
-            <LinkButton href="/admin/labels" outline={true} className="mr-6">
-              Annuler
-            </LinkButton>
-            <Button submit={true}>Modifier</Button>
-          </div>
-        </Form>
-
-        <Loader show={loading} />
-      </AdminDashboardModelLayout>
-    </>
+        <Input label="Nom" placeholder="Premier groupe" value={name} setValue={setName} />
+      </FormGroup>
+    </AdminDashboardModelLayout>
   );
 };
 

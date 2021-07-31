@@ -4,11 +4,7 @@ import { useRouter } from 'next/dist/client/router';
 
 import Input from '@element/Input';
 import Title from '@element/Title';
-import Button from '@element/Button';
-import LinkButton from '@element/LinkButton';
-import Loader from '@element/Loader';
 
-import Form from '@module/Form';
 import FormGroup from '@module/FormGroup';
 
 import AdminDashboardModelLayout from '@layout/AdminDashboardModel';
@@ -30,16 +26,12 @@ const CreateLabel: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePr
 
   const { addNotification } = useContext(NotificationContext);
 
-  const [loading, setLoading] = useState(false);
-
   const [name, setName] = useState('');
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     try {
-      setLoading(true);
-
       if (name === '') {
         addNotification({ content: 'Veuillez remplire tout les champs', type: 'ERROR' });
         return;
@@ -52,32 +44,17 @@ const CreateLabel: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePr
     } catch (err: any) {
       if (err.response && err.response.status === 403) return router.push('/login');
       else console.log(err.response);
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <>
-      <AdminDashboardModelLayout active="Labels" title="Créer un label" path="Labels > Créer">
-        <Form full={true} onSubmit={handleSubmit}>
-          <FormGroup>
-            <Title level={2}>Informations générales</Title>
+    <AdminDashboardModelLayout active="Labels" title="Créer un label" type="create" onSubmit={handleSubmit}>
+      <FormGroup>
+        <Title level={2}>Informations générales</Title>
 
-            <Input label="Nom" placeholder="Premier groupe" value={name} setValue={setName} />
-          </FormGroup>
-
-          <div className="flex mt-auto ml-auto">
-            <LinkButton href="/admin/labels" outline={true} className="mr-6">
-              Annuler
-            </LinkButton>
-            <Button submit={true}>Créer</Button>
-          </div>
-        </Form>
-
-        <Loader show={loading} />
-      </AdminDashboardModelLayout>
-    </>
+        <Input label="Nom" placeholder="Premier groupe" value={name} setValue={setName} />
+      </FormGroup>
+    </AdminDashboardModelLayout>
   );
 };
 

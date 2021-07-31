@@ -6,20 +6,15 @@ import Input from '@element/Input';
 import Title from '@element/Title';
 import Dropdown from '@element/Dropdown';
 import TagsInput from '@element/TagsInput';
-import Button from '@element/Button';
-import LinkButton from '@element/LinkButton';
 import PasswordInput from '@element/PasswordInput';
 
-import Form from '@module/Form';
 import FormGroup from '@module/FormGroup';
-import Row from '@module/Row';
 
 import AdminDashboardModelLayout from '@layout/AdminDashboardModel';
 
 import { getHeaders } from '@util/authentication.utils';
 
 import ROLES from '@constant/roles';
-import Loader from '@element/Loader';
 
 import database from 'database/database';
 
@@ -36,8 +31,6 @@ const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
-
-  const [loading, setLoading] = useState(false);
 
   const [username, setUsername] = useState(user.username);
   const [firstName, setFirstName] = useState(user.firstName);
@@ -72,8 +65,6 @@ const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }
     e.preventDefault();
 
     try {
-      setLoading(true);
-
       if (user.role && roleSlug !== user.role.slug) {
         const role = roles.find(({ slug }: Role) => slug === roleSlug);
         if (role) await database.put(`/api/users/${user.id}/role`, { roleId: role.id }, getHeaders(token));
@@ -110,61 +101,44 @@ const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }
       if (Object.values(requestBody).some((value) => value !== undefined)) {
         await database.put(`/api/users/${user.id}`, requestBody, getHeaders(token));
       }
+
+      addNotification({ content: 'Utilisateur modifié.', type: 'INFO' });
+      router.push('/admin/users');
     } catch (err: any) {
       if (err.response && err.response.status === 403) return router.push('/login');
       else console.log(err.response);
-    } finally {
-      setLoading(false);
-      addNotification({ content: 'Utilisateur modifié.', type: 'INFO' });
-
-      router.push('/admin/users');
     }
   };
 
   return (
-    <>
-      <AdminDashboardModelLayout active="Utilisateurs" title="Modifier un utilisateur" path="Utilisateurs > Modifier">
-        <Form full={true} onSubmit={handleSubmit}>
-          <Row>
-            <FormGroup>
-              <Title level={2}>Informations générales</Title>
+    <AdminDashboardModelLayout active="Utilisateurs" title="Modifier un utilisateur" type="edit" onSubmit={handleSubmit}>
+      <FormGroup>
+        <Title level={2}>Informations générales</Title>
 
-              <Input label="Nom d'utilisateur" placeholder="johndoe" value={username} setValue={setUsername} />
-              <Input label="Prénom" placeholder="John" value={firstName} setValue={setFirstName} />
-              <Input label="Nom de famille" placeholder="Doe" value={lastName} setValue={setLastName} />
+        <Input label="Nom d'utilisateur" placeholder="johndoe" value={username} setValue={setUsername} />
+        <Input label="Prénom" placeholder="John" value={firstName} setValue={setFirstName} />
+        <Input label="Nom de famille" placeholder="Doe" value={lastName} setValue={setLastName} />
 
-              <PasswordInput
-                label="Mot de passe"
-                placeholder="*****"
-                value={password}
-                setValue={setPassword}
-                note="Le mot de passe doit faire au minimum 5 charactères"
-                generator={true}
-              />
+        <PasswordInput
+          label="Mot de passe"
+          placeholder="*****"
+          value={password}
+          setValue={setPassword}
+          note="Le mot de passe doit faire au minimum 5 charactères"
+          generator={true}
+        />
 
-              <Dropdown label="Sexe" placeholder="Indéfini" values={getGenderDropdownValues()} value={gender} setValue={setGender} />
-            </FormGroup>
+        <Dropdown label="Sexe" placeholder="Indéfini" values={getGenderDropdownValues()} value={gender} setValue={setGender} />
+      </FormGroup>
 
-            <FormGroup>
-              <Title level={2}>Informations supplémentaires</Title>
+      <FormGroup>
+        <Title level={2}>Informations supplémentaires</Title>
 
-              <Dropdown label="Role" placeholder="Role" values={getRoleDropdownValues()} value={roleSlug} setValue={setRoleSlug} />
+        <Dropdown label="Role" placeholder="Role" values={getRoleDropdownValues()} value={roleSlug} setValue={setRoleSlug} />
 
-              <TagsInput label="Groupes" placeholder="Groupes" data={groups} values={userGroups} addValue={addGroup} removeValue={removeGroup} />
-            </FormGroup>
-          </Row>
-
-          <div className="flex mt-auto ml-auto">
-            <LinkButton href="/admin/users" outline={true} className="mr-6">
-              Annuler
-            </LinkButton>
-            <Button submit={true}>Modifier</Button>
-          </div>
-        </Form>
-
-        <Loader show={loading} />
-      </AdminDashboardModelLayout>
-    </>
+        <TagsInput label="Groupes" placeholder="Groupes" data={groups} values={userGroups} addValue={addGroup} removeValue={removeGroup} />
+      </FormGroup>
+    </AdminDashboardModelLayout>
   );
 };
 
