@@ -86,7 +86,7 @@ const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }
     e.preventDefault();
 
     try {
-      if (user.role && roleSlug !== user.role.slug) {
+      if (!user.role || roleSlug !== user.role.slug) {
         const role = roles.find(({ slug }: Role) => slug === roleSlug);
         if (role) await database.put(`/api/users/${user.id}/role`, { roleId: role.id }, getHeaders(token));
       }

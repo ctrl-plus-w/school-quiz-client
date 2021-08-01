@@ -14,6 +14,7 @@ import Layout from '@layout/Default';
 import Form from '@module/Form';
 
 import database from 'database/database';
+import roles from '@constant/roles';
 
 const Login: FunctionComponent = () => {
   const [error, setError] = useState(false);
@@ -31,7 +32,9 @@ const Login: FunctionComponent = () => {
       const { data } = await database.post('/auth/login', { username, password });
 
       setCookie('user', data.token, { path: '/', maxAge: 3600, sameSite: true });
-      router.push('/admin');
+
+      const roleObject = Object.values(roles).find(({ slug }) => slug === data.role);
+      router.push(roleObject?.path || '/');
     } catch (err) {
       if (err) setError(true);
     }
