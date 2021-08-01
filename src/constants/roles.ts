@@ -8,7 +8,7 @@ export default {
   PROFESSOR: {
     PERMISSION: 2,
     name: { EN: 'Professor', FR: 'Professeur' },
-    slug: 'professor',
+    slug: 'professeur',
     path: '/professor',
   },
   STUDENT: {
