@@ -6,12 +6,15 @@ import type { AppProps } from 'next/app';
 import Notifications from '@module/Notifications';
 
 import NotificationProvider from 'context/NotificationContext/NotificationProvider';
+import AuthProvider from 'context/AuthContext/AuthProvider';
 
 const MyApp: FunctionComponent<AppProps> = ({ Component, pageProps }: AppProps) => {
   return (
     <NotificationProvider>
-      <Notifications />
-      <Component {...pageProps} />
+      <AuthProvider>
+        <Notifications />
+        <Component {...pageProps} />
+      </AuthProvider>
     </NotificationProvider>
   );
 };

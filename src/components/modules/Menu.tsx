@@ -19,7 +19,7 @@ const Menu: FunctionComponent<IProps> = ({ children, logoutButton = false }: IPr
   };
 
   return (
-    <div className="flex flex-col h-full px-10 py-12 border-r border-gray-300">
+    <div className="flex flex-col h-full px-10 py-12 border-r border-gray-300 flex-shrink-0">
       {children}
 
       {logoutButton && (

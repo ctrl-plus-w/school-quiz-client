@@ -1,20 +1,28 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useContext, useEffect } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
 import AdminDashboardModelsLayout from '@layout/AdminDashboardModels';
+
+import Table from '@module/Table';
 
 import { getHeaders } from '@util/authentication.utils';
 
 import roles from '@constant/roles';
 
+import { AuthContext } from 'context/AuthContext/AuthContext';
+
 import database from 'database/database';
-import Table from '@module/Table';
 
 interface ServerSideProps {
   labels: Array<Label>;
+  token: string;
 }
 
-const AdminLabelsDashboard: FunctionComponent<ServerSideProps> = ({ labels }: ServerSideProps) => {
+const AdminLabelsDashboard: FunctionComponent<ServerSideProps> = ({ labels, token }: ServerSideProps) => {
+  const { setToken } = useContext(AuthContext);
+
+  useEffect(() => setToken(token), []);
+
   return (
     <AdminDashboardModelsLayout title="Labels" subtitle="Créer un label">
       <Table<Label, keyof Label>
@@ -24,6 +32,7 @@ const AdminLabelsDashboard: FunctionComponent<ServerSideProps> = ({ labels }: Se
           ['Slug', 'slug'],
         ]}
         data={labels}
+        apiName="labels"
       />
     </AdminDashboardModelsLayout>
   );
@@ -42,7 +51,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const { data: labels } = await database.get('/api/labels', getHeaders(token));
     if (!labels) throw new Error();
 
-    const props: ServerSideProps = { labels };
+    const props: ServerSideProps = { labels, token };
 
     return { props };
   } catch (err) {

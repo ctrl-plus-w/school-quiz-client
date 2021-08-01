@@ -94,3 +94,8 @@ type NotificationContextState = {
   addNotification: (notifications: UINotification) => void;
   removeNotification: (notifications: UINotification) => void;
 };
+
+type AuthContextState = {
+  token: string;
+  setToken: (token: string) => void;
+};

@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useContext, useEffect } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
 import AdminDashboardModelsLayout from '@layout/AdminDashboardModels';
@@ -9,13 +9,20 @@ import { getHeaders } from '@util/authentication.utils';
 
 import ROLES from '@constant/roles';
 
+import { AuthContext } from 'context/AuthContext/AuthContext';
+
 import database from 'database/database';
 
 interface ServerSideProps {
   roles: Array<Role>;
+  token: string;
 }
 
-const AdminRolesDashboard: FunctionComponent<ServerSideProps> = ({ roles }: ServerSideProps) => {
+const AdminRolesDashboard: FunctionComponent<ServerSideProps> = ({ roles, token }: ServerSideProps) => {
+  const { setToken } = useContext(AuthContext);
+
+  useEffect(() => setToken(token), []);
+
   return (
     <AdminDashboardModelsLayout title="Rôles" subtitle="Créer un état">
       <Table<Role, keyof Role>
@@ -26,6 +33,7 @@ const AdminRolesDashboard: FunctionComponent<ServerSideProps> = ({ roles }: Serv
           ['Slug', 'slug'],
         ]}
         data={roles}
+        apiName="roles"
       />
     </AdminDashboardModelsLayout>
   );
@@ -44,7 +52,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const { data: roles } = await database.get('/api/roles', getHeaders(token));
     if (!roles) throw new Error();
 
-    const props: ServerSideProps = { roles };
+    const props: ServerSideProps = { roles, token };
 
     return { props };
   } catch (err) {

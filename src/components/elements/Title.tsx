@@ -23,10 +23,13 @@ const Title: FunctionComponent<IProps> = ({ level, children, color = 'black' }: 
       return <h1 className={`text-${getColor()} font-semibold text-3xl`}>{children}</h1>;
 
     case 2:
-      return <h1 className={`text-${getColor()} font-semibold text-2xl`}>{children}</h1>;
+      return <h2 className={`text-${getColor()} font-semibold text-2xl`}>{children}</h2>;
 
     case 3:
-      return <h1 className={`text-${getColor()} font-semibold text-xl`}>{children}</h1>;
+      return <h3 className={`text-${getColor()} font-semibold text-xl`}>{children}</h3>;
+
+    case 4:
+      return <h4 className={`text-${getColor()} font-medium text-xl`}>{children}</h4>;
 
     default:
       return <h1 className={`text-${getColor()} font-semibold text-3xl`}>{children}</h1>;

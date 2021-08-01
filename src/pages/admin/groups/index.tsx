@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useContext, useEffect } from 'react';
 
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
@@ -10,14 +10,20 @@ import roles from '@constant/roles';
 
 import database from 'database/database';
 import Table from '@module/Table';
+import { AuthContext } from 'context/AuthContext/AuthContext';
 
 type ServerSideProps = {
   groups: Array<Group>;
+  token: string;
 };
 
-const AdminGroupsDashboard: FunctionComponent<ServerSideProps> = ({ groups }: ServerSideProps) => {
+const AdminGroupsDashboard: FunctionComponent<ServerSideProps> = ({ groups, token }: ServerSideProps) => {
+  const { setToken } = useContext(AuthContext);
+
+  useEffect(() => setToken(token), []);
+
   return (
-    <AdminDashboardModelsLayout  title="Groupes" subtitle="Créer un groupe">
+    <AdminDashboardModelsLayout title="Groupes" subtitle="Créer un groupe">
       <Table
         data={groups}
         attributes={[
@@ -25,6 +31,7 @@ const AdminGroupsDashboard: FunctionComponent<ServerSideProps> = ({ groups }: Se
           ['Nom', 'name'],
           ['Slug', 'slug'],
         ]}
+        apiName="groups"
       />
     </AdminDashboardModelsLayout>
   );
@@ -42,7 +49,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
     const { data: groups } = await database.get('/api/groups', getHeaders(token));
 
-    const props: ServerSideProps = { groups };
+    const props: ServerSideProps = { groups, token };
 
     return { props };
   } catch (err) {

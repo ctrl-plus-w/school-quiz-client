@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useContext, useEffect } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
 import AdminDashboardModelsLayout from '@layout/AdminDashboardModels';
@@ -9,13 +9,20 @@ import { getHeaders } from '@util/authentication.utils';
 
 import roles from '@constant/roles';
 
+import { AuthContext } from 'context/AuthContext/AuthContext';
+
 import database from 'database/database';
 
 interface ServerSideProps {
   states: Array<State>;
+  token: string;
 }
 
-const AdminStatesDashboard: FunctionComponent<ServerSideProps> = ({ states }: ServerSideProps) => {
+const AdminStatesDashboard: FunctionComponent<ServerSideProps> = ({ states, token }: ServerSideProps) => {
+  const { setToken } = useContext(AuthContext);
+
+  useEffect(() => setToken(token), []);
+
   return (
     <AdminDashboardModelsLayout title="États" subtitle="Créer un état">
       <Table<State, keyof State>
@@ -25,6 +32,7 @@ const AdminStatesDashboard: FunctionComponent<ServerSideProps> = ({ states }: Se
           ['Slug', 'slug'],
         ]}
         data={states}
+        apiName="states"
       />
     </AdminDashboardModelsLayout>
   );
@@ -43,7 +51,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const { data: states } = await database.get('/api/states', getHeaders(token));
     if (!states) throw new Error();
 
-    const props: ServerSideProps = { states };
+    const props: ServerSideProps = { states, token };
 
     return { props };
   } catch (err) {
