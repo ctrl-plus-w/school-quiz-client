@@ -3,6 +3,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { ChevronDownIcon } from '@heroicons/react/outline';
 
+import useClickOutside from 'hooks/useClickOutside';
+
 interface IProps {
   placeholder: string;
   label: string;
@@ -30,6 +32,12 @@ const Dropdown: FunctionComponent<IProps> = ({ className, label, placeholder = '
     setHidden((prev) => !prev);
   };
 
+  const handleClickOutside = (): void => {
+    if (!isHidden) setHidden(true);
+  };
+
+  const { container } = useClickOutside<HTMLDivElement>(handleClickOutside);
+
   return (
     <div className={`form-control flex flex-col w-80 ${className}`}>
       <label className="relative text-sm font-semibold text-gray-900">
@@ -37,7 +45,7 @@ const Dropdown: FunctionComponent<IProps> = ({ className, label, placeholder = '
           <p>{label}</p>
         </div>
 
-        <div className="relative">
+        <div className="relative" ref={container}>
           <div className="z-20 relative border border-gray-500 rounded-sm w-full py-2 px-3 mt-2 cursor-pointer" onClick={switchState}>
             <p className={`${value === '' || value === null ? 'text-gray-600' : 'text-black'} font-normal capitalize`}>
               {value ? values.find(({ slug }) => slug === value)?.name : placeholder}
