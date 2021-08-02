@@ -12,7 +12,7 @@ import Table from '@module/Table';
 import { AuthContext } from 'context/AuthContext/AuthContext';
 
 interface ServerSideProps {
-  verificationTypes: Array<VerificationType>;
+  verificationTypes: Array<IVerificationType>;
   token: string;
 }
 
@@ -23,7 +23,7 @@ const AdminVerificationTypesDashboard: FunctionComponent<ServerSideProps> = ({ v
 
   return (
     <AdminDashboardModelsLayout title="Vérification" subtitle="Créer un type de vérification">
-      <Table<VerificationType, keyof VerificationType>
+      <Table<IVerificationType, keyof IVerificationType>
         attributes={[
           ['ID', 'id'],
           ['Nom', 'name'],

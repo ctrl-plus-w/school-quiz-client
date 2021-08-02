@@ -21,7 +21,7 @@ import { idNameSlugMapper } from '@util/mapper.utils';
 import { areArraysEquals } from '@util/condition.utils';
 
 type ServerSideProps = {
-  group: Group;
+  group: IGroup;
   labels: Array<Label>;
   token: string;
 };

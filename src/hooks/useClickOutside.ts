@@ -8,7 +8,6 @@ const useClickOutside = <T extends Element>(func: () => void, updater: Array<any
       const target = e.target as Element;
 
       if (container.current && container.current !== target && !container.current.contains(target)) {
-        // console.log(container.current, target, container.current.isSameNode(target));
         func();
       }
     };

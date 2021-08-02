@@ -5,7 +5,7 @@ interface IProps {
 }
 
 const Row: FunctionComponent<IProps> = ({ children }: IProps) => {
-  return <div className="flex flex-row flex-wrap w-full">{children}</div>;
+  return <div className="form-control flex flex-row flex-wrap w-full">{children}</div>;
 };
 
 export default Row;

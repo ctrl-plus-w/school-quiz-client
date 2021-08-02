@@ -55,6 +55,7 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
     setShownElement(instance.id);
   };
 
+
   const deleteInstance = async (e: FormEvent) => {
     e.preventDefault();
 

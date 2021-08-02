@@ -15,7 +15,7 @@ import { AuthContext } from 'context/AuthContext/AuthContext';
 import database from 'database/database';
 
 type ServerSideProps = {
-  users: Array<User>;
+  users: Array<IUser>;
   token: string;
 };
 
@@ -31,7 +31,7 @@ const AdminUsersDashboard: FunctionComponent<ServerSideProps> = ({ users, token 
 
   return (
     <AdminDashboardModelsLayout title="Utilisateurs" subtitle="Créer un utilisateur">
-      <Table<User, keyof User>
+      <Table<IUser, keyof IUser>
         data={users}
         attributes={[
           ['ID', 'id'],

@@ -14,7 +14,7 @@ import { AuthContext } from 'context/AuthContext/AuthContext';
 import database from 'database/database';
 
 interface ServerSideProps {
-  states: Array<State>;
+  states: Array<IState>;
   token: string;
 }
 
@@ -25,7 +25,7 @@ const AdminStatesDashboard: FunctionComponent<ServerSideProps> = ({ states, toke
 
   return (
     <AdminDashboardModelsLayout title="États" subtitle="Créer un état">
-      <Table<State, keyof State>
+      <Table<IState, keyof IState>
         attributes={[
           ['ID', 'id'],
           ['Nom', 'name'],

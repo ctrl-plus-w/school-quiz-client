@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import Layout from '@layout/Default';
 
-import Menu from '@module/Menu';
+import DashboardMenu from '@module/DashboardMenu';
 
 import MenuGroup from '@element/MenuGroup';
 
@@ -26,11 +26,11 @@ const AdminDashboardLayout: FunctionComponent<IProps> = ({ children }: IProps) =
 
   return (
     <Layout title="Admin Dashboard" display="row">
-      <Menu logoutButton={true}>
+      <DashboardMenu logoutButton={true}>
         {ADMIN_MENUS.map(({ title, links }) => (
           <MenuGroup title={title} links={linkMapper(links)} key={uuidv4()} />
         ))}
-      </Menu>
+      </DashboardMenu>
 
       <div className="flex flex-col flex-grow">{children}</div>
     </Layout>

@@ -17,7 +17,7 @@ interface IProps<T, K> {
 const Table = <T extends { id: number }, K extends keyof T>({ attributes, data, apiName }: IProps<T, K>): ReactElement => {
   const [shownElement, setShownElement] = useState(-1);
 
-  return (
+  return data.length > 0 ? (
     <table className="table-fixed w-full mt-14">
       <thead>
         <tr>
@@ -43,6 +43,11 @@ const Table = <T extends { id: number }, K extends keyof T>({ attributes, data, 
         ))}
       </tbody>
     </table>
+  ) : (
+    <div className="flex flex-col w-full h-full mt-14">
+      <hr />
+      <p className="text-gray-500 text-base font-regular m-auto">Aucune donnée trouvée...</p>
+    </div>
   );
 };
 

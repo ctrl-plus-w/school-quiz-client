@@ -10,3 +10,7 @@ export const stringifyGender = (gender: boolean | null): string => {
   if (gender === null) return 'undefined';
   return gender ? 'male' : 'female';
 };
+
+export const booleanMapper = (value: boolean): string => {
+  return value ? 'Oui' : 'Non';
+};

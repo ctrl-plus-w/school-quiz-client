@@ -89,8 +89,6 @@ const CreateUser: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
       if (err.response.status === 422) addNotification({ content: 'Un des champs est invalide.', type: 'ERROR' });
 
       if (err.response.status === 409) addNotification({ content: 'Cet utilisateur existe déja.', type: 'ERROR' });
-
-      console.log(err.response);
     }
   };
 

@@ -14,7 +14,7 @@ import { AuthContext } from 'context/AuthContext/AuthContext';
 import database from 'database/database';
 
 interface ServerSideProps {
-  labels: Array<Label>;
+  labels: Array<ILabel>;
   token: string;
 }
 
@@ -25,7 +25,7 @@ const AdminLabelsDashboard: FunctionComponent<ServerSideProps> = ({ labels, toke
 
   return (
     <AdminDashboardModelsLayout title="Labels" subtitle="Créer un label">
-      <Table<Label, keyof Label>
+      <Table<ILabel, keyof ILabel>
         attributes={[
           ['ID', 'id'],
           ['Nom', 'name'],

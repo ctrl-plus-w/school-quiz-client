@@ -17,6 +17,10 @@ body,
   @apply mt-4;
 }
 
+.form > .form-group:not(:first-child) {
+  @apply mt-8;
+}
+
 .form > .error {
   @apply mt-6;
 }

@@ -24,9 +24,9 @@ import { idNameSlugMapper, stringifyGender } from '@util/mapper.utils';
 import { areArraysEquals } from '@util/condition.utils';
 
 type ServerSideProps = {
-  user: User;
-  groups: Array<Group>;
-  roles: Array<Role>;
+  user: IUser;
+  groups: Array<IGroup>;
+  roles: Array<IRole>;
   token: string;
 };
 
@@ -71,7 +71,7 @@ const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }
   };
 
   const getRoleDropdownValues = (): DropdownValues => {
-    return roles.map(({ name, slug }: Role) => ({ name, slug }));
+    return roles.map(({ name, slug }: IRole) => ({ name, slug }));
   };
 
   const getGenderDropdownValues = (): DropdownValues => {
@@ -87,7 +87,7 @@ const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }
 
     try {
       if (!user.role || roleSlug !== user.role.slug) {
-        const role = roles.find(({ slug }: Role) => slug === roleSlug);
+        const role = roles.find(({ slug }: IRole) => slug === roleSlug);
         if (role) await database.put(`/api/users/${user.id}/role`, { roleId: role.id }, getHeaders(token));
       }
 
@@ -127,7 +127,6 @@ const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }
       router.push('/admin/users');
     } catch (err: any) {
       if (err.response && err.response.status === 403) return router.push('/login');
-      else console.log(err.response);
     }
   };
 

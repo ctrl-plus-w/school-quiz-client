@@ -4,16 +4,17 @@ import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 
 import AdminDashboardModelsLayout from '@layout/AdminDashboardModels';
 
+import Table from '@module/Table';
+
 import { getHeaders } from '@util/authentication.utils';
 
 import roles from '@constant/roles';
 
 import database from 'database/database';
-import Table from '@module/Table';
 import { AuthContext } from 'context/AuthContext/AuthContext';
 
 type ServerSideProps = {
-  groups: Array<Group>;
+  groups: Array<IGroup>;
   token: string;
 };
 
@@ -24,7 +25,7 @@ const AdminGroupsDashboard: FunctionComponent<ServerSideProps> = ({ groups, toke
 
   return (
     <AdminDashboardModelsLayout title="Groupes" subtitle="Créer un groupe">
-      <Table
+      <Table<IGroup, keyof IGroup>
         data={groups}
         attributes={[
           ['ID', 'id'],
