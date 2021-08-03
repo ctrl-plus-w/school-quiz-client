@@ -35,10 +35,10 @@ const Container: FunctionComponent<IProps> = ({ children, title, subtitle, bread
         {breadcrumb.map(({ name, path }) =>
           path ? (
             <Link href={path} key={uuidv4()}>
-              <a className="font-semibold">{name} &gt;</a>
+              <a className="font-semibold hover:text-blue-500 transition-all duration-300">{name} &gt; </a>
             </Link>
           ) : (
-            <span key={uuidv4()}> {name}</span>
+            <span key={uuidv4()}>{name}</span>
           )
         )}
       </p>

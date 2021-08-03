@@ -14,3 +14,19 @@ export const stringifyGender = (gender: boolean | null): string => {
 export const booleanMapper = (value: boolean): string => {
   return value ? 'Oui' : 'Non';
 };
+
+export const questionTypeMapper = (questionType: QuestionType): string => {
+  if (questionType === 'textualQuestion') return 'Textuelle';
+  if (questionType === 'choiceQuestion') return 'À choix';
+  return 'Numérique';
+};
+
+export const questionTypeFilter =
+  (questionType: QuestionType) =>
+  (instance: IQuestionSpecification): boolean => {
+    return instance.questionType === questionType;
+  };
+
+export const str = (val: RegExp): string => {
+  return val.toString().slice(1, -1);
+};

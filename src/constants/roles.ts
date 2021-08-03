@@ -1,4 +1,4 @@
-export default {
+const ROLES = {
   ADMIN: {
     PERMISSION: 1,
     name: { EN: 'Admin', FR: 'Admin' },
@@ -18,3 +18,5 @@ export default {
     path: '/student',
   },
 };
+
+export default ROLES;

@@ -50,12 +50,12 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const token = context.req.cookies.user;
     if (!token) throw new Error();
 
-    const { data } = await database.post('/auth/validateToken', {}, getHeaders(token));
-    if (!data.valid) throw new Error();
+    const { data: validatedToken } = await database.post('/auth/validateToken', {}, getHeaders(token));
+    if (!validatedToken.valid) throw new Error();
 
-    if (data.rolePermission !== ROLES.PROFESSOR.PERMISSION) throw new Error();
+    if (validatedToken.rolePermission !== ROLES.PROFESSOR.PERMISSION) throw new Error();
 
-    const { data: quizzes } = await database.get(`/api/quizzes`, { ...getHeaders(token), params: { userId: data.userId } });
+    const { data: quizzes } = await database.get(`/api/quizzes`, { ...getHeaders(token), params: { userId: validatedToken.userId } });
     if (!quizzes) throw new Error();
 
     const props: IServerSideProps = { quizzes, token };

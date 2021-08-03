@@ -1,11 +1,10 @@
-import React, { Dispatch, ReactElement, SetStateAction, useState } from 'react';
+import React, { Dispatch, ReactElement, SetStateAction } from 'react';
 
 import clsx from 'clsx';
 
 import { v4 as uuidv4 } from 'uuid';
 
 interface IRadioInputProps {
-  id: string;
   name: string;
 
   checked: boolean;
@@ -13,17 +12,7 @@ interface IRadioInputProps {
   setValue: () => void;
 }
 
-interface IProps<T> {
-  values: Array<{ name: string; slug: T }>;
-  label: string;
-  big?: boolean;
-  className?: string;
-
-  value: T;
-  setValue: Dispatch<SetStateAction<T>>;
-}
-
-const BigRadioInput = ({ id, name, checked, setValue }: IRadioInputProps) => {
+const BigRadioInput = ({ name, checked, setValue }: IRadioInputProps) => {
   return (
     <label
       className={clsx([
@@ -31,17 +20,17 @@ const BigRadioInput = ({ id, name, checked, setValue }: IRadioInputProps) => {
         checked ? 'bg-gray-500 border-gray-900 text-gray-900' : 'bg-gray-400 border-gray-600 text-gray-600',
       ])}
     >
-      <input type="radio" className="hidden" name={id} checked={checked} onChange={setValue} />
+      <input type="radio" className="hidden" checked={checked} onChange={setValue} />
 
       <p>{name}</p>
     </label>
   );
 };
 
-const NormalRadioInput = ({ id, name, checked, setValue }: IRadioInputProps) => {
+const NormalRadioInput = ({ name, checked, setValue }: IRadioInputProps) => {
   return (
     <label className="flex items-center mb-0.5 cursor-pointer">
-      <input type="radio" className="hidden" name={id} checked={checked} onChange={setValue} />
+      <input type="radio" className="hidden" checked={checked} onChange={setValue} />
 
       <div
         className={clsx([
@@ -55,9 +44,17 @@ const NormalRadioInput = ({ id, name, checked, setValue }: IRadioInputProps) => 
   );
 };
 
-const RadioInput = <T,>({ label, values, value, setValue, big = false, className }: IProps<T>): ReactElement => {
-  const [id] = useState(uuidv4());
+interface IProps<T> {
+  values: Array<{ name: string; slug: T }>;
+  label: string;
+  big?: boolean;
+  className?: string;
 
+  value: T;
+  setValue: Dispatch<SetStateAction<T>>;
+}
+
+const RadioInput = <T,>({ label, values, value, setValue, big = false, className }: IProps<T>): ReactElement => {
   return (
     <div className={`form-control flex flex-col w-80 ${className}`}>
       <div className="text-sm font-semibold text-gray-900">
@@ -67,8 +64,8 @@ const RadioInput = <T,>({ label, values, value, setValue, big = false, className
 
         <div className={clsx('flex mt-2', big ? 'flex-row' : 'flex-col items-start')}>
           {values.map(({ name, slug }) => {
-            const props: IRadioInputProps = { name, checked: value === slug, id, setValue: () => setValue(slug) };
-            return big ? <BigRadioInput {...props} /> : <NormalRadioInput {...props} />;
+            const props: IRadioInputProps = { name, checked: value === slug, setValue: () => setValue(slug) };
+            return big ? <BigRadioInput {...props} key={uuidv4()} /> : <NormalRadioInput {...props} key={uuidv4()} />;
           })}
         </div>
       </div>
