@@ -37,11 +37,11 @@ interface IServerSideProps {
 }
 
 const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSideProps): ReactElement => {
-  const [valid, _setValid] = useState(false);
+  const [valid, setValid] = useState(false);
 
   // The basic question properties
   const [title, setTitle] = useState('');
-  const [questionType, setQuestionType] = useState<QuestionType>('numericQuestion');
+  const [questionType, setQuestionType] = useState<QuestionType>('choiceQuestion');
   const [verificationType, setVerificationType] = useState<VerificationType>('automatique');
   const [caseSensitive, setCaseSensitive] = useState(false);
   const [accentSensitive, setAccentSensitive] = useState(false);
@@ -51,13 +51,13 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
   const [choiceAmount, setChoiceAmount] = useState('2');
 
   // The choices of a choice question (radio)
-  const [uniqueChoices, setUniqueChoices] = useState<EditableRadioInputValues>([
+  const [uniqueChoices, setUniqueChoices] = useState<EditableInputValues>([
     { id: uuidv4(), name: '', checked: false },
     { id: uuidv4(), name: '', checked: false },
   ]);
 
   // The choices of a choice quetion (checkbox)
-  const [multipleChoices, setMultipleChoices] = useState<EditableCheckboxInputValues>([
+  const [multipleChoices, setMultipleChoices] = useState<EditableInputValues>([
     { id: uuidv4(), name: '', checked: false },
     { id: uuidv4(), name: '', checked: false },
   ]);
@@ -97,20 +97,40 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
   // When the creation properties of the question get updated, make calculation to see if it is valid or not
   useEffect(() => {
     // TODO : Edit the valid state depending on the given properties.
-  }, [
-    title,
-    questionType,
-    verificationType,
-    caseSensitive,
-    accentSensitive,
-    shuffle,
-    uniqueChoices,
-    multipleChoices,
-    tqAnswers,
-    nqAnswerMax,
-    nqAnswerMin,
-    nqAnswerMax,
-  ]);
+
+    const isValid = (): boolean => {
+      if (title === '') return false;
+
+      // Textual question
+      if (questionType === 'textualQuestion' && tqAnswers.length === 0) return false;
+
+      // Numeric question
+      if (questionType === 'numericQuestion') {
+        if (nqSpecificationType === 'exact') {
+          if (nqAnswers.length === 0) return false;
+        }
+
+        if (nqSpecificationType === 'comparison') {
+          if (nqAnswerMin === '' || nqAnswerMax === '') return false;
+        }
+      }
+
+      // Choice question
+      if (questionType === 'choiceQuestion') {
+        const choices = cqSpecification === 'choix-unique' ? uniqueChoices : multipleChoices;
+
+        const isOneChecked = choices.some(({ checked }) => checked === true);
+        const areValuesNotEmpty = choices.every(({ name }) => name !== '');
+
+        if (uniqueChoices.length < 2 || !isOneChecked || !areValuesNotEmpty) return false;
+      }
+
+      return true;
+    };
+
+    if (isValid()) setValid(true);
+    else setValid(false);
+  }, [title, uniqueChoices, multipleChoices, cqSpecification, tqAnswers, nqAnswers, nqAnswerMin, nqAnswerMax]);
 
   const handleSubmit = (): void => {
     // TODO : If the valid property is set to true, make the computations to create a quiz.
