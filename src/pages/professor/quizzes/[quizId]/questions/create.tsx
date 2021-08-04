@@ -1,5 +1,6 @@
-import React, { ReactElement, useEffect, useState } from 'react';
+import React, { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { useRouter } from 'next/dist/client/router';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -8,6 +9,7 @@ import ProfessorDashboard from '@layout/ProfessorDashboard';
 import Container from '@module/Container';
 import Form from '@module/Form';
 import FormGroup from '@module/FormGroup';
+import Row from '@module/Row';
 
 import Input from '@element/Input';
 import Title from '@element/Title';
@@ -19,17 +21,19 @@ import Dropdown from '@element/Dropdown';
 import NumberInput from '@element/NumberInput';
 import EditableRadioInput from '@element/EditableRadioInput';
 import EditableCheckboxInput from '@element/EditableCheckboxInput';
+import LinkButton from '@element/LinkButton';
+import Button from '@element/Button';
+import Textarea from '@element/Textarea';
 
 import { getHeaders } from '@util/authentication.utils';
 import { nameSlugMapper, questionTypeFilter } from '@util/mapper.utils';
 
 import ROLES from '@constant/roles';
 
+import { NotificationContext } from 'context/NotificationContext/NotificationContext';
+
+import { addChoices, createChoiceQuestion } from 'api/questions';
 import database from 'database/database';
-import Row from '@module/Row';
-import LinkButton from '@element/LinkButton';
-import Button from '@element/Button';
-import Textarea from '@element/Textarea';
 
 interface IServerSideProps {
   quiz: IQuiz;
@@ -38,6 +42,10 @@ interface IServerSideProps {
 }
 
 const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSideProps): ReactElement => {
+  const router = useRouter();
+
+  const { addNotification } = useContext(NotificationContext);
+
   const [valid, setValid] = useState(false);
 
   // The basic question properties
@@ -89,12 +97,12 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
   const [nqSpecificationType, setNqSpecificationType] = useState<'exact' | 'comparison'>('exact');
 
   // The question specifications of the numeric and choice question (fetched on the database and formatted).
-  const [numericQuestionSpecifications] = useState(questionSpecifications.filter(questionTypeFilter('numericQuestion')).map(nameSlugMapper));
-  const [choiceQuestionSpecifications] = useState(questionSpecifications.filter(questionTypeFilter('choiceQuestion')).map(nameSlugMapper));
+  const [nqSpecifications] = useState(questionSpecifications.filter(questionTypeFilter('numericQuestion')).map(nameSlugMapper));
+  const [cqSpecifications] = useState(questionSpecifications.filter(questionTypeFilter('choiceQuestion')).map(nameSlugMapper));
 
   // The numeric and choice question specification
-  const [nqSpecification, setNqSpecification] = useState(nameSlugMapper(numericQuestionSpecifications[0]).slug);
-  const [cqSpecification, setCqSpecification] = useState(nameSlugMapper(choiceQuestionSpecifications[0]).slug);
+  const [nqSpecification, setNqSpecification] = useState(nameSlugMapper(nqSpecifications[0]).slug);
+  const [cqSpecification, setCqSpecification] = useState(nameSlugMapper(cqSpecifications[0]).slug);
 
   // When the creation properties of the question get updated, make calculation to see if it is valid or not
   useEffect(() => {
@@ -134,8 +142,42 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
     else setValid(false);
   }, [title, uniqueChoices, multipleChoices, cqSpecification, tqAnswers, nqAnswers, nqAnswerMin, nqAnswerMax]);
 
-  const handleSubmit = (): void => {
-    // TODO : If the valid property is set to true, make the computations to create a quiz.
+  const choiceQuestionComputations = async (): Promise<void> => {
+    const questionSpecificationSlug = cqSpecification;
+    const creationAttributes: ChoiceQuestionCreationAttributes = { title, description, shuffle, questionSpecificationSlug };
+
+    const [question, questionCreationError] = await createChoiceQuestion<IQuestion>(quiz.id, creationAttributes, token);
+
+    if (questionCreationError) {
+      if (questionCreationError.status === 403) router.push('/login');
+      else addNotification({ content: questionCreationError.message, type: 'ERROR' });
+    }
+
+    if (!question) return;
+
+    const questionChoices = cqSpecification === 'choix-unique' ? uniqueChoices : multipleChoices;
+    const [choices, choicesCreationError] = await addChoices(quiz.id, question.id, questionChoices, token);
+
+    if (choicesCreationError) {
+      if (choicesCreationError.status === 403) router.push('/login');
+      else addNotification({ content: choicesCreationError.message, type: 'ERROR' });
+    }
+
+    if (!choices) return;
+
+    addNotification({ content: 'Question créée.', type: 'INFO' });
+    router.push(`/professor/quizzes/${quiz.id}/questions`);
+  };
+
+  // Call the right function to create the question
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+
+    if (!valid) return;
+
+    if (questionType === 'choiceQuestion') choiceQuestionComputations();
+
+    // TODO : Make the textual and numeric question computations.
   };
 
   return (
@@ -201,13 +243,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
 
             {questionType === 'numericQuestion' && (
               <>
-                <Dropdown
-                  label="Spécification"
-                  placeholder="test"
-                  values={numericQuestionSpecifications}
-                  value={nqSpecification}
-                  setValue={setNqSpecification}
-                />
+                <Dropdown label="Spécification" placeholder="test" values={nqSpecifications} value={nqSpecification} setValue={setNqSpecification} />
 
                 {['nombre-entier', 'nombre-decimal', 'pourcentage', 'prix'].includes(nqSpecification) && (
                   <>
@@ -241,13 +277,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
 
             {questionType === 'choiceQuestion' && (
               <>
-                <Dropdown
-                  label="Spécification"
-                  placeholder="test"
-                  values={choiceQuestionSpecifications}
-                  value={cqSpecification}
-                  setValue={setCqSpecification}
-                />
+                <Dropdown label="Spécification" placeholder="test" values={cqSpecifications} value={cqSpecification} setValue={setCqSpecification} />
 
                 <CheckboxInput label="Option supplémentaire" values={[{ name: 'Mélanger les choix', checked: shuffle, setValue: setShuffle }]} />
 
