@@ -5,4 +5,33 @@ type QuizCreationAttributes = {
   shuffle: boolean;
 };
 
-type APIResponse = [boolean, { status: number; message: string } | undefined];
+type QuestionCreationAttributes = {
+  title: string;
+  description: string;
+};
+
+type TextualQuestionCreationAttributes = QuestionCreationAttributes & {
+  accentSensitive: boolean;
+  caseSensitive: boolean;
+
+  verificationTypeSlug: VerificationType;
+};
+
+type NumericQuestionCreationAttributes = QuestionCreationAttributes & {
+  questionSpecificationSlug: string;
+};
+
+type ChoiceQuestionCreationAttributes = QuestionCreationAttributes & {
+  shuffle: boolean;
+
+  questionSpecificationSlug: string;
+};
+
+type ChoiceCreationAttributes = {
+  valid: boolean;
+  name: string;
+};
+
+type APIResponse<T> = [T | null, { status: number; message: string } | undefined];
+
+type UpdateResponse = { set: boolean };
