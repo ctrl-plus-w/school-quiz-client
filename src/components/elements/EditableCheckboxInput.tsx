@@ -45,8 +45,8 @@ interface IProps {
   label: string;
   placeholder: string;
 
-  values: EditableRadioInputValues;
-  setValues: Dispatch<SetStateAction<EditableRadioInputValues>>;
+  values: EditableInputValues;
+  setValues: Dispatch<SetStateAction<EditableInputValues>>;
 }
 
 const EditableCheckboxInput = ({ label, placeholder, values, setValues }: IProps): ReactElement => {

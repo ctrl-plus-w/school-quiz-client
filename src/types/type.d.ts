@@ -36,5 +36,4 @@ type AuthContextState = {
   setToken: (token: string) => void;
 };
 
-type EditableRadioInputValues = Array<{ id: string; name: string; checked: boolean }>;
-type EditableCheckboxInputValues = Array<{ id: string; name: string; checked: boolean }>;
+type EditableInputValues = Array<{ id: string; name: string; checked: boolean }>;
