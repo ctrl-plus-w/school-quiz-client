@@ -29,6 +29,7 @@ import database from 'database/database';
 import Row from '@module/Row';
 import LinkButton from '@element/LinkButton';
 import Button from '@element/Button';
+import Textarea from '@element/Textarea';
 
 interface IServerSideProps {
   quiz: IQuiz;
@@ -41,6 +42,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
 
   // The basic question properties
   const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
   const [questionType, setQuestionType] = useState<QuestionType>('choiceQuestion');
   const [verificationType, setVerificationType] = useState<VerificationType>('automatique');
   const [caseSensitive, setCaseSensitive] = useState(false);
@@ -99,7 +101,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
     // TODO : Edit the valid state depending on the given properties.
 
     const isValid = (): boolean => {
-      if (title === '') return false;
+      if (title === '' || description === '') return false;
 
       // Textual question
       if (questionType === 'textualQuestion' && tqAnswers.length === 0) return false;
@@ -152,7 +154,9 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
           <FormGroup>
             <Title level={2}>Informations générales</Title>
 
-            <Input label="Titre" placeholder="Comment... ?" value={title} setValue={setTitle} />
+            <Input label="Titre" placeholder="Comment... ?" value={title} setValue={setTitle} maxLength={35} />
+
+            <Textarea label="Description" placeholder="Lorem ipsum..." value={description} setValue={setDescription} maxLength={120} />
           </FormGroup>
 
           <FormGroup>
@@ -191,7 +195,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
                   ]}
                 />
 
-                <MultipleTextInput label="Réponses" placeholder="Réponse" values={tqAnswers} setValues={setTqAnswers} />
+                <MultipleTextInput label="Réponses" placeholder="Réponse" values={tqAnswers} setValues={setTqAnswers} maxLength={25} />
               </>
             )}
 
@@ -250,9 +254,9 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
                 <NumberInput label="Nombre de réponses" type="nombre-entier" value={choiceAmount} setValue={setChoiceAmount} min={2} />
 
                 {cqSpecification === 'choix-unique' ? (
-                  <EditableRadioInput label="Choix" placeholder="Choix" values={uniqueChoices} setValues={setUniqueChoices} />
+                  <EditableRadioInput label="Choix" placeholder="Choix" values={uniqueChoices} setValues={setUniqueChoices} maxLength={35} />
                 ) : (
-                  <EditableCheckboxInput label="Choix" placeholder="Choix" values={multipleChoices} setValues={setMultipleChoices} />
+                  <EditableCheckboxInput label="Choix" placeholder="Choix" values={multipleChoices} setValues={setMultipleChoices} maxLength={35} />
                 )}
               </>
             )}

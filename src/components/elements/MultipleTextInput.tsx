@@ -8,13 +8,15 @@ interface IProps {
   label: string;
   placeholder: string;
 
+  maxLength?: number;
+
   className?: string;
 
   values: string[];
   setValues: Dispatch<SetStateAction<string[]>>;
 }
 
-const MultipleTextInput = ({ className, label, placeholder, values, setValues }: IProps): ReactElement => {
+const MultipleTextInput = ({ className, label, placeholder, values, setValues, maxLength }: IProps): ReactElement => {
   const [tempValue, setTempValue] = useState('');
 
   const addValue = (str: string): void => {
@@ -55,6 +57,7 @@ const MultipleTextInput = ({ className, label, placeholder, values, setValues }:
           onKeyDown={handleInput}
           value={tempValue}
           onChange={onChange}
+          maxLength={maxLength}
         />
 
         <div className="flex flex-wrap w-full">

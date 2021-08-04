@@ -8,7 +8,7 @@ const DEFAULT_API_ERROR_RESPONSE: APIResponse = [false, { status: 400, message: 
 
 export const createQuiz = async (creationAttributes: QuizCreationAttributes, token: string): Promise<APIResponse> => {
   try {
-    await database.post('/api/quizzes', creationAttributes, getHeaders(token));
+    await database.post('/api/questions', creationAttributes, getHeaders(token));
 
     return [true, undefined];
   } catch (_err) {

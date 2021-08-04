@@ -7,13 +7,15 @@ interface IRadioInputProps {
   inputName: string;
   placeholder: string;
 
+  maxLength?: number;
+
   checked: boolean;
 
   setValue: (value: string) => void;
   setChecked: (id: string) => void;
 }
 
-const RadioInput = ({ id, inputName, checked, setValue, setChecked, placeholder }: IRadioInputProps): ReactElement => {
+const RadioInput = ({ id, inputName, checked, setValue, setChecked, placeholder, maxLength }: IRadioInputProps): ReactElement => {
   const [tempValue, setTempValue] = useState('');
 
   const handleInputchange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -36,6 +38,7 @@ const RadioInput = ({ id, inputName, checked, setValue, setChecked, placeholder 
         value={tempValue}
         onChange={handleInputchange}
         autoComplete="off"
+        maxLength={maxLength}
       />
     </div>
   );
@@ -45,11 +48,13 @@ interface IProps {
   label: string;
   placeholder: string;
 
+  maxLength?: number;
+
   values: EditableInputValues;
   setValues: Dispatch<SetStateAction<EditableInputValues>>;
 }
 
-const EditableRadioInput = ({ label, placeholder, values, setValues }: IProps): ReactElement => {
+const EditableRadioInput = ({ label, placeholder, values, setValues, maxLength }: IProps): ReactElement => {
   const [inputName] = useState(uuidv4());
 
   const [tempChecked, setTempChecked] = useState('');
@@ -91,6 +96,7 @@ const EditableRadioInput = ({ label, placeholder, values, setValues }: IProps): 
                 setValue={(v) => setValue(id, v)}
                 setChecked={setChecked}
                 checked={tempChecked === id}
+                maxLength={maxLength}
                 key={id}
               />
             ))}

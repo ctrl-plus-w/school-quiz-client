@@ -5,13 +5,15 @@ interface IProps {
   label: string;
   note?: string;
 
+  maxLength?: number;
+
   className?: string;
 
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Textarea = ({ label, placeholder, className, value, setValue, note }: IProps): ReactElement => {
+const Textarea = ({ label, placeholder, className, value, setValue, note, maxLength }: IProps): ReactElement => {
   const onChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
     setValue(e.target.value);
   };
@@ -29,7 +31,16 @@ const Textarea = ({ label, placeholder, className, value, setValue, note }: IPro
           value={value}
           onChange={onChange}
           autoComplete="off"
+          maxLength={maxLength}
         ></textarea>
+
+        {maxLength && (
+          <div className="flex justify-end w-full mt-0.5">
+            <p className="text-gray-500 font-medium text-xs">
+              {value.length}/{maxLength}
+            </p>
+          </div>
+        )}
 
         {note && (
           <div className="w-full mt-0.5">

@@ -75,9 +75,9 @@ const CreateQuiz = ({ token }: IServerSideProps): ReactElement => {
           <FormGroup>
             <Title level={2}>Informations générales</Title>
 
-            <Input label="Titre" placeholder="Comment... ?" value={title} setValue={setTitle} />
+            <Input label="Titre" placeholder="Comment... ?" value={title} setValue={setTitle} maxLength={25} />
 
-            <Textarea label="Description" placeholder="Lorem ipsum dolo..." value={description} setValue={setDescription} />
+            <Textarea label="Description" placeholder="Lorem ipsum dolo..." value={description} setValue={setDescription} maxLength={120} />
 
             <CheckboxInput
               label="Options supplémentaires"
