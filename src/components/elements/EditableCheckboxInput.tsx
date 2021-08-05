@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 interface IRadioInputProps {
   id: string;
+  value?: string;
   inputName: string;
   placeholder: string;
 
@@ -15,8 +16,8 @@ interface IRadioInputProps {
   setChecked: (id: string, value: boolean) => void;
 }
 
-const CheckboxInput = ({ id, inputName, checked, setValue, setChecked, placeholder, maxLength }: IRadioInputProps): ReactElement => {
-  const [tempValue, setTempValue] = useState('');
+const CheckboxInput = ({ id, inputName, checked, value = '', setValue, setChecked, placeholder, maxLength }: IRadioInputProps): ReactElement => {
+  const [tempValue, setTempValue] = useState(value);
 
   const handleInputchange = (e: ChangeEvent<HTMLInputElement>): void => {
     setTempValue(e.target.value);
@@ -40,14 +41,6 @@ const CheckboxInput = ({ id, inputName, checked, setValue, setChecked, placehold
         autoComplete="off"
         maxLength={maxLength}
       />
-
-      {maxLength && (
-        <div className="flex justify-end w-full mt-0.5">
-          <p className="text-gray-500 font-medium text-xs">
-            {tempValue.length}/{maxLength}
-          </p>
-        </div>
-      )}
     </div>
   );
 };
@@ -93,11 +86,12 @@ const EditableCheckboxInput = ({ label, placeholder, values, setValues, maxLengt
         <div className="flex mt-2 flex-col items-start">
           {values
             .sort(({ id }, { id: _id }) => id.localeCompare(_id))
-            .map(({ id, checked }) => (
+            .map(({ id, checked, name }) => (
               <CheckboxInput
                 id={id}
                 placeholder={placeholder}
                 inputName={inputName}
+                value={name}
                 setValue={(v) => setValue(id, v)}
                 setChecked={setChecked}
                 checked={checked}

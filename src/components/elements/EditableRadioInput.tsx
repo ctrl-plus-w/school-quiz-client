@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 interface IRadioInputProps {
   id: string;
+  value?: string;
   inputName: string;
   placeholder: string;
 
@@ -15,8 +16,8 @@ interface IRadioInputProps {
   setChecked: (id: string) => void;
 }
 
-const RadioInput = ({ id, inputName, checked, setValue, setChecked, placeholder, maxLength }: IRadioInputProps): ReactElement => {
-  const [tempValue, setTempValue] = useState('');
+const RadioInput = ({ id, inputName, checked, value = '', setValue, setChecked, placeholder, maxLength }: IRadioInputProps): ReactElement => {
+  const [tempValue, setTempValue] = useState(value);
 
   const handleInputchange = (e: ChangeEvent<HTMLInputElement>): void => {
     setTempValue(e.target.value);
@@ -57,7 +58,7 @@ interface IProps {
 const EditableRadioInput = ({ label, placeholder, values, setValues, maxLength }: IProps): ReactElement => {
   const [inputName] = useState(uuidv4());
 
-  const [tempChecked, setTempChecked] = useState('');
+  const [tempChecked, setTempChecked] = useState(values.find(({ checked }) => checked)?.id || '');
 
   const setValue = (id: string, value: string): void => {
     setValues((prev) => {
@@ -88,12 +89,13 @@ const EditableRadioInput = ({ label, placeholder, values, setValues, maxLength }
         <div className="flex mt-2 flex-col items-start">
           {values
             .sort(({ id }, { id: _id }) => id.localeCompare(_id))
-            .map(({ id, checked }) => (
+            .map(({ id, checked, name }) => (
               <RadioInput
                 id={id}
                 placeholder={placeholder}
                 inputName={inputName}
                 setValue={(v) => setValue(id, v)}
+                value={name}
                 setChecked={setChecked}
                 checked={tempChecked === id}
                 maxLength={maxLength}
