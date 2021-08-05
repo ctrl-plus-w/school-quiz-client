@@ -25,6 +25,7 @@ interface IProps<T, K> {
   shownElement: number;
   apiName: string;
   setShownElement: Dispatch<SetStateAction<number>>;
+  handleClick?: (instance: T) => void;
 }
 
 const TableRow = <T extends { id: number }, K extends keyof T>({
@@ -33,6 +34,7 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
   shownElement,
   apiName,
   setShownElement,
+  handleClick,
 }: IProps<T, K>): ReactElement => {
   const router = useRouter();
 
@@ -47,7 +49,7 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
 
   const { container } = useClickOutside<HTMLFormElement>(updateShownElement, [shownElement]);
 
-  const handleClick = (instance: T): void => {
+  const defaultHandleClick = (instance: T): void => {
     router.push({ pathname: `${router.pathname}/[id]`, query: { id: instance.id } });
   };
 
@@ -88,7 +90,7 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
         <td
           className="px-4 py-3 cursor-pointer text-gray-500 text-sm border-t border-gray-300 group-hover:bg-gray-200 transition-all duration-100"
           key={uuidv4()}
-          onClick={() => handleClick(instance)}
+          onClick={() => (handleClick ? handleClick(instance) : defaultHandleClick(instance))}
         >
           {mapper ? mapper(instance[attribute]) : instance[attribute]}
         </td>

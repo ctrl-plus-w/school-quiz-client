@@ -12,9 +12,10 @@ interface IProps<T, K> {
   data: Array<T>;
   attributes: Array<[name: string, attribute: K, mapper?: MapperFunction]>;
   apiName: string;
+  handleClick?: (instance: T) => void;
 }
 
-const Table = <T extends { id: number }, K extends keyof T>({ attributes, data, apiName }: IProps<T, K>): ReactElement => {
+const Table = <T extends { id: number }, K extends keyof T>({ attributes, data, apiName, handleClick }: IProps<T, K>): ReactElement => {
   const [shownElement, setShownElement] = useState(-1);
 
   return data.length > 0 ? (
@@ -39,6 +40,7 @@ const Table = <T extends { id: number }, K extends keyof T>({ attributes, data, 
             shownElement={shownElement}
             setShownElement={setShownElement}
             apiName={apiName}
+            handleClick={handleClick}
           />
         ))}
       </tbody>

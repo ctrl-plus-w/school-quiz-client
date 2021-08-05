@@ -1,26 +1,28 @@
 import React, { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { useRouter } from 'next/dist/client/router';
+
+import Input from '@element/Input';
+import Title from '@element/Title';
+import Textarea from '@element/Textarea';
+import CheckboxInput from '@element/CheckboxInput';
+import Route from '@element/Route';
+
+import Table from '@module/Table';
+import Container from '@module/Container';
+import Form from '@module/Form';
+import FormGroup from '@module/FormGroup';
 
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
-import Container from '@module/Container';
-
 import { getHeaders } from '@util/authentication.utils';
+import { questionTypeMapper } from '@util/mapper.utils';
 
 import ROLES from '@constant/roles';
 
 import database from 'database/database';
 
 import { AuthContext } from 'context/AuthContext/AuthContext';
-import Form from '@module/Form';
-import FormGroup from '@module/FormGroup';
-import Input from '@element/Input';
-import Title from '@element/Title';
-import Textarea from '@element/Textarea';
-import CheckboxInput from '@element/CheckboxInput';
-import Table from '@module/Table';
-import Route from '@element/Route';
-import { questionTypeMapper } from '@util/mapper.utils';
 
 interface ServerSideProps {
   quiz: IQuiz;
@@ -28,6 +30,8 @@ interface ServerSideProps {
 }
 
 const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
+  const router = useRouter();
+
   const { setToken } = useContext(AuthContext);
 
   const [title, setTitle] = useState(quiz.title);
@@ -41,6 +45,10 @@ const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
     e.preventDefault();
 
     alert();
+  };
+
+  const handleClick = (instance: IQuestion) => {
+    router.push({ pathname: `${router.pathname}/questions/[questionId]`, query: { quizId: quiz.id, questionId: instance.id } });
   };
 
   return (
@@ -80,6 +88,7 @@ const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
             ]}
             data={quiz.questions}
             apiName={`quizzes/${quiz.id}/questions`}
+            handleClick={handleClick}
           />
         </div>
       </Container>
