@@ -32,7 +32,7 @@ import ROLES from '@constant/roles';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 
-import { addChoices, addComparisonAnswer, addExactAnswers, createChoiceQuestion, createNumericQuestion } from 'api/questions';
+import { addChoices, addComparisonAnswer, addExactAnswers, createChoiceQuestion, createNumericQuestion, createTextualQuestion } from 'api/questions';
 import database from 'database/database';
 
 interface IServerSideProps {
@@ -142,6 +142,33 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
     else setValid(false);
   }, [title, uniqueChoices, multipleChoices, cqSpecification, tqAnswers, nqAnswers, nqAnswerMin, nqAnswerMax]);
 
+  const textualQuestionComputations = async (): Promise<void> => {
+    const verificationTypeSlug = verificationType;
+    const creationAttributes: TextualQuestionCreationAttributes = { title, description, accentSensitive, caseSensitive, verificationTypeSlug };
+
+    const [question, questionCreationError] = await createTextualQuestion<IQuestion>(quiz.id, creationAttributes, token);
+
+    if (questionCreationError) {
+      if (questionCreationError.status === 403) router.push('/login');
+      else addNotification({ content: questionCreationError.message, type: 'ERROR' });
+    }
+
+    if (!question) return;
+
+    const answers: Array<ExactAnswerCreationAttributes> = tqAnswers.map((answer) => ({ answerContent: answer }));
+    const [createdAnswers, answersCreationError] = await addExactAnswers(quiz.id, question.id, answers, token);
+
+    if (answersCreationError) {
+      if (answersCreationError.status === 403) router.push('/login');
+      else addNotification({ content: answersCreationError.message, type: 'ERROR' });
+    }
+
+    if (!createdAnswers) return;
+
+    addNotification({ content: 'Question créée.', type: 'INFO' });
+    router.push(`/professor/quizzes/${quiz.id}`);
+  };
+
   const numericQuestionComputations = async (): Promise<void> => {
     const questionSpecificationSlug = nqSpecification;
     const creationAttributes: NumericQuestionCreationAttributes = { title, description, questionSpecificationSlug };
@@ -223,6 +250,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
 
     if (questionType === 'choiceQuestion') choiceQuestionComputations();
     if (questionType === 'numericQuestion') numericQuestionComputations();
+    if (questionType === 'textualQuestion') textualQuestionComputations();
 
     // TODO : Make the textual and numeric question computations.
   };
