@@ -73,9 +73,14 @@ type TypedAnswer = IExactAnswer | IComparisonAnswer;
 
 type AnswerType = 'exactAnswer' | 'comparisonAnswer';
 
-interface IAnswer extends DefaultModelProperties {
-  typedAnswer?: TypedAnswer;
-  answertype: AnswerType;
+type Answer = DefaultModelProperties & {
+  typedAnswer?: IExactAnswer | IComparisonAnswer;
+  answerType: AnswerType;
+};
+
+interface IAnswer<T extends IExactAnswer | IComparisonAnswer> extends DefaultModelProperties {
+  typedAnswer: T;
+  answerType: AnswerType;
 }
 
 interface IExactAnswer extends DefaultModelProperties {
@@ -118,7 +123,7 @@ interface IQuestion<T extends ITextualQuestion | INumericQuestion | IChoiceQuest
 
   typedQuestion: T;
 
-  answers: Array<IAnswer>;
+  answers: Array<IAnswer<IExactAnswer | IComparisonAnswer>>;
   userAnswers: Array<IUserAnswer>;
 }
 
