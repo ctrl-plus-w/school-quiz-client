@@ -65,11 +65,16 @@ interface IProps {
 }
 
 const MultipleNumberInput = ({ className, label, type, placeholder = undefined, values, setValues }: IProps): ReactElement => {
+  const [loaded, setLoaded] = useState(false);
   const [tempValue, setTempValue] = useState('');
 
   useEffect(() => {
-    setTempValue('');
-    setValues([]);
+    if (loaded) {
+      setTempValue('');
+      setValues([]);
+    } else {
+      setLoaded(true);
+    }
   }, [type]);
 
   const addValue = (value: string): void => {
