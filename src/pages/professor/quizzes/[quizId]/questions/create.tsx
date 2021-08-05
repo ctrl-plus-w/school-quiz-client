@@ -193,104 +193,118 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
         <hr className="mb-8 mt-8" />
 
         <Form full={true} onSubmit={handleSubmit}>
-          <FormGroup>
-            <Title level={2}>Informations générales</Title>
+          <Row>
+            <FormGroup>
+              <Title level={2}>Informations générales</Title>
 
-            <Input label="Titre" placeholder="Comment... ?" value={title} setValue={setTitle} maxLength={35} />
+              <Input label="Titre" placeholder="Comment... ?" value={title} setValue={setTitle} maxLength={35} />
 
-            <Textarea label="Description" placeholder="Lorem ipsum..." value={description} setValue={setDescription} maxLength={120} />
-          </FormGroup>
+              <Textarea label="Description" placeholder="Lorem ipsum..." value={description} setValue={setDescription} maxLength={120} />
 
-          <FormGroup>
-            <Title level={2}>Type</Title>
+              <RadioInput<QuestionType>
+                label="Type de question"
+                values={[
+                  { name: 'Abc', slug: 'textualQuestion' },
+                  { name: '123', slug: 'numericQuestion' },
+                  { name: 'ooo', slug: 'choiceQuestion' },
+                ]}
+                value={questionType}
+                setValue={setQuestionType}
+                big={true}
+              />
+            </FormGroup>
 
-            <RadioInput<QuestionType>
-              label="Type de question"
-              values={[
-                { name: 'Abc', slug: 'textualQuestion' },
-                { name: '123', slug: 'numericQuestion' },
-                { name: 'ooo', slug: 'choiceQuestion' },
-              ]}
-              value={questionType}
-              setValue={setQuestionType}
-              big={true}
-            />
+            <FormGroup>
+              <Title level={2}>Options du type</Title>
 
-            {questionType === 'textualQuestion' && (
-              <>
-                <RadioInput<VerificationType>
-                  label="Type de vérification"
-                  values={[
-                    { name: 'Automatique', slug: 'automatique' },
-                    { name: 'Hybride', slug: 'hybride' },
-                    { name: 'Manuel', slug: 'manuel' },
-                  ]}
-                  value={verificationType}
-                  setValue={setVerificationType}
-                />
+              {questionType === 'textualQuestion' && (
+                <>
+                  <RadioInput<VerificationType>
+                    label="Type de vérification"
+                    values={[
+                      { name: 'Automatique', slug: 'automatique' },
+                      { name: 'Hybride', slug: 'hybride' },
+                      { name: 'Manuel', slug: 'manuel' },
+                    ]}
+                    value={verificationType}
+                    setValue={setVerificationType}
+                  />
 
-                <CheckboxInput
-                  label="Options supplémentaires"
-                  values={[
-                    { name: 'Sensible à la case', checked: caseSensitive, setValue: setCaseSensitive },
-                    { name: 'Sensible aux accents', checked: accentSensitive, setValue: setAccentSensitive },
-                  ]}
-                />
+                  <CheckboxInput
+                    label="Options supplémentaires"
+                    values={[
+                      { name: 'Sensible à la case', checked: caseSensitive, setValue: setCaseSensitive },
+                      { name: 'Sensible aux accents', checked: accentSensitive, setValue: setAccentSensitive },
+                    ]}
+                  />
 
-                <MultipleTextInput label="Réponses" placeholder="Réponse" values={tqAnswers} setValues={setTqAnswers} maxLength={25} />
-              </>
-            )}
+                  <MultipleTextInput label="Réponses" placeholder="Réponse" values={tqAnswers} setValues={setTqAnswers} maxLength={25} />
+                </>
+              )}
 
-            {questionType === 'numericQuestion' && (
-              <>
-                <Dropdown label="Spécification" placeholder="test" values={nqSpecifications} value={nqSpecification} setValue={setNqSpecification} />
+              {questionType === 'numericQuestion' && (
+                <>
+                  <Dropdown
+                    label="Spécification"
+                    placeholder="test"
+                    values={nqSpecifications}
+                    value={nqSpecification}
+                    setValue={setNqSpecification}
+                  />
 
-                {['nombre-entier', 'nombre-decimal', 'pourcentage', 'prix'].includes(nqSpecification) && (
-                  <>
-                    <Dropdown
-                      label="Type de spécification"
-                      placeholder="Type de spécification"
-                      values={[
-                        { name: 'Exact', slug: 'exact' },
-                        { name: 'Comparaison', slug: 'comparison' },
-                      ]}
-                      value={nqSpecificationType}
-                      setValue={setNqSpecificationType}
-                    />
+                  {['nombre-entier', 'nombre-decimal', 'pourcentage', 'prix'].includes(nqSpecification) && (
+                    <>
+                      <Dropdown
+                        label="Type de spécification"
+                        placeholder="Type de spécification"
+                        values={[
+                          { name: 'Exact', slug: 'exact' },
+                          { name: 'Comparaison', slug: 'comparison' },
+                        ]}
+                        value={nqSpecificationType}
+                        setValue={setNqSpecificationType}
+                      />
 
-                    {nqSpecificationType === 'comparison' ? (
-                      <Row className="w-80 justify-between">
-                        <NumberInput label="Minimum" type={nqSpecification} value={nqAnswerMin} setValue={setNqAnswerMin} />
-                        <NumberInput label="Maximum" type={nqSpecification} value={nqAnswerMax} setValue={setNqAnswerMax} />
-                      </Row>
-                    ) : (
-                      <MultipleNumberInput label="Réponses" type={nqSpecification} values={nqAnswers} setValues={setNqAnswers} />
-                    )}
-                  </>
-                )}
+                      {nqSpecificationType === 'comparison' ? (
+                        <Row className="w-80 justify-between">
+                          <NumberInput label="Minimum" type={nqSpecification} value={nqAnswerMin} setValue={setNqAnswerMin} />
+                          <NumberInput label="Maximum" type={nqSpecification} value={nqAnswerMax} setValue={setNqAnswerMax} />
+                        </Row>
+                      ) : (
+                        <MultipleNumberInput label="Réponses" type={nqSpecification} values={nqAnswers} setValues={setNqAnswers} />
+                      )}
+                    </>
+                  )}
 
-                {['date'].includes(nqSpecification) && (
-                  <MultipleNumberInput label="Réponses" type={nqSpecification} values={nqAnswers} setValues={setNqAnswers} />
-                )}
-              </>
-            )}
+                  {['date'].includes(nqSpecification) && (
+                    <MultipleNumberInput label="Réponses" type={nqSpecification} values={nqAnswers} setValues={setNqAnswers} />
+                  )}
+                </>
+              )}
 
-            {questionType === 'choiceQuestion' && (
-              <>
-                <Dropdown label="Spécification" placeholder="test" values={cqSpecifications} value={cqSpecification} setValue={setCqSpecification} />
+              {questionType === 'choiceQuestion' && (
+                <>
+                  <Dropdown
+                    label="Spécification"
+                    placeholder="test"
+                    values={cqSpecifications}
+                    value={cqSpecification}
+                    setValue={setCqSpecification}
+                  />
 
-                <CheckboxInput label="Option supplémentaire" values={[{ name: 'Mélanger les choix', checked: shuffle, setValue: setShuffle }]} />
+                  <CheckboxInput label="Option supplémentaire" values={[{ name: 'Mélanger les choix', checked: shuffle, setValue: setShuffle }]} />
 
-                <NumberInput label="Nombre de réponses" type="nombre-entier" value={choiceAmount} setValue={setChoiceAmount} min={2} />
+                  <NumberInput label="Nombre de réponses" type="nombre-entier" value={choiceAmount} setValue={setChoiceAmount} min={2} />
 
-                {cqSpecification === 'choix-unique' ? (
-                  <EditableRadioInput label="Choix" placeholder="Choix" values={uniqueChoices} setValues={setUniqueChoices} maxLength={35} />
-                ) : (
-                  <EditableCheckboxInput label="Choix" placeholder="Choix" values={multipleChoices} setValues={setMultipleChoices} maxLength={35} />
-                )}
-              </>
-            )}
-          </FormGroup>
+                  {cqSpecification === 'choix-unique' ? (
+                    <EditableRadioInput label="Choix" placeholder="Choix" values={uniqueChoices} setValues={setUniqueChoices} maxLength={35} />
+                  ) : (
+                    <EditableCheckboxInput label="Choix" placeholder="Choix" values={multipleChoices} setValues={setMultipleChoices} maxLength={35} />
+                  )}
+                </>
+              )}
+            </FormGroup>
+          </Row>
 
           <div className="flex mt-auto ml-auto">
             <LinkButton href="/professor/quizzes" outline={true} className="mr-6">

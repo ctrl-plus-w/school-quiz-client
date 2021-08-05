@@ -9,19 +9,13 @@ body,
 #__next {
   height: 100%;
 }
-
-.form > .form-control:not(:first-child),
-.form > .button,
-.form > .row,
-.form-group > .row,
-.form-group > .form-control:not(:first-child),
-.form-group > .button {
-  @apply mt-4;
+.form,
+.form .row {
+  @apply gap-12;
 }
 
-.form > .form-group:not(:first-child),
-.col > .form-group:not(:first-child) {
-  @apply mt-8;
+.form .form-group {
+  @apply gap-4;
 }
 
 .form > .error {
