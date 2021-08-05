@@ -96,8 +96,7 @@ type TypedQuestion = NumericQuestion | TextualQuestion | ChoiceQuestion;
 type VerificationType = 'hybride' | 'automatique' | 'manuel';
 type QuestionType = 'numericQuestion' | 'textualQuestion' | 'choiceQuestion';
 
-interface IQuestion extends DefaultModelProperties {
-  id: number;
+type Question = DefaultModelProperties & {
   title: string;
   slug: string;
   description: string;
@@ -105,22 +104,36 @@ interface IQuestion extends DefaultModelProperties {
 
   typedQuestion?: TypedQuestion;
 
-  answers: Array<Answer>;
-  userAnswers: Array<UserAnswer>;
+  answers: Array<IAnswer>;
+  userAnswers: Array<IUserAnswer>;
 
   shuffle?: boolean;
+};
+
+interface IQuestion<T extends ITextualQuestion | INumericQuestion | IChoiceQuestion> extends DefaultModelProperties {
+  title: string;
+  slug: string;
+  description: string;
+  questionType: QuestionType;
+
+  typedQuestion: T;
+
+  answers: Array<IAnswer>;
+  userAnswers: Array<IUserAnswer>;
 }
 
-interface INumericQuestion extends DefaultModelProperties {
+interface INumericQuestion extends IQuestion {
   questionSpecification?: IQuestionSpecification;
 }
 
-interface ITextualQuestion extends DefaultModelProperties {
+interface ITextualQuestion extends IQuestion {
+  accentSensitive: boolean;
+  caseSensitive: boolean;
+
   verificationType?: IVerificationType;
-  questionSpecification: IQuestionSpecification;
 }
 
-interface IChoiceQuestion extends DefaultModelProperties {
+interface IChoiceQuestion extends IQuestion {
   shuffle: boolean;
 
   choices: Array<IChoice>;

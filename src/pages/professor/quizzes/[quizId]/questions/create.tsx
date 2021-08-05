@@ -146,7 +146,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
     const verificationTypeSlug = verificationType;
     const creationAttributes: TextualQuestionCreationAttributes = { title, description, accentSensitive, caseSensitive, verificationTypeSlug };
 
-    const [question, questionCreationError] = await createTextualQuestion<IQuestion>(quiz.id, creationAttributes, token);
+    const [question, questionCreationError] = await createTextualQuestion<Question>(quiz.id, creationAttributes, token);
 
     if (questionCreationError) {
       if (questionCreationError.status === 403) router.push('/login');
@@ -173,7 +173,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
     const questionSpecificationSlug = nqSpecification;
     const creationAttributes: NumericQuestionCreationAttributes = { title, description, questionSpecificationSlug };
 
-    const [question, questionCreationError] = await createNumericQuestion<IQuestion>(quiz.id, creationAttributes, token);
+    const [question, questionCreationError] = await createNumericQuestion<Question>(quiz.id, creationAttributes, token);
 
     if (questionCreationError) {
       if (questionCreationError.status === 403) router.push('/login');
@@ -219,7 +219,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
     const questionSpecificationSlug = cqSpecification;
     const creationAttributes: ChoiceQuestionCreationAttributes = { title, description, shuffle, questionSpecificationSlug };
 
-    const [question, questionCreationError] = await createChoiceQuestion<IQuestion>(quiz.id, creationAttributes, token);
+    const [question, questionCreationError] = await createChoiceQuestion<Question>(quiz.id, creationAttributes, token);
 
     if (questionCreationError) {
       if (questionCreationError.status === 403) router.push('/login');

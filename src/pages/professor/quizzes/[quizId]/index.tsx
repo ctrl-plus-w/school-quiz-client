@@ -47,7 +47,7 @@ const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
     alert();
   };
 
-  const handleClick = (instance: IQuestion) => {
+  const handleClick = (instance: Question) => {
     router.push({ pathname: `${router.pathname}/questions/[questionId]`, query: { quizId: quiz.id, questionId: instance.id } });
   };
 
@@ -79,7 +79,7 @@ const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
             Créer une question
           </Route>
 
-          <Table<IQuestion, keyof IQuestion>
+          <Table<Question, keyof Question>
             attributes={[
               ['ID', 'id'],
               ['Titre', 'title'],
