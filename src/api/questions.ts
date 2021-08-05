@@ -27,6 +27,8 @@ export const createQuestion = <T>(questionType: QuestionType) => {
 
 export const createTextualQuestion = createQuestion<TextualQuestionCreationAttributes>('textualQuestion');
 
+export const createNumericQuestion = createQuestion<NumericQuestionCreationAttributes>('numericQuestion');
+
 export const createChoiceQuestion = createQuestion<ChoiceQuestionCreationAttributes>('choiceQuestion');
 
 export const addChoices = async (
@@ -44,6 +46,52 @@ export const addChoices = async (
     );
 
     return [createdChoices, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+    if (err.response.status === 409) return [null, { status: 409, message: 'Un des choix existe déja.' }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
+export const addExactAnswers = async (
+  quizId: number,
+  questionId: number,
+  answers: Array<ExactAnswerCreationAttributes>,
+  token: string
+): Promise<APIResponse<Array<IAnswer>>> => {
+  try {
+    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers/exact`;
+    const { data: createdAnswers } = await database.post(endpoint, answers, getHeaders(token));
+
+    return [createdAnswers, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+    if (err.response.status === 409) return [null, { status: 409, message: 'Un des choix existe déja.' }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
+export const addComparisonAnswer = async (
+  quizId: number,
+  questionId: number,
+  answer: ComparisonAnswerCreationAttributes,
+  token: string
+): Promise<APIResponse<IAnswer>> => {
+  try {
+    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers/comparison`;
+    const { data: createdAnswers } = await database.post(endpoint, answer, getHeaders(token));
+
+    return [createdAnswers, undefined];
   } catch (_err) {
     const err = _err as AxiosError;
 

@@ -32,6 +32,15 @@ type ChoiceCreationAttributes = {
   name: string;
 };
 
+type ExactAnswerCreationAttributes = {
+  answerContent: string;
+};
+
+type ComparisonAnswerCreationAttributes = {
+  greaterThan: number;
+  lowerThan: number;
+};
+
 type APIResponse<T> = [T | null, { status: number; message: string } | undefined];
 
 type UpdateResponse = { set: boolean };

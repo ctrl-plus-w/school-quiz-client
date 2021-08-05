@@ -26,13 +26,13 @@ import Button from '@element/Button';
 import Textarea from '@element/Textarea';
 
 import { getHeaders } from '@util/authentication.utils';
-import { nameSlugMapper, questionTypeFilter } from '@util/mapper.utils';
+import { nameSlugMapper, parseExactAnswer, parseNumericAnswer, questionTypeFilter, slugMapper } from '@util/mapper.utils';
 
 import ROLES from '@constant/roles';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 
-import { addChoices, createChoiceQuestion } from 'api/questions';
+import { addChoices, addComparisonAnswer, addExactAnswers, createChoiceQuestion, createNumericQuestion } from 'api/questions';
 import database from 'database/database';
 
 interface IServerSideProps {
@@ -101,8 +101,8 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
   const [cqSpecifications] = useState(questionSpecifications.filter(questionTypeFilter('choiceQuestion')).map(nameSlugMapper));
 
   // The numeric and choice question specification
-  const [nqSpecification, setNqSpecification] = useState(nameSlugMapper(nqSpecifications[0]).slug);
-  const [cqSpecification, setCqSpecification] = useState(nameSlugMapper(cqSpecifications[0]).slug);
+  const [nqSpecification, setNqSpecification] = useState(slugMapper(nqSpecifications[0]));
+  const [cqSpecification, setCqSpecification] = useState(slugMapper(cqSpecifications[0]));
 
   // When the creation properties of the question get updated, make calculation to see if it is valid or not
   useEffect(() => {
@@ -142,6 +142,52 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
     else setValid(false);
   }, [title, uniqueChoices, multipleChoices, cqSpecification, tqAnswers, nqAnswers, nqAnswerMin, nqAnswerMax]);
 
+  const numericQuestionComputations = async (): Promise<void> => {
+    const questionSpecificationSlug = nqSpecification;
+    const creationAttributes: NumericQuestionCreationAttributes = { title, description, questionSpecificationSlug };
+
+    const [question, questionCreationError] = await createNumericQuestion<IQuestion>(quiz.id, creationAttributes, token);
+
+    if (questionCreationError) {
+      if (questionCreationError.status === 403) router.push('/login');
+      else addNotification({ content: questionCreationError.message, type: 'ERROR' });
+    }
+
+    if (!question) return;
+
+    if (nqSpecificationType === 'exact') {
+      const answers: Array<ExactAnswerCreationAttributes> = nqAnswers.map((answer) => ({
+        answerContent: parseExactAnswer(answer, questionSpecificationSlug),
+      }));
+
+      const [createdAnswers, answersCreationError] = await addExactAnswers(quiz.id, question.id, answers, token);
+
+      if (answersCreationError) {
+        if (answersCreationError.status === 403) router.push('/login');
+        else addNotification({ content: answersCreationError.message, type: 'ERROR' });
+      }
+
+      if (!createdAnswers) return;
+    } else {
+      const answer: ComparisonAnswerCreationAttributes = {
+        greaterThan: parseNumericAnswer(nqAnswerMin, questionSpecificationSlug),
+        lowerThan: parseNumericAnswer(nqAnswerMax, questionSpecificationSlug),
+      };
+
+      const [createdAnswer, answerCreationError] = await addComparisonAnswer(quiz.id, question.id, answer, token);
+
+      if (answerCreationError) {
+        if (answerCreationError.status === 403) router.push('/login');
+        else addNotification({ content: answerCreationError.message, type: 'ERROR' });
+      }
+
+      if (!createdAnswer) return;
+    }
+
+    addNotification({ content: 'Question créée.', type: 'INFO' });
+    router.push(`/professor/quizzes/${quiz.id}`);
+  };
+
   const choiceQuestionComputations = async (): Promise<void> => {
     const questionSpecificationSlug = cqSpecification;
     const creationAttributes: ChoiceQuestionCreationAttributes = { title, description, shuffle, questionSpecificationSlug };
@@ -166,7 +212,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
     if (!choices) return;
 
     addNotification({ content: 'Question créée.', type: 'INFO' });
-    router.push(`/professor/quizzes/${quiz.id}/questions`);
+    router.push(`/professor/quizzes/${quiz.id}`);
   };
 
   // Call the right function to create the question
@@ -176,6 +222,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
     if (!valid) return;
 
     if (questionType === 'choiceQuestion') choiceQuestionComputations();
+    if (questionType === 'numericQuestion') numericQuestionComputations();
 
     // TODO : Make the textual and numeric question computations.
   };
@@ -307,7 +354,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
           </Row>
 
           <div className="flex mt-auto ml-auto">
-            <LinkButton href="/professor/quizzes" outline={true} className="mr-6">
+            <LinkButton href={`/professor/quizzes/${quiz.id}`} outline={true} className="mr-6">
               Annuler
             </LinkButton>
 
