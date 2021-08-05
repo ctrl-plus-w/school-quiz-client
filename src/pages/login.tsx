@@ -1,4 +1,4 @@
-import React, { FormEvent, FunctionComponent, useState } from 'react';
+import React, { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { useCookies } from 'react-cookie';
 
@@ -15,8 +15,11 @@ import Form from '@module/Form';
 
 import database from 'database/database';
 import roles from '@constant/roles';
+import FormGroup from '@module/FormGroup';
+import Col from '@module/Col';
 
 const Login: FunctionComponent = () => {
+  const [valid, setValid] = useState(false);
   const [error, setError] = useState(false);
   const [_cookie, setCookie] = useCookies(['user']);
 
@@ -25,8 +28,12 @@ const Login: FunctionComponent = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  useEffect(() => setValid(username !== '' && password !== ''), [username, password]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    if (!valid) return;
 
     try {
       const { data } = await database.post('/auth/login', { username, password });
@@ -43,14 +50,20 @@ const Login: FunctionComponent = () => {
   return (
     <Layout title="Login" center>
       <Form onSubmit={handleSubmit}>
-        <Title>Connection</Title>
-        <Route to="/password-lost">Mot de passe oublié ?</Route>
+        <FormGroup>
+          <Col>
+            <Title>Connection</Title>
+            <Route to="/password-lost">Mot de passe oublié ?</Route>
+          </Col>
 
-        <Input label="Nom d'utilisateur" placeholder="jdupont" value={username} setValue={setUsername} />
-        <PasswordInput label="Mot de passe" placeholder="****" value={password} setValue={setPassword} />
-        <Button submit>Se connecter</Button>
+          <Input label="Nom d'utilisateur" placeholder="jdupont" value={username} setValue={setUsername} />
+          <PasswordInput label="Mot de passe" placeholder="****" value={password} setValue={setPassword} />
+          <Button disabled={!valid} submit>
+            Se connecter
+          </Button>
 
-        {error && <ErrorModal body="Identifiants invalides" />}
+          {error && <ErrorModal body="Identifiants invalides" />}
+        </FormGroup>
       </Form>
     </Layout>
   );
