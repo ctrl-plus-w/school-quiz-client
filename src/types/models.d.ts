@@ -99,6 +99,7 @@ type QuestionType = 'numericQuestion' | 'textualQuestion' | 'choiceQuestion';
 interface IQuestion extends DefaultModelProperties {
   id: number;
   title: string;
+  slug: string;
   description: string;
   questionType: QuestionType;
 
