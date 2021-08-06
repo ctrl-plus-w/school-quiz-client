@@ -15,8 +15,10 @@ import MultipleTextInput from '@element/MultipleTextInput';
 import CheckboxInput from '@element/CheckboxInput';
 import NumberInput from '@element/NumberInput';
 import RadioInput from '@element/RadioInput';
+import LinkButton from '@element/LinkButton';
 import Textarea from '@element/Textarea';
 import Dropdown from '@element/Dropdown';
+import Button from '@element/Button';
 import Input from '@element/Input';
 import Title from '@element/Title';
 
@@ -54,13 +56,34 @@ const QuestionDefaultFields = ({ title, setTitle, description, setDescription, c
   );
 };
 
+interface IQuizDefaultButtonsProps {
+  quiz: IQuiz;
+  valid: boolean;
+}
+
+const QuizDefaultButtons = ({ quiz, valid }: IQuizDefaultButtonsProps) => {
+  return (
+    <div className="flex mt-auto ml-auto">
+      <LinkButton href={`/professor/quizzes/${quiz.id}`} outline={true} className="mr-6">
+        Annuler
+      </LinkButton>
+
+      <Button submit={true} disabled={!valid}>
+        Créer
+      </Button>
+    </div>
+  );
+};
+
 interface ITextualQuestionProps extends IServerSideProps {
   question: IQuestion<ITextualQuestion>;
 }
 
 const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITextualQuestionProps): ReactElement => {
+  const [valid, setValid] = useState(false);
+
   const [title, setTitle] = useState(question.title);
-  const [description, setDescription] = useState(question.title);
+  const [description, setDescription] = useState(question.description);
 
   const [caseSensitive, setCaseSensitive] = useState(question.typedQuestion.caseSensitive);
   const [accentSensitive, setAccentSensitive] = useState(question.typedQuestion.accentSensitive);
@@ -69,7 +92,28 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
   const [verificationType, setVerificationType] = useState<VerificationType>(questionVerificationType || 'manuel');
 
   const questionAnswers = question.answers as Array<IAnswer<IExactAnswer>>;
-  const [answers, setAnswers] = useState(questionAnswers.map(({ typedAnswer }) => typedAnswer.answerContent));
+  const questionAnswersContent = questionAnswers.map(({ typedAnswer }) => typedAnswer.answerContent);
+
+  const [answers, setAnswers] = useState(questionAnswersContent);
+
+  useEffect(() => {
+    const isValid = (): boolean => {
+      if (
+        title === question.title &&
+        description === question.description &&
+        accentSensitive === question.typedQuestion.accentSensitive &&
+        caseSensitive === question.typedQuestion.caseSensitive &&
+        verificationType === questionVerificationType &&
+        areArraysEquals(questionAnswersContent, answers)
+      )
+        return false;
+
+      return true;
+    };
+
+    if (isValid()) setValid(true);
+    else setValid(false);
+  }, [title, description, verificationType, caseSensitive, accentSensitive, answers]);
 
   const handleSubmit = (e: FormEvent): void => {
     alert();
@@ -105,6 +149,8 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
           />
         </FormGroup>
       </Row>
+
+      <QuizDefaultButtons {...{ quiz, valid }} />
     </Form>
   );
 };
@@ -193,6 +239,8 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
           {['date'].includes(specification) && <MultipleNumberInput label="Réponses" type={specification} values={answers} setValues={setAnswers} />}
         </FormGroup>
       </Row>
+
+      <QuizDefaultButtons {...{ quiz, valid: false }} />
     </Form>
   );
 };
@@ -213,7 +261,7 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
     return choices.map((choice, index) => ({ id: index, name: choice.name, checked: choice.valid, defaultName: choice.name }));
   };
 
-  const [_valid, setValid] = useState(false);
+  const [valid, setValid] = useState(false);
 
   const [title, setTitle] = useState(question.title);
   const [description, setDescription] = useState(question.description);
@@ -240,6 +288,7 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
       if (
         title === question.title &&
         description === question.description &&
+        shuffle === question.typedQuestion.shuffle &&
         areArraysEquals(questionChoicesName, choicesName, choiceSorter) &&
         areArraysEquals(questionCheckedChoices, checkedChoices, choiceSorter)
       )
@@ -255,7 +304,7 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
 
     if (isValid()) setValid(true);
     else setValid(false);
-  }, [title, description, uniqueChoices, multipleChoices]);
+  }, [title, description, shuffle, uniqueChoices, multipleChoices]);
 
   useEffect(() => {
     const choicesLength = specification === 'choix-unique' ? uniqueChoices.length : multipleChoices.length;
@@ -295,6 +344,8 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
           )}
         </FormGroup>
       </Row>
+
+      <QuizDefaultButtons {...{ quiz, valid }} />
     </Form>
   );
 };
