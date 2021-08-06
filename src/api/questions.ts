@@ -34,7 +34,7 @@ export const createChoiceQuestion = createQuestion<ChoiceQuestionCreationAttribu
 export const addChoices = async (
   quizId: number,
   questionId: number,
-  choices: EditableInputValues,
+  choices: Array<EditableInputValue>,
   token: string
 ): Promise<APIResponse<Array<IChoice>>> => {
   try {
@@ -63,7 +63,7 @@ export const addExactAnswers = async (
   questionId: number,
   answers: Array<ExactAnswerCreationAttributes>,
   token: string
-): Promise<APIResponse<Array<IAnswer>>> => {
+): Promise<APIResponse<Array<Answer>>> => {
   try {
     const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers/exact`;
     const { data: createdAnswers } = await database.post(endpoint, answers, getHeaders(token));
@@ -86,7 +86,7 @@ export const addComparisonAnswer = async (
   questionId: number,
   answer: ComparisonAnswerCreationAttributes,
   token: string
-): Promise<APIResponse<IAnswer>> => {
+): Promise<APIResponse<Answer>> => {
   try {
     const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers/comparison`;
     const { data: createdAnswers } = await database.post(endpoint, answer, getHeaders(token));

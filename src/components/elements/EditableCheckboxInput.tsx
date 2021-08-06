@@ -1,11 +1,9 @@
+import { choiceSorter } from 'helpers/question.helper';
 import React, { ChangeEvent, Dispatch, ReactElement, SetStateAction, useState } from 'react';
 
-import { v4 as uuidv4 } from 'uuid';
-
 interface IRadioInputProps {
-  id: string;
+  id: number;
   value?: string;
-  inputName: string;
   placeholder: string;
 
   maxLength?: number;
@@ -13,10 +11,10 @@ interface IRadioInputProps {
   checked: boolean;
 
   setValue: (value: string) => void;
-  setChecked: (id: string, value: boolean) => void;
+  setChecked: (id: number, value: boolean) => void;
 }
 
-const CheckboxInput = ({ id, inputName, checked, value = '', setValue, setChecked, placeholder, maxLength }: IRadioInputProps): ReactElement => {
+const CheckboxInput = ({ id, checked, value = '', setValue, setChecked, placeholder, maxLength }: IRadioInputProps): ReactElement => {
   const [tempValue, setTempValue] = useState(value);
 
   const handleInputchange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -30,7 +28,7 @@ const CheckboxInput = ({ id, inputName, checked, value = '', setValue, setChecke
 
   return (
     <div className="flex mb-0.5">
-      <input type="checkbox" name={inputName} checked={checked} onChange={handleCheckboxChange} />
+      <input type="checkbox" checked={checked} onChange={handleCheckboxChange} />
 
       <input
         type="text"
@@ -51,14 +49,12 @@ interface IProps {
 
   maxLength?: number;
 
-  values: EditableInputValues;
-  setValues: Dispatch<SetStateAction<EditableInputValues>>;
+  values: Array<EditableInputValue>;
+  setValues: Dispatch<SetStateAction<Array<EditableInputValue>>>;
 }
 
 const EditableCheckboxInput = ({ label, placeholder, values, setValues, maxLength }: IProps): ReactElement => {
-  const [inputName] = useState(uuidv4());
-
-  const setValue = (id: string, value: string): void => {
+  const setValue = (id: number, value: string): void => {
     setValues((prev) => {
       const el = prev.find(({ id: _id }) => _id === id);
       const rest = prev.filter(({ id: _id }) => _id !== id);
@@ -67,7 +63,7 @@ const EditableCheckboxInput = ({ label, placeholder, values, setValues, maxLengt
     });
   };
 
-  const setChecked = (id: string, value: boolean): void => {
+  const setChecked = (id: number, value: boolean): void => {
     setValues((prev) => {
       const el = prev.find(({ id: _id }) => _id === id);
       const rest = prev.filter(({ id: _id }) => _id !== id);
@@ -84,21 +80,18 @@ const EditableCheckboxInput = ({ label, placeholder, values, setValues, maxLengt
         </div>
 
         <div className="flex mt-2 flex-col items-start">
-          {values
-            .sort(({ id }, { id: _id }) => id.localeCompare(_id))
-            .map(({ id, checked, name }) => (
-              <CheckboxInput
-                id={id}
-                placeholder={placeholder}
-                inputName={inputName}
-                value={name}
-                setValue={(v) => setValue(id, v)}
-                setChecked={setChecked}
-                checked={checked}
-                maxLength={maxLength}
-                key={id}
-              />
-            ))}
+          {values.sort(choiceSorter).map(({ id, checked, name }) => (
+            <CheckboxInput
+              id={id}
+              placeholder={placeholder}
+              value={name}
+              setValue={(v) => setValue(id, v)}
+              setChecked={setChecked}
+              checked={checked}
+              maxLength={maxLength}
+              key={id}
+            />
+          ))}
         </div>
       </div>
     </div>

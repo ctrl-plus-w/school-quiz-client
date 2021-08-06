@@ -36,4 +36,14 @@ type AuthContextState = {
   setToken: (token: string) => void;
 };
 
-type EditableInputValues = Array<{ id: string; name: string; checked: boolean }>;
+type EditableInputValue = { id: number; name: string; checked: boolean; defaultName?: string };
+
+type AllOptional<T> = {
+  [P in keyof T]?: T[P];
+};
+
+type Choice = {
+  id: number;
+  name: string;
+  checked: boolean;
+};

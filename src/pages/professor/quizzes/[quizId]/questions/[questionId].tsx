@@ -1,7 +1,5 @@
-import React, { Dispatch, FormEvent, ReactElement, ReactNode, SetStateAction, useState } from 'react';
+import React, { Dispatch, FormEvent, ReactElement, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
-
-import { v4 as uuidv4 } from 'uuid';
 
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
@@ -23,7 +21,10 @@ import Input from '@element/Input';
 import Title from '@element/Title';
 
 import { getHeaders } from '@util/authentication.utils';
-import { nameSlugMapper } from '@util/mapper.utils';
+import { nameMapper, nameSlugMapper } from '@util/mapper.utils';
+import { areArraysEquals } from '@util/condition.utils';
+
+import { choiceSorter, generateChoices, removeChoices } from 'helpers/question.helper';
 
 import ROLES from '@constant/roles';
 
@@ -208,12 +209,14 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
     return specifications.find(({ slug }) => slug === questionSpecificationSlug);
   };
 
-  const choiceMapper = (choices: Array<IChoice>): EditableInputValues => {
-    return choices.map((choice) => ({ id: uuidv4(), name: choice.name, checked: choice.valid }));
+  const choiceMapper = (choices: Array<IChoice>): Array<EditableInputValue> => {
+    return choices.map((choice, index) => ({ id: index, name: choice.name, checked: choice.valid, defaultName: choice.name }));
   };
 
+  const [_valid, setValid] = useState(false);
+
   const [title, setTitle] = useState(question.title);
-  const [description, setDescription] = useState(question.title);
+  const [description, setDescription] = useState(question.description);
 
   const [shuffle, setShuffle] = useState(question.typedQuestion.shuffle);
 
@@ -223,6 +226,49 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
 
   const [uniqueChoices, setUniqueChoices] = useState(choiceMapper(question.typedQuestion.choices));
   const [multipleChoices, setMultipleChoices] = useState(choiceMapper(question.typedQuestion.choices));
+
+  useEffect(() => {
+    const isValid = (): boolean => {
+      const choices = specification === 'choix-unique' ? uniqueChoices : multipleChoices;
+
+      const questionChoicesName = question.typedQuestion.choices.map(({ name }) => name);
+      const choicesName = choices.map(({ name }) => name);
+
+      const questionCheckedChoices = question.typedQuestion.choices.filter(({ valid }) => valid).map(nameMapper);
+      const checkedChoices = choices.filter(({ checked }) => checked).map(nameMapper);
+
+      if (
+        title === question.title &&
+        description === question.description &&
+        areArraysEquals(questionChoicesName, choicesName, choiceSorter) &&
+        areArraysEquals(questionCheckedChoices, checkedChoices, choiceSorter)
+      )
+        return false;
+
+      const isOneChecked = choices.some(({ checked }) => checked === true);
+      const areValuesNotEmpty = choices.every(({ name }) => name !== '');
+
+      if (uniqueChoices.length < 2 || !isOneChecked || !areValuesNotEmpty) return false;
+
+      return true;
+    };
+
+    if (isValid()) setValid(true);
+    else setValid(false);
+  }, [title, description, uniqueChoices, multipleChoices]);
+
+  useEffect(() => {
+    const choicesLength = specification === 'choix-unique' ? uniqueChoices.length : multipleChoices.length;
+    const setterFunction = specification === 'choix-unique' ? setUniqueChoices : setMultipleChoices;
+
+    if (parseInt(choiceAmount) > choicesLength) {
+      setterFunction((prev) => generateChoices(parseInt(choiceAmount) - choicesLength, prev));
+    }
+
+    if (parseInt(choiceAmount) < choicesLength) {
+      setterFunction((prev) => removeChoices(-(choicesLength - parseInt(choiceAmount)), prev));
+    }
+  }, [choiceAmount]);
 
   const handleSubmit = (e: FormEvent): void => {
     alert();
@@ -261,8 +307,6 @@ interface IServerSideProps {
 }
 
 const Question = ({ quiz, question, questionSpecifications, token }: IServerSideProps): ReactElement => {
-  console.log(question);
-
   const getComponent = (): ReactElement => {
     const textualQuestion = question as IQuestion<ITextualQuestion>;
     const numericQuestion = question as IQuestion<INumericQuestion>;

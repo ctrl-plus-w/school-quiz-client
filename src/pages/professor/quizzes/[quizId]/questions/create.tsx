@@ -2,8 +2,6 @@ import React, { FormEvent, ReactElement, useContext, useEffect, useState } from 
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
-import { v4 as uuidv4 } from 'uuid';
-
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
 import Container from '@module/Container';
@@ -27,6 +25,8 @@ import Textarea from '@element/Textarea';
 
 import { getHeaders } from '@util/authentication.utils';
 import { nameSlugMapper, parseExactAnswer, parseNumericAnswer, questionTypeFilter, slugMapper } from '@util/mapper.utils';
+
+import { generateChoices, removeChoices } from 'helpers/question.helper';
 
 import ROLES from '@constant/roles';
 
@@ -61,27 +61,29 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
   const [choiceAmount, setChoiceAmount] = useState('2');
 
   // The choices of a choice question (radio)
-  const [uniqueChoices, setUniqueChoices] = useState<EditableInputValues>([
-    { id: uuidv4(), name: '', checked: false },
-    { id: uuidv4(), name: '', checked: false },
+  const [uniqueChoices, setUniqueChoices] = useState<Array<EditableInputValue>>([
+    { id: 0, name: '', checked: false },
+    { id: 1, name: '', checked: false },
   ]);
 
   // The choices of a choice quetion (checkbox)
-  const [multipleChoices, setMultipleChoices] = useState<EditableInputValues>([
-    { id: uuidv4(), name: '', checked: false },
-    { id: uuidv4(), name: '', checked: false },
+  const [multipleChoices, setMultipleChoices] = useState<Array<EditableInputValue>>([
+    { id: 0, name: '', checked: false },
+    { id: 1, name: '', checked: false },
   ]);
 
   // When the amount of choice get updated, add a "blank" object to the choices, so the user can edit it
   useEffect(() => {
-    const uniqueChoicesLength = uniqueChoices.length;
-    const multipleChoicesLength = multipleChoices.length;
+    const choicesLength = cqSpecification === 'choix-unique' ? uniqueChoices.length : multipleChoices.length;
+    const setterFunction = cqSpecification === 'choix-unique' ? setUniqueChoices : setMultipleChoices;
 
-    if (parseInt(choiceAmount) > uniqueChoicesLength) setUniqueChoices((prev) => [...prev, { id: uuidv4(), name: '', checked: false }]);
-    else if (parseInt(choiceAmount) < uniqueChoicesLength) setUniqueChoices((prev) => prev.slice(0, -1));
+    if (parseInt(choiceAmount) > choicesLength) {
+      setterFunction((prev) => generateChoices(parseInt(choiceAmount) - choicesLength, prev));
+    }
 
-    if (parseInt(choiceAmount) > multipleChoicesLength) setMultipleChoices((prev) => [...prev, { id: uuidv4(), name: '', checked: false }]);
-    else if (parseInt(choiceAmount) < multipleChoicesLength) setMultipleChoices((prev) => prev.slice(0, -1));
+    if (parseInt(choiceAmount) < choicesLength) {
+      setterFunction((prev) => removeChoices(-(choicesLength - parseInt(choiceAmount)), prev));
+    }
   }, [choiceAmount]);
 
   // The answers of the textual question and the numeric question

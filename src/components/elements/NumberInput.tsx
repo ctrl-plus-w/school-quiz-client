@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, FocusEvent, ReactElement, SetStateAction, useEffect } from 'react';
+import React, { ChangeEvent, Dispatch, FocusEvent, ReactElement, SetStateAction, useEffect, useState } from 'react';
 
 import clsx from 'clsx';
 import { str } from '@util/mapper.utils';
@@ -67,7 +67,12 @@ interface IProps {
 }
 
 const NumberInput = ({ label, placeholder, type, className, value, setValue, note, min, max }: IProps): ReactElement => {
-  useEffect(() => setValue(min ? min.toString() : ''), [type]);
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    if (loaded) setValue(min ? min.toString() : '');
+    else setLoaded(true);
+  }, [type]);
 
   const getInput = () => {
     const props = { value, setValue };
