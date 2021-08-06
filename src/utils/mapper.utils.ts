@@ -2,15 +2,15 @@ export const idNameSlugMapper = <T extends IBasicModel>(instance: T): IBasicMode
   return { id: instance.id, name: instance.name, slug: instance.slug };
 };
 
-export const nameSlugMapper = <T extends IBasicModel>(instance: T): IBasicModel => {
+export const nameSlugMapper = <T extends { name: string; slug: string }>(instance: T): IBasicModel => {
   return { name: instance.name, slug: instance.slug };
 };
 
-export const slugMapper = <T extends IBasicModel>(instance: T): string => {
+export const slugMapper = <T extends { slug: string }>(instance: T): string => {
   return instance.slug;
 };
 
-export const nameMapper = <T extends IBasicModel>(instance: T): string => {
+export const nameMapper = <T extends { name: string }>(instance: T): string => {
   return instance.name;
 };
 
