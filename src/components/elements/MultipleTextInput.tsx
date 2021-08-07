@@ -32,12 +32,12 @@ const MultipleTextInput = ({ className, label, placeholder, values, setValues, m
   const handleInput = (e: KeyboardEvent<HTMLInputElement>): void => {
     if (e.key !== 'Enter' || tempValue.length === 0) return;
 
-    const target = e.target as HTMLInputElement;
-
     e.preventDefault();
     e.stopPropagation();
 
-    addValue(target.value);
+    if (tempValue === '' || values.includes(tempValue)) return;
+
+    addValue(tempValue);
     setTempValue('');
   };
 

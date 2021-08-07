@@ -93,6 +93,8 @@ const MultipleNumberInput = ({ className, label, type, placeholder = undefined, 
 
     if (type === 'date' && !regex.date.test(tempValue)) return setTempValue('');
 
+    if (tempValue === '' || values.includes(tempValue)) return;
+
     addValue(tempValue);
     setTempValue('');
   };
