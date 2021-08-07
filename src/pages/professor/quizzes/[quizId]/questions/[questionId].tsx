@@ -160,42 +160,55 @@ interface INumericQuestionProps extends IServerSideProps {
 }
 
 const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INumericQuestionProps): ReactElement => {
+  const questionAnswers = question.answers as Array<IAnswer<IExactAnswer>>;
+  const questionAnswer = question.answers[0] as IAnswer<IComparisonAnswer>;
+
+  const firstAnswerType = questionAnswer.answerType === 'exactAnswer' ? 'exact' : 'comparison';
+
+  // Constants
+
   const [specifications] = useState(questionSpecifications.map(nameSlugMapper));
+  const [questionSpecification] = useState(specifications.find(({ slug }) => slug === question.typedQuestion.questionSpecification?.slug)?.slug);
 
-  const getQuestionSpecification = () => {
-    const questionSpecificationSlug = question.typedQuestion.questionSpecification?.slug;
-    return specifications.find(({ slug }) => slug === questionSpecificationSlug);
-  };
+  const [questionAnswersContent] = useState(questionAnswers.map(({ typedAnswer }) => typedAnswer.answerContent));
 
-  const getQuestionAnswersContent = () => {
-    const questionAnswers = question.answers as Array<IAnswer<IExactAnswer>>;
-    return specificationType === 'exact' ? questionAnswers.map(({ typedAnswer }) => typedAnswer.answerContent) : [];
-  };
+  // States
 
-  const getQuestionAnswerMin = () => {
-    const questionAnswer = question.answers[0] as IAnswer<IComparisonAnswer>;
-    return specificationType === 'comparison' ? questionAnswer.typedAnswer.greaterThan.toString() : '';
-  };
-
-  const getQuestionAnswerMax = () => {
-    const questionAnswer = question.answers[0] as IAnswer<IComparisonAnswer>;
-    return specificationType === 'comparison' ? questionAnswer.typedAnswer.lowerThan.toString() : '';
-  };
+  const [valid, setValid] = useState(false);
 
   const [title, setTitle] = useState(question.title);
-  const [description, setDescription] = useState(question.title);
+  const [description, setDescription] = useState(question.description);
 
-  const [specification, setSpecification] = useState(getQuestionSpecification()?.slug || 'nombre-entier');
+  const [specification, setSpecification] = useState(questionSpecification || 'nombre-entier');
 
-  const firstAnswer = question.answers[0];
-  const firstAnswerType = firstAnswer.answerType === 'exactAnswer' ? 'exact' : 'comparison';
+  const [specificationType, setSpecificationType] = useState<'exact' | 'comparison'>(questionAnswer ? firstAnswerType : 'exact');
 
-  const [specificationType, setSpecificationType] = useState<'exact' | 'comparison'>(firstAnswer ? firstAnswerType : 'exact');
+  const [answers, setAnswers] = useState(questionAnswersContent);
 
-  const [answers, setAnswers] = useState(getQuestionAnswersContent());
+  const [questionAnswerMin] = useState(specificationType === 'comparison' ? questionAnswer?.typedAnswer?.greaterThan?.toString() : '');
+  const [questionAnswerMax] = useState(specificationType === 'comparison' ? questionAnswer?.typedAnswer?.lowerThan?.toString() : '');
 
-  const [answerMin, setAnswerMin] = useState(getQuestionAnswerMin());
-  const [answerMax, setAnswerMax] = useState(getQuestionAnswerMax());
+  const [answerMin, setAnswerMin] = useState(questionAnswerMin);
+  const [answerMax, setAnswerMax] = useState(questionAnswerMax);
+
+  useEffect(() => {
+    const isValid = () => {
+      if (title !== question.title || description !== question.description) return true;
+
+      if (specificationType === 'exact') {
+        if (areArraysEquals(questionAnswersContent, answers)) return false;
+      }
+
+      if (specificationType === 'comparison') {
+        if (questionAnswerMin === answerMin && questionAnswerMax === answerMax) return false;
+      }
+
+      return true;
+    };
+
+    if (isValid()) setValid(true);
+    else setValid(false);
+  }, [title, description, answers, answerMin, answerMax]);
 
   const handleSubmit = (e: FormEvent): void => {
     alert();
@@ -240,7 +253,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
         </FormGroup>
       </Row>
 
-      <QuizDefaultButtons {...{ quiz, valid: false }} />
+      <QuizDefaultButtons {...{ quiz, valid }} />
     </Form>
   );
 };
