@@ -1,6 +1,8 @@
 import React, { FunctionComponent } from 'react';
 import Link from 'next/link';
 
+import clsx from 'clsx';
+
 import { v4 as uuidv4 } from 'uuid';
 
 interface IProps {
@@ -14,7 +16,7 @@ const MenuGroup: FunctionComponent<IProps> = ({ title, links = [] }: IProps) => 
       <li className="text-black font-semibold text-base uppercase mb-4">{title}</li>
 
       {links.map(({ name, path, active = false }) => (
-        <li className={`${active ? 'text-blue-700' : 'text-black'} font-normal text-base mb-0.5`} key={uuidv4()}>
+        <li className={clsx([active ? 'text-blue-700' : 'text-black', 'font-normal text-base mb-0.5'])} key={uuidv4()}>
           <Link href={path}>
             <a>{name}</a>
           </Link>

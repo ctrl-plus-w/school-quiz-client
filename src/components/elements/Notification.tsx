@@ -1,5 +1,7 @@
 import React, { FunctionComponent, useEffect, useRef } from 'react';
 
+import clsx from 'clsx';
+
 import NOTIFICATION from '@constant/notification';
 
 interface IProps {
@@ -20,27 +22,15 @@ const Notification: FunctionComponent<IProps> = ({ children, notification, remov
     }
   }, []);
 
-  const getColor = () => {
-    return NOTIF.CLASSNAME;
-  };
-
-  const getIcon = () => {
-    return NOTIF.ICON;
-  };
-
-  const getTitle = () => {
-    return NOTIF.TITLE;
-  };
-
   return (
     <div
-      className={`flex items-center px-3 py-3 mb-4 border ${getColor()} rounded-sm cursor-pointer pointer-events-auto`}
+      className={clsx(['flex items-center px-3 py-3 mb-4 border rounded-sm cursor-pointer pointer-events-auto', NOTIF.CLASSNAME])}
       onClick={() => removeNotification(notification)}
     >
-      {getIcon()}
+      {NOTIF.ICON}
 
       <div className="flex flex-col ml-1">
-        <p className="text-sm font-semibold">{getTitle()}</p>
+        <p className="text-sm font-semibold">{NOTIF.TITLE}</p>
         <p className="text-sm">{children}</p>
       </div>
     </div>

@@ -1,5 +1,7 @@
 import React, { ChangeEvent, Dispatch, KeyboardEvent, ReactElement, SetStateAction, useState } from 'react';
 
+import clsx from 'clsx';
+
 import { v4 as uuidv4 } from 'uuid';
 
 import { XIcon } from '@heroicons/react/outline';
@@ -44,7 +46,7 @@ const MultipleTextInput = ({ className, label, placeholder, values, setValues, m
   };
 
   return (
-    <div className={`form-control flex flex-col w-80 ${className}`}>
+    <div className={clsx(['form-control flex flex-col w-80', className])}>
       <label className="relative text-sm font-semibold text-gray-900">
         <div className="flex items-center">
           <span className="uppercase mr-2">{label}</span>

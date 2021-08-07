@@ -1,5 +1,7 @@
 import React, { FormEvent, FunctionComponent } from 'react';
 
+import clsx from 'clsx';
+
 interface IProps {
   full?: boolean;
   children?: React.ReactNode;
@@ -8,7 +10,7 @@ interface IProps {
 
 const Form: FunctionComponent<IProps> = ({ children, onSubmit, full = false }: IProps) => {
   return (
-    <form className={`form flex flex-col ${full ? 'w-full h-full' : 'w-80'} items-start`} onSubmit={onSubmit}>
+    <form className={clsx(['form flex flex-col items-start', full ? 'w-full h-full' : 'w-80'])} onSubmit={onSubmit}>
       {children}
     </form>
   );

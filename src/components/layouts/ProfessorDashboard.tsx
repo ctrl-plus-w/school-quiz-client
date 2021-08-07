@@ -1,4 +1,9 @@
 import React, { FunctionComponent } from 'react';
+import { useRouter } from 'next/dist/client/router';
+
+import Link from 'next/link';
+
+import clsx from 'clsx';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -6,9 +11,7 @@ import Layout from '@layout/Default';
 
 import Menu from '@module/Menu';
 
-import { useRouter } from 'next/dist/client/router';
 import PROFESSOR_MENU from '@constant/professorMenu';
-import Link from 'next/link';
 
 interface IProps {
   children?: React.ReactNode;
@@ -31,7 +34,7 @@ const ProfessorDashboardLayout: FunctionComponent<IProps> = ({ children }: IProp
           {linkMapper(PROFESSOR_MENU.links).map(({ name, path, active }) => (
             <li key={uuidv4()} className="mr-6">
               <Link href={path}>
-                <a className={`${active ? 'text-blue-700' : 'text-black'} font-normal text-base`}>{name}</a>
+                <a className={clsx(['font-normal text-base', active ? 'text-blue-700' : 'text-black'])}>{name}</a>
               </Link>
             </li>
           ))}

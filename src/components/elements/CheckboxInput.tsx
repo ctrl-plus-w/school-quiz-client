@@ -1,5 +1,6 @@
-import clsx from 'clsx';
 import React, { Dispatch, ReactElement, SetStateAction } from 'react';
+
+import clsx from 'clsx';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -12,7 +13,7 @@ interface IProps {
 
 const CheckboxInput = ({ label, values, className }: IProps): ReactElement => {
   return (
-    <div className={`form-control flex flex-col w-80 ${className}`}>
+    <div className={clsx(['form-control flex flex-col w-80', className])}>
       <div className="text-sm font-semibold text-gray-900">
         <div>
           <p className="uppercase">{label}</p>

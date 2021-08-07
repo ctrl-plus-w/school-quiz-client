@@ -96,7 +96,7 @@ const NumberInput = ({ label, placeholder, type, className, value, setValue, not
   };
 
   return (
-    <div className={`form-control flex flex-col w-full ${className}`}>
+    <div className={clsx(['form-control flex flex-col w-full', className])}>
       <label className="text-sm font-semibold text-gray-900">
         <div>
           <p className="uppercase">{label}</p>

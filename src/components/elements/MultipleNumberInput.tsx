@@ -119,7 +119,7 @@ const MultipleNumberInput = ({ className, label, type, placeholder = undefined, 
   };
 
   return (
-    <div className={`form-control flex flex-col w-80 ${className}`}>
+    <div className={clsx(['form-control flex flex-col w-80', className])}>
       <label className="relative text-sm font-semibold text-gray-900">
         <div className="flex items-center">
           <span className="uppercase mr-2">{label}</span>

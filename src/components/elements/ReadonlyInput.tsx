@@ -1,5 +1,7 @@
 import React, { ReactElement } from 'react';
 
+import clsx from 'clsx';
+
 interface IProps {
   placeholder?: string;
   label: string;
@@ -10,7 +12,7 @@ interface IProps {
 
 const ReadOnlyInput = ({ label, placeholder, className, value }: IProps): ReactElement => {
   return (
-    <div className={`form-control flex flex-col w-80 ${className}`}>
+    <div className={clsx(['form-control flex flex-col w-80', className])}>
       <label className="text-sm font-semibold uppercase text-gray-900">
         {label}
 

@@ -56,7 +56,7 @@ interface IProps<T> {
 
 const RadioInput = <T,>({ label, values, value, setValue, big = false, className }: IProps<T>): ReactElement => {
   return (
-    <div className={`form-control flex flex-col w-80 ${className}`}>
+    <div className={clsx(['form-control flex flex-col w-80', className])}>
       <div className="text-sm font-semibold text-gray-900">
         <div>
           <p className="uppercase">{label}</p>

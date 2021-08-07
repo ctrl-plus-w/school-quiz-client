@@ -73,7 +73,7 @@ const EditableCheckboxInput = ({ label, placeholder, values, setValues, maxLengt
   };
 
   return (
-    <div className={`form-control flex flex-col w-80`}>
+    <div className="form-control flex flex-col w-80">
       <div className="text-sm font-semibold text-gray-900">
         <div>
           <p className="uppercase">{label}</p>

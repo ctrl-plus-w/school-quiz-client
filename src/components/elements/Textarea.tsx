@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import React, { ChangeEvent, ReactElement } from 'react';
 
 interface IProps {
@@ -19,7 +20,7 @@ const Textarea = ({ label, placeholder, className, value, setValue, note, maxLen
   };
 
   return (
-    <div className={`form-control flex flex-col w-80 ${className}`}>
+    <div className={clsx(['form-control flex flex-col w-80', className])}>
       <label className="text-sm font-semibold text-gray-900">
         <div>
           <p className="uppercase">{label}</p>

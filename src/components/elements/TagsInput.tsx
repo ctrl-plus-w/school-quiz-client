@@ -1,6 +1,11 @@
 import React, { ChangeEvent, FunctionComponent, KeyboardEvent, useState } from 'react';
+
+import clsx from 'clsx';
+
 import { v4 as uuidv4 } from 'uuid';
+
 import { XIcon } from '@heroicons/react/outline';
+
 import Helper from './Helper';
 
 interface IProps {
@@ -61,7 +66,7 @@ const TagsInput: FunctionComponent<IProps> = ({ className, label, placeholder, v
   };
 
   return (
-    <div className={`form-control flex flex-col w-80 ${className}`}>
+    <div className={clsx(['form-control flex flex-col w-80', className])}>
       <label className="relative text-sm font-semibold text-gray-900">
         <div className="flex items-center">
           <span className="uppercase mr-2">{label}</span>
@@ -80,14 +85,14 @@ const TagsInput: FunctionComponent<IProps> = ({ className, label, placeholder, v
         <div className="relative flex border border-gray-500 rounded-sm w-full mt-2">
           <input
             type="text"
-            className={`${isValid ? 'text-green-600' : ''} appearance-none outline-none w-full px-3 py-2`}
+            className={clsx([isValid && 'text-green-600', 'appearance-none outline-none w-full px-3 py-2'])}
             placeholder={placeholder}
             onKeyDown={handleInput}
             value={tempValue}
             onChange={onChange}
           />
 
-          <p className={`absolute top-1/2 left-0 transform -translate-y-1/2 pointer-events-none w-full px-3 py-2`}>
+          <p className="absolute top-1/2 left-0 transform -translate-y-1/2 pointer-events-none w-full px-3 py-2">
             <span className="invisible">{tempValue}</span>
             <span className="text-gray-400 font-normal">{completion}</span>
           </p>

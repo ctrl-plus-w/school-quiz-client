@@ -1,5 +1,7 @@
 import React, { ChangeEvent, ReactElement } from 'react';
 
+import clsx from 'clsx';
+
 interface IProps {
   placeholder?: string;
   label: string;
@@ -19,7 +21,7 @@ const Input = ({ label, placeholder, className, value, setValue, note, maxLength
   };
 
   return (
-    <div className={`form-control flex flex-col w-80 ${className}`}>
+    <div className={clsx(['form-control flex flex-col w-80', className])}>
       <label className="text-sm font-semibold text-gray-900">
         <div>
           <p className="uppercase">{label}</p>

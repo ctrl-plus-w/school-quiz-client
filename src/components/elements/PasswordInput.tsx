@@ -1,5 +1,7 @@
 import React, { ChangeEvent, FunctionComponent, MouseEvent, useState } from 'react';
 
+import clsx from 'clsx';
+
 import { EyeIcon, EyeOffIcon, CogIcon } from '@heroicons/react/outline';
 
 import { generatePassword } from '@util/generate.utils';
@@ -40,7 +42,7 @@ const PasswordInput: FunctionComponent<IProps> = ({ label, placeholder, classNam
   };
 
   return (
-    <div className={`form-control flex flex-col w-full ${className}`}>
+    <div className={clsx(['form-control flex flex-col w-full', className])}>
       <label className="text-sm font-semibold text-gray-900">
         <div className="flex items-center">
           <p className="uppercase mr-2">{label}</p>

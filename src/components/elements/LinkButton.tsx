@@ -1,5 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import Link from 'next/link';
+import clsx from 'clsx';
 
 interface IProps {
   children?: React.ReactNode;
@@ -16,7 +17,13 @@ const LinkButton: FunctionComponent<IProps> = ({ children, href, className, outl
 
   return (
     <Link href={href}>
-      <a className={`button flex justify-center items-center py-2 px-8 w-full rounded-sm ${outline ? STYLES.OUTLINE : STYLES.DEFAULT} ${className}`}>
+      <a
+        className={clsx([
+          'button flex justify-center items-center py-2 px-8 w-full rounded-sm',
+          outline ? STYLES.OUTLINE : STYLES.DEFAULT,
+          className,
+        ])}
+      >
         {children}
       </a>
     </Link>
