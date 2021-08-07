@@ -18,7 +18,7 @@ import database from 'database/database';
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 
 type ServerSideProps = {
-  label: Label;
+  label: ILabel;
   token: string;
 };
 

@@ -19,7 +19,7 @@ import { NotificationContext } from 'context/NotificationContext/NotificationCon
 import NumberInput from '@element/NumberInput';
 
 type ServerSideProps = {
-  role: Role;
+  role: IRole;
   token: string;
 };
 
@@ -31,10 +31,10 @@ const Role: FunctionComponent<ServerSideProps> = ({ role, token }: ServerSidePro
   const [valid, setValid] = useState(false);
 
   const [name, setName] = useState(role.name);
-  const [permission, setPermission] = useState(role.permission);
+  const [permission, setPermission] = useState(role.permission.toString());
 
   useEffect(() => {
-    if ((name !== role.name || permission !== role.permission) && permission > 0) {
+    if ((name !== role.name || permission !== role.permission.toString()) && parseInt(permission) > 0) {
       setValid(true);
     } else {
       setValid(false);
@@ -45,10 +45,11 @@ const Role: FunctionComponent<ServerSideProps> = ({ role, token }: ServerSidePro
     e.preventDefault();
 
     try {
-      if (permission <= 0) {
+      if (parseInt(permission) <= 0) {
         addNotification({ content: 'La permission ne peut pas être en dessous de 1', type: 'ERROR' });
         return;
       }
+
       await database.put(`/api/roles/${role.id}`, { name, permission }, getHeaders(token));
 
       addNotification({ content: 'Rôle modifié.', type: 'INFO' });
@@ -72,7 +73,14 @@ const Role: FunctionComponent<ServerSideProps> = ({ role, token }: ServerSidePro
         <Title level={2}>Informations générales</Title>
 
         <Input label="Nom" placeholder="En attente" value={name} setValue={setName} />
-        <NumberInput label="Permission" placeholder="5" value={permission} setValue={setPermission} note="La permission doit être supérieure à 1." />
+        <NumberInput
+          label="Permission"
+          placeholder="5"
+          type="nombre-entier"
+          value={permission}
+          setValue={setPermission}
+          note="La permission doit être supérieure à 1."
+        />
       </FormGroup>
     </AdminDashboardModelLayout>
   );

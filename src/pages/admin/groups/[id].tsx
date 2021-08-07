@@ -22,7 +22,7 @@ import { areArraysEquals } from '@util/condition.utils';
 
 type ServerSideProps = {
   group: IGroup;
-  labels: Array<Label>;
+  labels: Array<ILabel>;
   token: string;
 };
 
@@ -35,7 +35,7 @@ const Group: FunctionComponent<ServerSideProps> = ({ group, labels, token }: Ser
 
   const [name, setName] = useState(group.name);
 
-  const [groupLabels, setGroupLabels] = useState<Array<IBasicModel>>(group.labels.map((label: Label) => idNameSlugMapper(label)));
+  const [groupLabels, setGroupLabels] = useState<Array<IBasicModel>>(group.labels.map((label: ILabel) => idNameSlugMapper(label)));
 
   useEffect(() => {
     if (name !== group.name || !areArraysEquals(group.labels.map(idNameSlugMapper), groupLabels)) {

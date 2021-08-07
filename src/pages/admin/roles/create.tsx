@@ -30,10 +30,10 @@ const CreateRole: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
   const [valid, setValid] = useState(false);
 
   const [name, setName] = useState('');
-  const [permission, setPermission] = useState(5);
+  const [permission, setPermission] = useState('5');
 
   useEffect(() => {
-    if (name !== '' && permission > 0) {
+    if (name !== '' && parseInt(permission) > 0) {
       setValid(true);
     } else {
       setValid(false);
@@ -71,7 +71,7 @@ const CreateRole: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
         <Title level={2}>Informations générales</Title>
 
         <Input label="Nom" placeholder="En attente" value={name} setValue={setName} />
-        <NumberInput label="Permission" placeholder="5" value={permission} setValue={setPermission} />
+        <NumberInput label="Permission" placeholder="5" type="nombre-entier" value={permission} setValue={setPermission} />
       </FormGroup>
     </AdminDashboardModelLayout>
   );

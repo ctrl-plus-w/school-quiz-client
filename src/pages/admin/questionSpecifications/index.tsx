@@ -14,7 +14,7 @@ import { AuthContext } from 'context/AuthContext/AuthContext';
 import database from 'database/database';
 
 interface ServerSideProps {
-  specificationTypes: Array<QuestionSpecification>;
+  specificationTypes: Array<IQuestionSpecification>;
   token: string;
 }
 
@@ -38,7 +38,7 @@ const AdminQuestionSpecificationDashboard: FunctionComponent<ServerSideProps> = 
 
   return (
     <AdminDashboardModelsLayout title="Spécification" subtitle="Créer un spécification">
-      <Table<QuestionSpecification, keyof QuestionSpecification>
+      <Table<IQuestionSpecification, keyof IQuestionSpecification>
         attributes={[
           ['ID', 'id'],
           ['Nom', 'name'],

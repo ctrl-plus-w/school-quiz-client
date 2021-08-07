@@ -19,7 +19,7 @@ import { NotificationContext } from 'context/NotificationContext/NotificationCon
 import Dropdown from '@element/Dropdown';
 
 type ServerSideProps = {
-  questionSpecification: QuestionSpecification;
+  questionSpecification: IQuestionSpecification;
   token: string;
 };
 
