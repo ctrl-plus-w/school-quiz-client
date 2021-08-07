@@ -108,8 +108,6 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
 
   // When the creation properties of the question get updated, make calculation to see if it is valid or not
   useEffect(() => {
-    // TODO : Edit the valid state depending on the given properties.
-
     const isValid = (): boolean => {
       if (title === '' || description === '') return false;
 
@@ -253,8 +251,6 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
     if (questionType === 'choiceQuestion') choiceQuestionComputations();
     if (questionType === 'numericQuestion') numericQuestionComputations();
     if (questionType === 'textualQuestion') textualQuestionComputations();
-
-    // TODO : Make the textual and numeric question computations.
   };
 
   return (
