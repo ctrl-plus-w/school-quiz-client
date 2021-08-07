@@ -34,10 +34,10 @@ const Input = ({ placeholder, suffix, pattern, value, setValue, min, max }: IInp
   };
 
   return (
-    <div className="flex items-center px-3 mt-2 border border-gray-500 rounded-sm ">
+    <div className="flex items-center rounded-sm ">
       <input
         type="text"
-        className={clsx(['w-full py-2 outline-none focus:outline-none', suffix && 'text-right'])}
+        className={clsx(['form-input', suffix && 'text-right'])}
         onChange={onChange}
         value={value}
         placeholder={placeholder}

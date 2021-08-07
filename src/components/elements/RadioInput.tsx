@@ -16,8 +16,10 @@ const BigRadioInput = ({ name, checked, setValue }: IRadioInputProps) => {
   return (
     <label
       className={clsx([
-        'flex justify-center items-center w-16 h-16 rounded-sm border mr-4 cursor-pointer transition-all duration-100',
-        checked ? 'bg-gray-500 border-gray-900 text-gray-900' : 'bg-gray-400 border-gray-600 text-gray-600',
+        'flex justify-center items-center w-16 h-16 rounded-sm border mr-4 transition-all duration-300',
+        checked
+          ? 'bg-gray-500 border-gray-900 text-gray-900'
+          : 'bg-gray-400 border-gray-600 text-gray-600 cursor-pointer hover:ring hover:ring-gray-300',
       ])}
     >
       <input type="radio" className="hidden" checked={checked} onChange={setValue} />
@@ -29,7 +31,7 @@ const BigRadioInput = ({ name, checked, setValue }: IRadioInputProps) => {
 
 const NormalRadioInput = ({ name, checked, setValue }: IRadioInputProps) => {
   return (
-    <label className="flex items-center mb-0.5 cursor-pointer">
+    <label className="group flex items-center mb-0.5 cursor-pointer">
       <input type="radio" className="hidden" checked={checked} onChange={setValue} />
 
       <div

@@ -82,10 +82,10 @@ const TagsInput: FunctionComponent<IProps> = ({ className, label, placeholder, v
           </Helper>
         </div>
 
-        <div className="relative flex border border-gray-500 rounded-sm w-full mt-2">
+        <div className="relative">
           <input
             type="text"
-            className={clsx([isValid && 'text-green-600', 'appearance-none outline-none w-full px-3 py-2'])}
+            className={clsx(['form-input', isValid && 'text-green-600'])}
             placeholder={placeholder}
             onKeyDown={handleInput}
             value={tempValue}
@@ -97,23 +97,26 @@ const TagsInput: FunctionComponent<IProps> = ({ className, label, placeholder, v
             <span className="text-gray-400 font-normal">{completion}</span>
           </p>
         </div>
-
-        <div className="flex flex-wrap w-full">
-          {values.map((instance) => (
-            <div
-              className="flex items-center py-0.75 pl-2 pr-1.5 mr-2 mt-2 bg-gray-300 border border-gray-500 rounded-sm cursor-pointer"
-              onClick={() => removeValue(instance)}
-              key={uuidv4()}
-            >
-              <p className="text-gray-700 font-normal mr-1" key={uuidv4()}>
-                {instance.name}
-              </p>
-
-              <XIcon className="h-4 w-4 text-gray-700" />
-            </div>
-          ))}
-        </div>
       </label>
+
+      <div className="flex flex-wrap w-full text-sm">
+        {values.map((instance) => (
+          <div
+            className={clsx([
+              'flex items-center py-0.75 pl-2 pr-1.5 mr-2 mt-2 border rounded-sm cursor-pointer transition-all duration-300',
+              'bg-gray-300 border-gray-500 text-gray-700 hover:bg-red-200 hover:border-red-800 hover:text-red-800',
+            ])}
+            onClick={() => removeValue(instance)}
+            key={uuidv4()}
+          >
+            <p className="font-normal mr-1" key={uuidv4()}>
+              {instance.name}
+            </p>
+
+            <XIcon className="h-4 w-4" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const colors = require('tailwindcss/colors');
 
 module.exports = {
@@ -827,7 +828,7 @@ module.exports = {
     alignContent: ['responsive'],
     alignItems: ['responsive'],
     alignSelf: ['responsive'],
-    animation: ['responsive'],
+    animation: ['hover', 'responsive'],
     appearance: ['responsive'],
     backdropBlur: ['responsive'],
     backdropBrightness: ['responsive'],
@@ -932,11 +933,11 @@ module.exports = {
     pointerEvents: ['responsive'],
     position: ['responsive'],
     resize: ['responsive'],
-    ringColor: ['responsive', 'dark', 'focus-within', 'focus'],
-    ringOffsetColor: ['responsive', 'dark', 'focus-within', 'focus'],
-    ringOffsetWidth: ['responsive', 'focus-within', 'focus'],
-    ringOpacity: ['responsive', 'dark', 'focus-within', 'focus'],
-    ringWidth: ['responsive', 'focus-within', 'focus'],
+    ringColor: ['hover', 'group-hover', 'responsive', 'dark', 'focus-within', 'focus'],
+    ringOffsetColor: ['hover', 'group-hover', 'responsive', 'dark', 'focus-within', 'focus'],
+    ringOffsetWidth: ['hover', 'group-hover', 'responsive', 'focus-within', 'focus'],
+    ringOpacity: ['hover', 'group-hover', 'responsive', 'dark', 'focus-within', 'focus'],
+    ringWidth: ['hover', 'group-hover', 'responsive', 'focus-within', 'focus'],
     rotate: ['responsive', 'hover', 'focus'],
     saturate: ['responsive'],
     scale: ['responsive', 'hover', 'focus'],

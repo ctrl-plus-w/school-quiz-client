@@ -6,6 +6,7 @@ interface IProps {
   placeholder?: string;
   label: string;
   note?: string;
+  error?: boolean;
 
   maxLength?: number;
 
@@ -15,7 +16,7 @@ interface IProps {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Input = ({ label, placeholder, className, value, setValue, note, maxLength }: IProps): ReactElement => {
+const Input = ({ label, error = false, placeholder, className, value, setValue, note, maxLength }: IProps): ReactElement => {
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setValue(e.target.value);
   };
@@ -29,7 +30,7 @@ const Input = ({ label, placeholder, className, value, setValue, note, maxLength
 
         <input
           type="text"
-          className="block border border-gray-500 rounded-sm w-full py-2 px-3 mt-2 outline-none focus:outline-none"
+          className={clsx(['form-input', error && 'error'])}
           placeholder={placeholder}
           value={value}
           onChange={onChange}

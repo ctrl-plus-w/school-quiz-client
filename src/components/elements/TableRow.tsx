@@ -113,7 +113,7 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
 
           <p className="text-gray-800 font-normal">Cette action est irréversible.</p>
 
-          <Button full={false} color="red" className="mt-6" submit={true}>
+          <Button full={false} className="mt-6" submit={true}>
             Supprimer
           </Button>
         </form>

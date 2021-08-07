@@ -51,7 +51,13 @@ const Dropdown: FunctionComponent<IProps> = ({ className, label, placeholder = '
         </div>
 
         <div className={clsx(['relative', readonly ? 'cursor-not-allowed' : 'cursor-pointer'])} ref={container}>
-          <div className="z-20 relative border border-gray-500 rounded-sm w-full py-2 px-3 mt-2" onClick={switchState}>
+          <div
+            className={clsx([
+              'z-20 relative border rounded-sm w-full py-2 px-3 mt-2 hover:border-blue-600',
+              isHidden ? 'border-gray-500' : 'border-blue-600 ring ring-blue-200',
+            ])}
+            onClick={switchState}
+          >
             <p className={clsx([value === '' || value === null ? 'text-gray-600' : 'text-black', 'font-normal'])}>
               {value ? values.find(({ slug }) => slug === value)?.name : placeholder}
             </p>

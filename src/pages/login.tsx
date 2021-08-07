@@ -7,7 +7,6 @@ import Input from '@element/Input';
 import PasswordInput from '@element/PasswordInput';
 import Route from '@element/Route';
 import Title from '@element/Title';
-import ErrorModal from '@element/Error';
 
 import Layout from '@layout/Default';
 
@@ -19,8 +18,6 @@ import FormGroup from '@module/FormGroup';
 import Col from '@module/Col';
 
 const Login: FunctionComponent = () => {
-  const [valid, setValid] = useState(false);
-  const [error, setError] = useState(false);
   const [_cookie, setCookie] = useCookies(['user']);
 
   const router = useRouter();
@@ -28,12 +25,27 @@ const Login: FunctionComponent = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  useEffect(() => setValid(username !== '' && password !== ''), [username, password]);
+  const [errors, setErrors] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (errors.includes('username')) setErrors((prev) => prev.filter((value) => value !== 'username'));
+  }, [username]);
+
+  useEffect(() => {
+    if (errors.includes('password')) setErrors((prev) => prev.filter((value) => value !== 'password'));
+  }, [password]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (!valid) return;
+    if (username === '' || password === '') {
+      const tempErrors = [];
+
+      if (username === '') tempErrors.push('username');
+      if (password === '') tempErrors.push('password');
+
+      return setErrors(tempErrors);
+    }
 
     try {
       const { data } = await database.post('/auth/login', { username, password });
@@ -43,7 +55,7 @@ const Login: FunctionComponent = () => {
       const roleObject = Object.values(roles).find(({ slug }) => slug === data.role);
       router.push(roleObject?.path || '/');
     } catch (err) {
-      if (err) setError(true);
+      if (err) setErrors(['username', 'password']);
     }
   };
 
@@ -56,13 +68,9 @@ const Login: FunctionComponent = () => {
             <Route to="/password-lost">Mot de passe oublié ?</Route>
           </Col>
 
-          <Input label="Nom d'utilisateur" placeholder="jdupont" value={username} setValue={setUsername} />
-          <PasswordInput label="Mot de passe" placeholder="****" value={password} setValue={setPassword} />
-          <Button disabled={!valid} submit>
-            Se connecter
-          </Button>
-
-          {error && <ErrorModal body="Identifiants invalides" />}
+          <Input label="Nom d'utilisateur" placeholder="jdupont" value={username} setValue={setUsername} error={errors.includes('username')} />
+          <PasswordInput label="Mot de passe" placeholder="****" value={password} setValue={setPassword} error={errors.includes('password')} />
+          <Button submit>Se connecter</Button>
         </FormGroup>
       </Form>
     </Layout>

@@ -6,24 +6,18 @@ interface IProps {
   children?: React.ReactNode;
   href: string;
   className?: string;
-  outline?: boolean;
+  primary?: boolean;
 }
 
-const LinkButton: FunctionComponent<IProps> = ({ children, href, className, outline = false }: IProps) => {
-  const STYLES = {
-    DEFAULT: 'bg-black text-white border border-transparent',
-    OUTLINE: 'bg-white text-black border border-black',
+const LinkButton: FunctionComponent<IProps> = ({ children, href, className, primary = true }: IProps) => {
+  const getStyle = () => {
+    if (primary) return 'bg-blue-800 text-white hover:bg-blue-700 hover:ring hover:ring-blue-300';
+    else return 'bg-white text-blue-800 font-medium border border-transparent';
   };
 
   return (
     <Link href={href}>
-      <a
-        className={clsx([
-          'button flex justify-center items-center py-2 px-8 w-full rounded-sm',
-          outline ? STYLES.OUTLINE : STYLES.DEFAULT,
-          className,
-        ])}
-      >
+      <a className={clsx(['button flex justify-center items-center py-2 px-8 w-full rounded-sm transition-all duration-300', getStyle(), className])}>
         {children}
       </a>
     </Link>

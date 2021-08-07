@@ -41,6 +41,60 @@ div > .form-group:not(:last-child) {
   -webkit-appearance: none;
 }
 
+.form-input {
+  @apply flex border border-gray-500 rounded-sm w-full py-2 px-3 mt-2 outline-none transition-all duration-150;
+}
+
+.form-input--np  {
+  @apply flex border border-gray-500 rounded-sm w-full mt-2 outline-none transition-all duration-150;
+}
+
+.form-input--nm {
+  @apply flex border border-gray-500 rounded-sm w-full py-2 px-3 outline-none transition-all duration-150;
+}
+
+.form-input--ns {
+  @apply flex border border-gray-500 rounded-sm w-full outline-none transition-all duration-150;
+}
+
+.form-input.error,
+.form-input--no--padding.error,
+.form-input--no--margin.error,
+.form-input--ns.error {
+  @apply border-red-500;
+}
+
+.form-input:hover,
+.form-input--np:hover,
+.form-input--nm:hover,
+.form-input--ns:hover {
+  @apply border-blue-600;
+}
+
+.form-input.error:hover,
+.form-input--np.error:hover,
+.form-input--nm.error:hover,
+.form-input--ns.error:hover {
+  @apply border-red-800;
+}
+
+.form-input:focus,
+.form-input--np:focus,
+.form-input--nm:focus,
+.form-input--ns:focus,
+.form-input.focus,
+.form-input--np.focus,
+.form-input--nm.focus,
+.form-input--ns.focus {
+  @apply outline-none border-blue-600 ring ring-blue-200;
+}
+
+.form-input.error:focus,
+.form-input--np.error:focus,
+.form-input--nm.error:focus .form-input--ns.error:focus {
+  @apply border-red-800 ring ring-red-200;
+}
+
 .link {
   position: relative;
 }

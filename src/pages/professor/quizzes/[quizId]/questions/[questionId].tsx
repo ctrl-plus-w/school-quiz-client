@@ -69,12 +69,12 @@ interface IQuizDefaultButtonsProps {
 const QuizDefaultButtons = ({ quiz, valid }: IQuizDefaultButtonsProps) => {
   return (
     <div className="flex mt-auto ml-auto">
-      <LinkButton href={`/professor/quizzes/${quiz.id}`} outline={true} className="mr-6">
+      <LinkButton href={`/professor/quizzes/${quiz.id}`} primary={false} className="mr-6">
         Annuler
       </LinkButton>
 
       <Button submit={true} disabled={!valid}>
-        Modified
+        Modifier
       </Button>
     </div>
   );

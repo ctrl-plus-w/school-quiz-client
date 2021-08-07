@@ -45,7 +45,7 @@ const AdminDashboardModelLayout: FunctionComponent<IProps> = ({ children, onSubm
           {children}
 
           <div className="flex mt-auto ml-auto">
-            <LinkButton href={mainPath} outline={true} className="mr-6">
+            <LinkButton href={mainPath} primary={false} className="mr-6">
               Annuler
             </LinkButton>
 

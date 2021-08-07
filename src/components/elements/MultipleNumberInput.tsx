@@ -25,6 +25,8 @@ interface IInputProps {
 }
 
 const Input = ({ placeholder, className = '', suffix, pattern, onKeyDown, value, setValue, min, max }: IInputProps): ReactElement => {
+  const [focus, setFocus] = useState(false);
+
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
     if (e.target.value === '') return setValue('');
 
@@ -37,17 +39,19 @@ const Input = ({ placeholder, className = '', suffix, pattern, onKeyDown, value,
   };
 
   return (
-    <div className={clsx(['flex items-center px-3 mt-2 border border-gray-500 rounded-sm', className])}>
+    <div className={clsx(['form-input--ns px-3 mt-2 rounded-sm', focus && 'focus', className])}>
       <input
         type="text"
-        className={clsx(['w-full py-2 outline-none focus:outline-none', suffix && 'text-right'])}
+        className={clsx('w-full py-2 outline-none focus:outline-none', [suffix && 'text-right'])}
         onChange={onChange}
         value={value}
         placeholder={placeholder}
         onKeyDown={onKeyDown}
         pattern={pattern}
+        onFocus={() => setFocus(true)}
+        onBlur={() => setFocus(false)}
       />
-      {suffix && <p className="text-gray-900 text-sm font-normal ml-1">{suffix}</p>}
+      {suffix && <p className="text-gray-900 text-sm font-normal py-2 ml-1">{suffix}</p>}
     </div>
   );
 };
@@ -128,23 +132,26 @@ const MultipleNumberInput = ({ className, label, type, placeholder = undefined, 
         </div>
 
         {getInput()}
-
-        <div className="flex flex-wrap w-full">
-          {values.map((str) => (
-            <div
-              className="flex items-center py-0.75 pl-2 pr-1.5 mr-2 mt-2 bg-gray-300 border border-gray-500 rounded-sm cursor-pointer"
-              onClick={() => removeValue(str)}
-              key={uuidv4()}
-            >
-              <p className="text-gray-700 font-normal mr-1" key={uuidv4()}>
-                {str}
-              </p>
-
-              <XIcon className="h-4 w-4 text-gray-700" />
-            </div>
-          ))}
-        </div>
       </label>
+
+      <div className="flex flex-wrap w-full text-sm">
+        {values.map((str) => (
+          <div
+            className={clsx([
+              'flex items-center py-0.75 pl-2 pr-1.5 mr-2 mt-2 border rounded-sm cursor-pointer',
+              'bg-gray-300 border-gray-500 hover:bg-red-200 hover:border-red-800 hover:text-red-800',
+            ])}
+            onClick={() => removeValue(str)}
+            key={uuidv4()}
+          >
+            <p className="text-gray-700 font-normal mr-1" key={uuidv4()}>
+              {str}
+            </p>
+
+            <XIcon className="h-4 w-4 text-gray-700" />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

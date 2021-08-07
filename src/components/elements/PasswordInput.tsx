@@ -12,6 +12,7 @@ interface IProps {
   placeholder?: string;
   label: string;
   note?: string;
+  error?: boolean;
 
   className?: string;
 
@@ -21,7 +22,16 @@ interface IProps {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const PasswordInput: FunctionComponent<IProps> = ({ label, placeholder, className, value, setValue, note, generator = false }: IProps) => {
+const PasswordInput: FunctionComponent<IProps> = ({
+  label,
+  error = false,
+  placeholder,
+  className,
+  value,
+  setValue,
+  note,
+  generator = false,
+}: IProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -50,20 +60,20 @@ const PasswordInput: FunctionComponent<IProps> = ({ label, placeholder, classNam
           {generator && <CogIcon className="h-4 w-4 cursor-pointer hover:text-blue-500 transition duration-300" onClick={setPassword} />}
         </div>
 
-        <div className="relative">
+        <div className="relative group">
           <input
             type={showPassword ? 'text' : 'password'}
-            className="block border border-gray-500 rounded-sm py-2 px-3 mt-2 outline-none focus:outline-none w-full"
+            className={clsx(['form-input', error && 'error'])}
             placeholder={placeholder}
             value={value}
             onChange={onChange}
           />
 
           <div
-            className=" absolute top-1/2 right-0 h-full px-2.5 transform -translate-y-1/2 flex justify-center items-center cursor-pointer"
+            className=" absolute top-1/2 right-0 h-full px-2.5 transform -translate-y-1/2 flex justify-center items-center cursor-pointer text-gray-600 hover:text-blue-600"
             onClick={switchPasswordVisibility}
           >
-            {showPassword ? <EyeIcon className="h-5 w-5 text-gray-600" /> : <EyeOffIcon className="h-5 w-5 text-gray-600" />}
+            {showPassword ? <EyeIcon className="h-5 w-5" /> : <EyeOffIcon className="h-5 w-5" />}
           </div>
         </div>
 

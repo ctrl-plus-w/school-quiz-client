@@ -89,7 +89,7 @@ const CreateQuiz = ({ token }: IServerSideProps): ReactElement => {
           </FormGroup>
 
           <div className="flex mt-auto ml-auto">
-            <LinkButton href="/professor/quizzes" outline={true} className="mr-6">
+            <LinkButton href="/professor/quizzes" primary={false} className="mr-6">
               Annuler
             </LinkButton>
 

@@ -27,7 +27,7 @@ const Textarea = ({ label, placeholder, className, value, setValue, note, maxLen
         </div>
 
         <textarea
-          className="block border border-gray-500 rounded-sm w-full py-2 px-3 mt-2 outline-none focus:outline-none"
+          className="form-input"
           placeholder={placeholder}
           value={value}
           onChange={onChange}

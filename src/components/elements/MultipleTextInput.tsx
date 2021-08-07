@@ -54,30 +54,33 @@ const MultipleTextInput = ({ className, label, placeholder, values, setValues, m
 
         <input
           type="text"
-          className="w-full py-2 px-3 mt-2 border border-gray-500 rounded-sm outline-none focus:outline-none"
+          className="form-input"
           placeholder={placeholder}
           onKeyDown={handleInput}
           value={tempValue}
           onChange={onChange}
           maxLength={maxLength}
         />
-
-        <div className="flex flex-wrap w-full">
-          {values.map((str) => (
-            <div
-              className="flex items-center py-0.75 pl-2 pr-1.5 mr-2 mt-2 bg-gray-300 border border-gray-500 rounded-sm cursor-pointer"
-              onClick={() => removeValue(str)}
-              key={uuidv4()}
-            >
-              <p className="text-gray-700 font-normal mr-1" key={uuidv4()}>
-                {str}
-              </p>
-
-              <XIcon className="h-4 w-4 text-gray-700" />
-            </div>
-          ))}
-        </div>
       </label>
+
+      <div className="flex flex-wrap w-full text-sm">
+        {values.map((str) => (
+          <div
+            className={clsx([
+              'flex items-center py-0.75 pl-2 pr-1.5 mr-2 mt-2 border  rounded-sm cursor-pointer',
+              'bg-gray-300 border-gray-500 hover:bg-red-200 hover:border-red-800 hover:text-red-800',
+            ])}
+            onClick={() => removeValue(str)}
+            key={uuidv4()}
+          >
+            <p className="font-normal mr-1" key={uuidv4()}>
+              {str}
+            </p>
+
+            <XIcon className="h-4 w-4 " />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
