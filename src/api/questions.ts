@@ -25,11 +25,33 @@ export const createQuestion = <T>(questionType: QuestionType) => {
   };
 };
 
+export const updateQuestion =
+  <T>() =>
+  async (quizId: number, questionId: number, updateAttributes: AllOptional<T>, token: string): Promise<APIResponse<UpdateResponse>> => {
+    try {
+      const { data: question } = await database.put(`/api/quizzes/${quizId}/questions/${questionId}`, updateAttributes, getHeaders(token));
+
+      return [question, undefined];
+    } catch (_err) {
+      const err = _err as AxiosError;
+
+      if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+      if (err.response.status === 403) return [null, { status: 403, message: '' }];
+      if (err.response.status === 409) return [null, { status: 409, message: 'Cete question existe déja.' }];
+
+      return DEFAULT_API_ERROR_RESPONSE;
+    }
+  };
+
 export const createTextualQuestion = createQuestion<TextualQuestionCreationAttributes>('textualQuestion');
+export const updateTextualQuestion = updateQuestion<AllOptional<TextualQuestionCreationAttributes>>();
 
 export const createNumericQuestion = createQuestion<NumericQuestionCreationAttributes>('numericQuestion');
+export const updateNumericQuestion = updateQuestion<AllOptional<NumericQuestionCreationAttributes>>();
 
 export const createChoiceQuestion = createQuestion<ChoiceQuestionCreationAttributes>('choiceQuestion');
+export const updateChoiceQuestion = updateQuestion<AllOptional<ChoiceQuestionCreationAttributes>>();
 
 export const addChoices = async (
   quizId: number,
@@ -69,6 +91,32 @@ export const addExactAnswers = async (
     const { data: createdAnswers } = await database.post(endpoint, answers, getHeaders(token));
 
     return [createdAnswers, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+    if (err.response.status === 409) return [null, { status: 409, message: 'Un des choix existe déja.' }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
+export const removeExactAnswers = async (
+  quizId: number,
+  questionId: number,
+  answersId: Array<number>,
+  token: string
+): Promise<APIResponse<DeleteResponse>> => {
+  try {
+    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers`;
+
+    for (const answerId of answersId) {
+      await database.delete(`${endpoint}/${answerId}`, getHeaders(token));
+    }
+
+    return [{ deleted: true }, undefined];
   } catch (_err) {
     const err = _err as AxiosError;
 

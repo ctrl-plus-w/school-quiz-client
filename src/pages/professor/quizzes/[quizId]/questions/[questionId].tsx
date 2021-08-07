@@ -1,5 +1,6 @@
-import React, { Dispatch, FormEvent, ReactElement, ReactNode, SetStateAction, useEffect, useState } from 'react';
+import React, { Dispatch, FormEvent, ReactElement, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { useRouter } from 'next/dist/client/router';
 
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
@@ -22,15 +23,19 @@ import Button from '@element/Button';
 import Input from '@element/Input';
 import Title from '@element/Title';
 
-import { getHeaders } from '@util/authentication.utils';
 import { nameMapper, nameSlugMapper } from '@util/mapper.utils';
 import { areArraysEquals } from '@util/condition.utils';
+import { getHeaders } from '@util/authentication.utils';
 
 import { choiceSorter, generateChoices, removeChoices } from 'helpers/question.helper';
 
-import ROLES from '@constant/roles';
+import { NotificationContext } from 'context/NotificationContext/NotificationContext';
+
+import { addExactAnswers, removeExactAnswers, updateTextualQuestion } from 'api/questions';
 
 import database from 'database/database';
+
+import ROLES from '@constant/roles';
 
 interface IQuestionDefaultFieldsProps {
   title: string;
@@ -69,7 +74,7 @@ const QuizDefaultButtons = ({ quiz, valid }: IQuizDefaultButtonsProps) => {
       </LinkButton>
 
       <Button submit={true} disabled={!valid}>
-        Créer
+        Modified
       </Button>
     </div>
   );
@@ -80,6 +85,10 @@ interface ITextualQuestionProps extends IServerSideProps {
 }
 
 const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITextualQuestionProps): ReactElement => {
+  const router = useRouter();
+
+  const { addNotification } = useContext(NotificationContext);
+
   const [valid, setValid] = useState(false);
 
   const [title, setTitle] = useState(question.title);
@@ -115,8 +124,61 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
     else setValid(false);
   }, [title, description, verificationType, caseSensitive, accentSensitive, answers]);
 
-  const handleSubmit = (e: FormEvent): void => {
-    alert();
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+
+    if (!valid) return;
+
+    // Update the question instance
+    const updateAttributes: AllOptional<TextualQuestionCreationAttributes> = {
+      title: title !== question.title ? title : undefined,
+      description: description !== question.description ? description : undefined,
+      accentSensitive: accentSensitive !== question.typedQuestion.accentSensitive ? accentSensitive : undefined,
+      caseSensitive: caseSensitive !== question.typedQuestion.caseSensitive ? caseSensitive : undefined,
+      verificationTypeSlug: questionVerificationType !== verificationType ? verificationType : undefined,
+    };
+
+    const [updated, updateQuestionError] = await updateTextualQuestion(quiz.id, question.id, updateAttributes, token);
+
+    if (updateQuestionError) {
+      if (updateQuestionError.status === 403) router.push('/login');
+      else addNotification({ content: updateQuestionError.message, type: 'ERROR' });
+    }
+
+    if (!updated) return;
+
+    // Update the question answers
+    if (!areArraysEquals(questionAnswersContent, answers)) {
+      const addedAnswers = answers.filter((answer) => !questionAnswersContent.includes(answer));
+      const removedAnswers = questionAnswers.filter(({ typedAnswer }) => !answers.includes(typedAnswer.answerContent));
+
+      if (addedAnswers.length > 0) {
+        const addAnswerCreationAttributes: Array<ExactAnswerCreationAttributes> = addedAnswers.map((answer) => ({ answerContent: answer }));
+        const [added, addedAnswersError] = await addExactAnswers(quiz.id, question.id, addAnswerCreationAttributes, token);
+
+        if (addedAnswersError) {
+          if (addedAnswersError.status === 403) router.push('/login');
+          else addNotification({ content: addedAnswersError.message, type: 'ERROR' });
+        }
+
+        if (!added) return;
+      }
+
+      if (removedAnswers.length > 0) {
+        const removeAnswersCreationAttributes: Array<number> = removedAnswers.map(({ id }) => id);
+        const [removed, removedAnswersError] = await removeExactAnswers(quiz.id, question.id, removeAnswersCreationAttributes, token);
+
+        if (removedAnswersError) {
+          if (removedAnswersError.status === 403) router.push('/login');
+          else addNotification({ content: removedAnswersError.message, type: 'ERROR' });
+        }
+
+        if (!removed) return;
+      }
+    }
+
+    addNotification({ content: 'Question modifiée.', type: 'INFO' });
+    router.push(`/professor/quizzes/${quiz.id}`);
   };
 
   return (
