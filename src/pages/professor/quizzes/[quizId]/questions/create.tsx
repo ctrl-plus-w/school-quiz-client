@@ -270,7 +270,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
         <hr className="mb-8 mt-8" />
 
         <Form full={true} onSubmit={handleSubmit}>
-          <Row>
+          <Row wrap>
             <FormGroup>
               <Title level={2}>Informations générales</Title>
 

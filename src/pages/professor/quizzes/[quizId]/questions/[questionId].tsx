@@ -121,7 +121,7 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
 
   return (
     <Form full={true} onSubmit={handleSubmit}>
-      <Row>
+      <Row wrap>
         <QuestionDefaultFields {...{ title, setTitle, description, setDescription }}>
           <MultipleTextInput label="Réponses" placeholder="Réponse" values={answers} setValues={setAnswers} maxLength={25} />
         </QuestionDefaultFields>
@@ -216,7 +216,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
   return (
     <Form full={true} onSubmit={handleSubmit}>
-      <Row>
+      <Row wrap>
         <QuestionDefaultFields {...{ title, setTitle, description, setDescription }} />
 
         <FormGroup>
@@ -239,7 +239,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
               />
 
               {specificationType === 'comparison' ? (
-                <Row className="w-80 justify-between">
+                <Row className="w-80">
                   <NumberInput label="Minimum" type={specification} value={answerMin} setValue={setAnswerMin} />
                   <NumberInput label="Maximum" type={specification} value={answerMax} setValue={setAnswerMax} />
                 </Row>
@@ -338,7 +338,7 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
 
   return (
     <Form full={true} onSubmit={handleSubmit}>
-      <Row>
+      <Row wrap>
         <QuestionDefaultFields {...{ title, setTitle, description, setDescription }} />
 
         <FormGroup>
