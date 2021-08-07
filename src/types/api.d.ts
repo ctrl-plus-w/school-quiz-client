@@ -43,4 +43,6 @@ type ComparisonAnswerCreationAttributes = {
 
 type APIResponse<T> = [T | null, { status: number; message: string } | undefined];
 
-type UpdateResponse = { set: boolean };
+type UpdateResponse = { updated: boolean };
+
+type DeleteResponse = { deleted: boolean };
