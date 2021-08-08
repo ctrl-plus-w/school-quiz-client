@@ -57,3 +57,9 @@ export const parseNumericAnswer = (answer: string, questionSpecificationSlug: st
 
   return parseInt(answer);
 };
+
+export const isNull = (el: unknown): boolean => {
+  return el !== null && el !== undefined;
+};
+
+export const isNotNull = (el: unknown): boolean => !isNull(el);
