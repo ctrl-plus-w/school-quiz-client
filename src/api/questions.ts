@@ -129,6 +129,24 @@ export const removeExactAnswers = async (
   }
 };
 
+export const clearAnswers = async (quizId: number, questionId: number, token: string): Promise<APIResponse<DeleteResponse>> => {
+  try {
+    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers`;
+
+    await database.delete(endpoint, getHeaders(token));
+
+    return [{ deleted: true }, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
 export const addComparisonAnswer = async (
   quizId: number,
   questionId: number,
@@ -147,6 +165,29 @@ export const addComparisonAnswer = async (
 
     if (err.response.status === 403) return [null, { status: 403, message: '' }];
     if (err.response.status === 409) return [null, { status: 409, message: 'Un des choix existe déja.' }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
+export const updateComparisonAnswer = async (
+  quizId: number,
+  questionId: number,
+  answerId: number,
+  updateAttributes: AllOptional<ComparisonAnswerCreationAttributes>,
+  token: string
+): Promise<APIResponse<UpdateResponse>> => {
+  try {
+    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers/${answerId}`;
+    await database.put(endpoint, updateAttributes, getHeaders(token));
+
+    return [{ updated: true }, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
 
     return DEFAULT_API_ERROR_RESPONSE;
   }
