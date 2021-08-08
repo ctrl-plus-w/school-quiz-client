@@ -12,7 +12,7 @@ interface IProps {
 const LinkButton: FunctionComponent<IProps> = ({ children, href, className, primary = true }: IProps) => {
   const getStyle = () => {
     if (primary) return 'bg-blue-800 text-white hover:bg-blue-700 hover:ring hover:ring-blue-300';
-    else return 'bg-white text-blue-800 font-medium border border-transparent';
+    else return 'bg-white text-blue-800 font-medium border border-transparent hover:text-blue-600';
   };
 
   return (
