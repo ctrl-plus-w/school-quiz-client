@@ -18,6 +18,8 @@ interface IInputProps {
 }
 
 const Input = ({ placeholder, suffix, pattern, value, setValue, min, max }: IInputProps): ReactElement => {
+  const [focus, setFocus] = useState(false);
+
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
     if (e.target.value === '') return setValue('');
 
@@ -30,22 +32,29 @@ const Input = ({ placeholder, suffix, pattern, value, setValue, min, max }: IInp
   };
 
   const onBlur = (e: FocusEvent<HTMLInputElement>): void => {
+    setFocus(false);
+
     if (min && e.target.value === '') setValue(min.toString());
   };
 
+  const onFocus = () => {
+    setFocus(true);
+  };
+
   return (
-    <div className="flex items-center rounded-sm ">
+    <div className={clsx(['form-input--ns px-3 mt-2 rounded-sm', focus && 'focus'])}>
       <input
         type="text"
-        className={clsx(['form-input', suffix && 'text-right'])}
+        className={clsx('w-full py-2 outline-none focus:outline-none', [suffix && 'text-right'])}
         onChange={onChange}
         value={value}
         placeholder={placeholder}
         pattern={pattern}
+        onFocus={onFocus}
         onBlur={onBlur}
       />
 
-      {suffix && <p className="text-gray-900 text-sm font-normal ml-1">{suffix}</p>}
+      {suffix && <p className="text-gray-900 text-sm font-normal py-2 ml-1">{suffix}</p>}
     </div>
   );
 };

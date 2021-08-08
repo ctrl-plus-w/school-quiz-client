@@ -116,6 +116,9 @@ const MultipleNumberInput = ({ className, label, type, placeholder = undefined, 
       case 'pourcentage':
         return <Input pattern={str(regex.percent)} placeholder="00" suffix="%" {...props} />;
 
+      case 'prix':
+        return <Input pattern={str(regex.float)} placeholder="0.00" suffix="€" {...props} />;
+
       case 'date':
         return <Input pattern={str(regex.dateInput)} placeholder="dd/mm/yyyy" {...props} />;
 
