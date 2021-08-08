@@ -4,17 +4,46 @@ import clsx from 'clsx';
 
 interface IProps {
   children?: React.ReactNode;
-  submit?: boolean;
-  primary?: boolean;
+
   className?: string;
+
+  type?: 'info' | 'success' | 'error';
+
+  primary?: boolean;
+  submit?: boolean;
   disabled?: boolean;
   full?: boolean;
 }
 
-const Button: FunctionComponent<IProps> = ({ children, className, full = true, submit = false, primary = true, disabled = false }: IProps) => {
-  const getStyle = () => {
-    if (primary) return clsx(['bg-blue-800 text-white shadow', !disabled && 'hover:bg-blue-700 hover:ring hover:ring-blue-300']);
-    else return 'bg-white text-blue-700 font-medium border border-transparent';
+const Button: FunctionComponent<IProps> = ({
+  children,
+  className,
+  full = true,
+  submit = false,
+  primary = true,
+  disabled = false,
+  type = 'info',
+}: IProps) => {
+  const getSecondaryStyle = () => {
+    switch (type) {
+      case 'error':
+        return clsx(['bg-transparent text-red-700 font-medium border border-transparent', !disabled && 'hover:text-red-500']);
+      case 'info':
+        return clsx(['bg-transparent text-blue-700 font-medium border border-transparent', !disabled && 'hover:text-blue-500']);
+      case 'success':
+        return clsx(['bg-transparent text-green-700 font-medium border border-transparent', !disabled && 'hover:text-green-600']);
+    }
+  };
+
+  const getPrimaryStyle = () => {
+    switch (type) {
+      case 'error':
+        return clsx(['bg-red-800 text-white shadow', !disabled && 'hover:bg-red-700 hover:ring hover:ring-red-300']);
+      case 'info':
+        return clsx(['bg-blue-800 text-white shadow', !disabled && 'hover:bg-blue-700 hover:ring hover:ring-blue-300']);
+      case 'success':
+        return clsx(['bg-green-700 text-white shadow', !disabled && 'hover:bg-green-600 hover:ring hover:ring-green-200']);
+    }
   };
 
   const handleClick = (e: MouseEvent) => {
@@ -31,7 +60,7 @@ const Button: FunctionComponent<IProps> = ({ children, className, full = true, s
         'shadow-2xl',
         full && 'w-full',
         disabled && 'opacity-80 cursor-not-allowed',
-        getStyle(),
+        primary ? getPrimaryStyle() : getSecondaryStyle(),
         className,
       ])}
       type={submit ? 'submit' : 'button'}

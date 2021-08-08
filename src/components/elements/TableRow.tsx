@@ -103,7 +103,10 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
 
         <form
           className={clsx([
-            'error-validation z-10 absolute top-full -left-72 w-72 flex items-start shadow-xl flex-col py-5 px-4 bg-white rounded border border-gray-400 cursor-default',
+            'error-validation z-10 w-72 flex items-start flex-col py-5 px-4 rounded border cursor-default',
+            'absolute top-full -left-72',
+            'bg-white border-gray-400 shadow-2xl',
+            'ring ring-gray-300',
             shownElement === instance.id ? 'visible' : 'invisible',
           ])}
           ref={container}
@@ -113,7 +116,7 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
 
           <p className="text-gray-800 font-normal">Cette action est irréversible.</p>
 
-          <Button full={false} className="mt-6" submit={true}>
+          <Button full={false} className="mt-6" submit={true} type="error">
             Supprimer
           </Button>
         </form>
