@@ -23,15 +23,24 @@ import Button from '@element/Button';
 import Input from '@element/Input';
 import Title from '@element/Title';
 
-import { nameMapper, nameSlugMapper } from '@util/mapper.utils';
+import { nameMapper, nameSlugMapper, parseExactAnswer, parseNumericAnswer } from '@util/mapper.utils';
 import { areArraysEquals } from '@util/condition.utils';
 import { getHeaders } from '@util/authentication.utils';
+import { getLength } from '@util/object.utils';
 
 import { choiceSorter, generateChoices, removeChoices } from 'helpers/question.helper';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 
-import { addExactAnswers, removeExactAnswers, updateTextualQuestion } from 'api/questions';
+import {
+  addComparisonAnswer,
+  addExactAnswers,
+  clearAnswers,
+  removeExactAnswers,
+  updateComparisonAnswer,
+  updateNumericQuestion,
+  updateTextualQuestion,
+} from 'api/questions';
 
 import database from 'database/database';
 
@@ -107,6 +116,8 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
 
   useEffect(() => {
     const isValid = (): boolean => {
+      if (title === '' || description === '') return false;
+
       if (
         title === question.title &&
         description === question.description &&
@@ -222,6 +233,10 @@ interface INumericQuestionProps extends IServerSideProps {
 }
 
 const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INumericQuestionProps): ReactElement => {
+  const router = useRouter();
+
+  const { addNotification } = useContext(NotificationContext);
+
   const questionAnswers = question.answers as Array<IAnswer<IExactAnswer>>;
   const questionAnswer = question.answers[0] as IAnswer<IComparisonAnswer>;
 
@@ -255,7 +270,18 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
   useEffect(() => {
     const isValid = () => {
-      if (title !== question.title || description !== question.description) return true;
+      if (title === '' || description === '') return false;
+
+      if (specificationType === 'exact' && answers.length === 0) return false;
+      if (specificationType === 'comparison' && (answerMin === '' || answerMax === '')) return false;
+
+      if (
+        title !== question.title ||
+        description !== question.description ||
+        specification !== questionSpecification ||
+        specificationType !== firstAnswerType
+      )
+        return true;
 
       if (specificationType === 'exact') {
         if (areArraysEquals(questionAnswersContent, answers)) return false;
@@ -270,10 +296,136 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
     if (isValid()) setValid(true);
     else setValid(false);
-  }, [title, description, answers, answerMin, answerMax]);
+  }, [title, description, answers, answerMin, answerMax, specification, specificationType]);
 
-  const handleSubmit = (e: FormEvent): void => {
-    alert();
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+
+    if (!valid) return;
+
+    // Update the question instance
+    const updateAttributes: AllOptional<NumericQuestionCreationAttributes> = {
+      title: title !== question.title ? title : undefined,
+      description: description !== question.description ? description : undefined,
+      questionSpecificationSlug: specification !== questionSpecification ? specification : undefined,
+    };
+
+    if (getLength(updateAttributes) > 0) {
+      const [updated, updateQuestionError] = await updateNumericQuestion(quiz.id, question.id, updateAttributes, token);
+
+      if (updateQuestionError) {
+        if (updateQuestionError.status === 403) router.push('/login');
+        else addNotification({ content: updateQuestionError.message, type: 'ERROR' });
+      }
+
+      if (!updated) return;
+    }
+
+    // If the specification is different (integer / float / percentage ...) or the specification type is different (exact / comparison)
+    // Means all the questions will change (reset then recreate).
+    if (specification !== questionSpecification || specificationType !== firstAnswerType) {
+      if (specificationType !== firstAnswerType) {
+        await clearAnswers(quiz.id, question.id, token);
+      }
+
+      if (specificationType === 'exact') {
+        const mappedAnswers: Array<ExactAnswerCreationAttributes> = answers.map((answer) => ({
+          answerContent: parseExactAnswer(answer, specification),
+        }));
+
+        const [createdAnswers, answersCreationError] = await addExactAnswers(quiz.id, question.id, mappedAnswers, token);
+
+        if (answersCreationError) {
+          if (answersCreationError.status === 403) router.push('/login');
+          else addNotification({ content: answersCreationError.message, type: 'ERROR' });
+        }
+
+        if (!createdAnswers) return;
+      } else {
+        const answer: ComparisonAnswerCreationAttributes = {
+          greaterThan: parseNumericAnswer(answerMin, specification),
+          lowerThan: parseNumericAnswer(answerMax, specification),
+        };
+
+        const [createdAnswer, answerCreationError] = await addComparisonAnswer(quiz.id, question.id, answer, token);
+
+        if (answerCreationError) {
+          if (answerCreationError.status === 403) router.push('/login');
+          else addNotification({ content: answerCreationError.message, type: 'ERROR' });
+        }
+
+        if (!createdAnswer) return;
+      }
+    } else {
+      // The specification and the specification type aren't modified, so the user only modifies the questions
+      if (specificationType === 'comparison') {
+        // If the question have an answer (questionAnswer === question.answers[0])
+        // Means that whe update the comparison answer because only one comparison answer exists per answer
+        if (questionAnswer) {
+          const updateAttributes: AllOptional<ComparisonAnswerCreationAttributes> = {
+            greaterThan: answerMin !== questionAnswerMin ? parseInt(answerMin) : undefined,
+            lowerThan: answerMax !== questionAnswerMax ? parseInt(answerMax) : undefined,
+          };
+
+          if (getLength(updateAttributes) > 0) {
+            const [updated, updateAnswerError] = await updateComparisonAnswer(quiz.id, question.id, questionAnswer.id, updateAttributes, token);
+
+            if (updateAnswerError) {
+              if (updateAnswerError.status === 403) router.push('/login');
+              else addNotification({ content: updateAnswerError.message, type: 'ERROR' });
+            }
+
+            if (!updated) return;
+          }
+        } else {
+          // Otherwise create the comparison answer
+          const creationAttributes: ComparisonAnswerCreationAttributes = { greaterThan: parseInt(answerMin), lowerThan: parseInt(answerMax) };
+          const [created, addAnswerError] = await addComparisonAnswer(quiz.id, question.id, creationAttributes, token);
+
+          if (addAnswerError) {
+            if (addAnswerError.status === 403) router.push('/login');
+            else addNotification({ content: addAnswerError.message, type: 'ERROR' });
+          }
+
+          if (!created) return;
+        }
+      } else {
+        // The specification type here is 'exact' so, we add and removed the answers
+        const addedAnswers = answers.filter((answer) => !questionAnswersContent.includes(answer));
+        const removedAnswers = questionAnswers.filter(({ typedAnswer }) => !answers.includes(typedAnswer.answerContent));
+
+        console.log(addedAnswers, removedAnswers);
+
+        if (addedAnswers.length > 0) {
+          const addAnswersCreationAttributes: Array<ExactAnswerCreationAttributes> = addedAnswers.map((answer) => ({ answerContent: answer }));
+
+          const [added, addAnswersError] = await addExactAnswers(quiz.id, question.id, addAnswersCreationAttributes, token);
+
+          if (addAnswersError) {
+            if (addAnswersError.status === 403) router.push('/login');
+            else addNotification({ content: addAnswersError.message, type: 'ERROR' });
+          }
+
+          if (!added) return;
+        }
+
+        if (removedAnswers.length > 0) {
+          const removeAnswersCreationAttributes: Array<number> = removedAnswers.map(({ id }) => id);
+
+          const [removed, removeAnswersError] = await removeExactAnswers(quiz.id, question.id, removeAnswersCreationAttributes, token);
+
+          if (removeAnswersError) {
+            if (removeAnswersError.status === 403) router.push('/login');
+            else addNotification({ content: removeAnswersError.message, type: 'ERROR' });
+          }
+
+          if (!removed) return;
+        }
+      }
+    }
+
+    addNotification({ content: 'Question modifiée.', type: 'INFO' });
+    router.push(`/professor/quizzes/${quiz.id}`);
   };
 
   return (
@@ -284,7 +436,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
         <FormGroup>
           <Title level={2}>Options du type</Title>
 
-          <Dropdown label="Spécification" placeholder="test" values={specifications} value={specification} setValue={setSpecification} readonly />
+          <Dropdown label="Spécification" placeholder="test" values={specifications} value={specification} setValue={setSpecification} />
 
           {['nombre-entier', 'nombre-decimal', 'pourcentage', 'prix'].includes(specification) && (
             <>
@@ -297,7 +449,6 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
                 ]}
                 value={specificationType}
                 setValue={setSpecificationType}
-                readonly
               />
 
               {specificationType === 'comparison' ? (
