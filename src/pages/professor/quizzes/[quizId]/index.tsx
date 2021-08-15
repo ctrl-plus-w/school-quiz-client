@@ -7,6 +7,8 @@ import Title from '@element/Title';
 import Textarea from '@element/Textarea';
 import CheckboxInput from '@element/CheckboxInput';
 import Route from '@element/Route';
+import LinkButton from '@element/LinkButton';
+import Button from '@element/Button';
 
 import Table from '@module/Table';
 import Container from '@module/Container';
@@ -22,6 +24,9 @@ import ROLES from '@constant/roles';
 
 import database from 'database/database';
 
+import { updateQuiz } from 'api/quizzes';
+
+import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 import { AuthContext } from 'context/AuthContext/AuthContext';
 
 interface ServerSideProps {
@@ -32,7 +37,10 @@ interface ServerSideProps {
 const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
   const router = useRouter();
 
+  const { addNotification } = useContext(NotificationContext);
   const { setToken } = useContext(AuthContext);
+
+  const [valid, setValid] = useState(false);
 
   const [title, setTitle] = useState(quiz.title);
   const [description, setDescription] = useState(quiz.description);
@@ -41,10 +49,40 @@ const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
 
   useEffect(() => setToken(token), []);
 
-  const handleSubmit = (e: FormEvent): void => {
+  useEffect(() => {
+    const isValid = (): boolean => {
+      if (title === quiz.title && description === quiz.description && strict === quiz.strict && shuffle === quiz.shuffle) return false;
+
+      return true;
+    };
+
+    if (isValid()) setValid(true);
+    else setValid(false);
+  }, [title, description, strict, shuffle]);
+
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
 
-    alert();
+    if (!valid) return;
+
+    const updateAttributes: AllOptional<QuizCreationAttributes> = {
+      title: title !== quiz.title ? title : undefined,
+      description: description !== quiz.description ? description : undefined,
+      shuffle: shuffle !== quiz.shuffle ? shuffle : undefined,
+      strict: strict !== quiz.strict ? strict : undefined,
+    };
+
+    const [updatedQuiz, updateQuizError] = await updateQuiz(quiz.id, updateAttributes, token);
+
+    if (updateQuizError) {
+      if (updateQuizError.status === 403) router.push('/login');
+      else addNotification({ content: updateQuizError.message, type: 'ERROR' });
+    }
+
+    if (!updatedQuiz) return;
+
+    addNotification({ content: 'Quiz modifiée.', type: 'INFO' });
+    router.push(`/professor/quizzes`);
   };
 
   const handleClick = (instance: Question) => {
@@ -56,8 +94,8 @@ const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
       <Container title="Modifier un test" breadcrumb={[{ name: 'Tests', path: '/professor/quizzes' }, { name: 'Modifier un test' }]}>
         <hr className="mb-8 mt-8" />
 
-        <Form onSubmit={handleSubmit}>
-          <FormGroup>
+        <Form onSubmit={handleSubmit} full>
+          <FormGroup className="mb-6">
             <Title level={2}>Informations générales</Title>
 
             <Input label="Titre" value={title} setValue={setTitle} />
@@ -71,6 +109,16 @@ const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
               ]}
             />
           </FormGroup>
+
+          <div className="flex mt-auto ml-auto ">
+            <LinkButton href="/professor/quizzes" primary={false} className="mr-6">
+              Annuler
+            </LinkButton>
+
+            <Button submit={true} disabled={!valid}>
+              Modifier
+            </Button>
+          </div>
         </Form>
 
         <div className="flex flex-col items-start min-h-full mt-16">
