@@ -1,12 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { useRouter } from 'next/dist/client/router';
 
-import Link from 'next/link';
-
-import clsx from 'clsx';
-
-import { v4 as uuidv4 } from 'uuid';
-
 import Layout from '@layout/Default';
 
 import Menu from '@module/Menu';
@@ -21,27 +15,17 @@ const ProfessorDashboardLayout: FunctionComponent<IProps> = ({ children }: IProp
   const router = useRouter();
 
   const linkMapper = (links: ILink[]) =>
-    links.map(({ name, path }) => ({
-      name,
-      path,
+    links.map(({ path, active: _, ...rest }) => ({
       active: path === '/professor' ? router.pathname === path : router.pathname.startsWith(path),
+      path,
+      ...rest,
     }));
 
   return (
-    <Layout title="Professor Dashboard" display="col">
-      <Menu logoutButton={true}>
-        <ul className="flex flex-row">
-          {linkMapper(PROFESSOR_MENU.links).map(({ name, path, active }) => (
-            <li key={uuidv4()} className="mr-6">
-              <Link href={path}>
-                <a className={clsx(['font-normal text-base', active ? 'text-blue-700' : 'text-black'])}>{name}</a>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </Menu>
+    <Layout title="Professor Dashboard" display="row">
+      <Menu logoutButton={true} links={linkMapper(PROFESSOR_MENU.links)} />
 
-      <div className="flex flex-col flex-grow">{children}</div>
+      <div className="flex flex-col flex-grow overflow-y-scroll">{children}</div>
     </Layout>
   );
 };

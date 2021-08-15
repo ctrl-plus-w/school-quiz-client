@@ -1,7 +1,8 @@
 interface ILink {
   name: string;
   path: string;
-  active?: boolean;
+  icon: React.ReactElement;
+  active: boolean;
 }
 
 interface IMenu {
