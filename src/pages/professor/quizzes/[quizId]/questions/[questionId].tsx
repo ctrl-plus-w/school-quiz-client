@@ -28,15 +28,18 @@ import { areArraysEquals } from '@util/condition.utils';
 import { getHeaders } from '@util/authentication.utils';
 import { getLength } from '@util/object.utils';
 
-import { choiceSorter, generateChoices, removeChoices } from 'helpers/question.helper';
+import { choiceSorter, generateChoices, removeChoices as removeStateChoices } from 'helpers/question.helper';
 
 import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 
 import {
+  addChoices,
   addComparisonAnswer,
   addExactAnswers,
   clearAnswers,
+  removeChoices,
   removeExactAnswers,
+  updateChoiceQuestion,
   updateComparisonAnswer,
   updateNumericQuestion,
   updateTextualQuestion,
@@ -245,7 +248,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
   // Constants
 
   const [specifications] = useState(questionSpecifications.map(nameSlugMapper));
-  const [questionSpecification] = useState(specifications.find(({ slug }) => slug === question.typedQuestion.questionSpecification?.slug)?.slug);
+  const [questionSpecification] = useState(question.typedQuestion.questionSpecification?.slug);
 
   const [questionAnswersContent] = useState(questionAnswers.map(({ typedAnswer }) => typedAnswer.answerContent));
 
@@ -394,8 +397,6 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
         const addedAnswers = answers.filter((answer) => !questionAnswersContent.includes(answer));
         const removedAnswers = questionAnswers.filter(({ typedAnswer }) => !answers.includes(typedAnswer.answerContent));
 
-        console.log(addedAnswers, removedAnswers);
-
         if (addedAnswers.length > 0) {
           const addAnswersCreationAttributes: Array<ExactAnswerCreationAttributes> = addedAnswers.map((answer) => ({ answerContent: answer }));
 
@@ -476,16 +477,17 @@ interface IChoiceQuestionProps extends IServerSideProps {
 }
 
 const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoiceQuestionProps): ReactElement => {
-  const [specifications] = useState(questionSpecifications.map(nameSlugMapper));
+  const router = useRouter();
 
-  const getQuestionSpecification = () => {
-    const questionSpecificationSlug = question.typedQuestion.questionSpecification?.slug;
-    return specifications.find(({ slug }) => slug === questionSpecificationSlug);
-  };
+  const { addNotification } = useContext(NotificationContext);
 
   const choiceMapper = (choices: Array<IChoice>): Array<EditableInputValue> => {
     return choices.map((choice, index) => ({ id: index, name: choice.name, checked: choice.valid, defaultName: choice.name }));
   };
+
+  const [questionChoices] = useState(choiceMapper(question.typedQuestion.choices));
+  const [specifications] = useState(questionSpecifications.map(nameSlugMapper));
+  const [questionSpecification] = useState(question.typedQuestion.questionSpecification?.slug);
 
   const [valid, setValid] = useState(false);
 
@@ -494,12 +496,12 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
 
   const [shuffle, setShuffle] = useState(question.typedQuestion.shuffle);
 
-  const [specification, setSpecification] = useState(getQuestionSpecification()?.slug || 'choix-unique');
+  const [specification, setSpecification] = useState(questionSpecification || 'choix-unique');
 
   const [choiceAmount, setChoiceAmount] = useState(question.typedQuestion.choices.length.toString());
 
-  const [uniqueChoices, setUniqueChoices] = useState(choiceMapper(question.typedQuestion.choices));
-  const [multipleChoices, setMultipleChoices] = useState(choiceMapper(question.typedQuestion.choices));
+  const [uniqueChoices, setUniqueChoices] = useState(questionChoices);
+  const [multipleChoices, setMultipleChoices] = useState(questionChoices);
 
   useEffect(() => {
     const isValid = (): boolean => {
@@ -510,6 +512,10 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
 
       const questionCheckedChoices = question.typedQuestion.choices.filter(({ valid }) => valid).map(nameMapper);
       const checkedChoices = choices.filter(({ checked }) => checked).map(nameMapper);
+
+      if (title === '' || description === '') return false;
+
+      if (specification === 'choix-unique' ? uniqueChoices === [] : multipleChoices === []) return false;
 
       if (
         title === question.title &&
@@ -530,7 +536,7 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
 
     if (isValid()) setValid(true);
     else setValid(false);
-  }, [title, description, shuffle, uniqueChoices, multipleChoices]);
+  }, [title, description, shuffle, specification, uniqueChoices, multipleChoices]);
 
   useEffect(() => {
     const choicesLength = specification === 'choix-unique' ? uniqueChoices.length : multipleChoices.length;
@@ -541,12 +547,95 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
     }
 
     if (parseInt(choiceAmount) < choicesLength) {
-      setterFunction((prev) => removeChoices(-(choicesLength - parseInt(choiceAmount)), prev));
+      setterFunction((prev) => removeStateChoices(-(choicesLength - parseInt(choiceAmount)), prev));
     }
   }, [choiceAmount]);
 
-  const handleSubmit = (e: FormEvent): void => {
-    alert();
+  useEffect(() => {
+    if (specification === 'choix-unique') setChoiceAmount(uniqueChoices.length.toString());
+    else setChoiceAmount(multipleChoices.length.toString());
+  }, [specification]);
+
+  const handleSubmit = async (e: FormEvent): Promise<void> => {
+    e.preventDefault();
+
+    if (!valid) return;
+
+    // Update the question instance
+    const updateAttributes: AllOptional<ChoiceQuestionCreationAttributes> = {
+      title: title !== question.title ? title : undefined,
+      description: description !== question.description ? description : undefined,
+      shuffle: shuffle !== question.typedQuestion.shuffle ? shuffle : undefined,
+      questionSpecificationSlug: specification !== questionSpecification ? specification : undefined,
+    };
+
+    if (getLength(updateAttributes) > 0) {
+      const [updated, updateQuestionError] = await updateChoiceQuestion(quiz.id, question.id, updateAttributes, token);
+
+      if (updateQuestionError) {
+        if (updateQuestionError.status === 403) router.push('/login');
+        else addNotification({ content: updateQuestionError.message, type: 'ERROR' });
+      }
+
+      if (!updated) return;
+    }
+
+    // Update the choices
+    if (
+      specification !== questionSpecification ||
+      (specification === 'choix-unique' && uniqueChoices !== questionChoices) ||
+      (specification !== 'choice-unique' && multipleChoices !== questionChoices)
+    ) {
+      const choices = specification === 'choix-unique' ? uniqueChoices : multipleChoices;
+
+      if (specification === questionSpecification) {
+        const newChoices = choices.filter(({ name, checked }) => {
+          return !questionChoices.some(({ name: _name, checked: _checked }) => name === _name && checked === _checked);
+        });
+
+        const removedChoices = questionChoices.filter(({ name, checked }) => {
+          return !choices.some(({ name: _name, checked: _checked }) => name === _name && checked === _checked);
+        });
+
+        if (removedChoices.length > 0) {
+          const choicesId = question.typedQuestion.choices
+            .filter(({ name }) => removedChoices.some(({ name: _name }) => name === _name))
+            .map(({ id }) => id);
+
+          const [removed, removeChoicesError] = await removeChoices(quiz.id, question.id, choicesId, token);
+
+          if (removeChoicesError) {
+            if (removeChoicesError.status === 403) router.push('/login');
+            else addNotification({ content: removeChoicesError.message, type: 'ERROR' });
+          }
+
+          if (!removed) return;
+        }
+
+        if (newChoices.length > 0) {
+          const [added, addChoicesError] = await addChoices(quiz.id, question.id, newChoices, token);
+
+          if (addChoicesError) {
+            if (addChoicesError.status === 403) router.push('/login');
+            else addNotification({ content: addChoicesError.message, type: 'ERROR' });
+          }
+
+          if (!added) return;
+        }
+      } else {
+        const [added, addChoicesError] = await addChoices(quiz.id, question.id, choices, token);
+
+        if (addChoicesError) {
+          if (addChoicesError.status === 403) router.push('/login');
+          else addNotification({ content: addChoicesError.message, type: 'ERROR' });
+        }
+
+        if (!added) return;
+      }
+    }
+
+    addNotification({ content: 'Question modifiée.', type: 'INFO' });
+    router.push(`/professor/quizzes/${quiz.id}`);
   };
 
   return (
@@ -557,7 +646,7 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
         <FormGroup>
           <Title level={2}>Options du type</Title>
 
-          <Dropdown label="Spécification" placeholder="test" values={specifications} value={specification} setValue={setSpecification} readonly />
+          <Dropdown label="Spécification" placeholder="test" values={specifications} value={specification} setValue={setSpecification} />
 
           <CheckboxInput label="Option supplémentaire" values={[{ name: 'Mélanger les choix', checked: shuffle, setValue: setShuffle }]} />
 
