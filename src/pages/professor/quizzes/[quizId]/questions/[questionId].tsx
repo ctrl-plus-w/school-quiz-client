@@ -4,6 +4,7 @@ import { useRouter } from 'next/dist/client/router';
 
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
+import FormButtons from '@module/FormButtons';
 import Container from '@module/Container';
 import FormGroup from '@module/FormGroup';
 import Form from '@module/Form';
@@ -16,10 +17,8 @@ import MultipleTextInput from '@element/MultipleTextInput';
 import CheckboxInput from '@element/CheckboxInput';
 import NumberInput from '@element/NumberInput';
 import RadioInput from '@element/RadioInput';
-import LinkButton from '@element/LinkButton';
 import Textarea from '@element/Textarea';
 import Dropdown from '@element/Dropdown';
-import Button from '@element/Button';
 import Input from '@element/Input';
 import Title from '@element/Title';
 
@@ -70,25 +69,6 @@ const QuestionDefaultFields = ({ title, setTitle, description, setDescription, c
 
       {children}
     </FormGroup>
-  );
-};
-
-interface IQuizDefaultButtonsProps {
-  quiz: IQuiz;
-  valid: boolean;
-}
-
-const QuizDefaultButtons = ({ quiz, valid }: IQuizDefaultButtonsProps) => {
-  return (
-    <div className="flex mt-auto ml-auto">
-      <LinkButton href={`/professor/quizzes/${quiz.id}`} primary={false} className="mr-6">
-        Annuler
-      </LinkButton>
-
-      <Button submit={true} disabled={!valid}>
-        Modifier
-      </Button>
-    </div>
   );
 };
 
@@ -226,7 +206,7 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
         </FormGroup>
       </Row>
 
-      <QuizDefaultButtons {...{ quiz, valid }} />
+      <FormButtons href={`/professor/quizzes/${quiz.id}`} valid={valid} update />
     </Form>
   );
 };
@@ -467,7 +447,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
         </FormGroup>
       </Row>
 
-      <QuizDefaultButtons {...{ quiz, valid }} />
+      <FormButtons href={`/professor/quizzes/${quiz.id}`} valid={valid} update />
     </Form>
   );
 };
@@ -660,7 +640,7 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
         </FormGroup>
       </Row>
 
-      <QuizDefaultButtons {...{ quiz, valid }} />
+      <FormButtons href={`/professor/quizzes/${quiz.id}`} valid={valid}  update/>
     </Form>
   );
 };

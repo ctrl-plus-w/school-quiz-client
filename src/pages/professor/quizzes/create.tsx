@@ -7,13 +7,12 @@ import ProfessorDashboard from '@layout/ProfessorDashboard';
 import Container from '@module/Container';
 import Form from '@module/Form';
 import FormGroup from '@module/FormGroup';
+import FormButtons from '@module/FormButtons';
 
 import Input from '@element/Input';
 import Title from '@element/Title';
 import CheckboxInput from '@element/CheckboxInput';
 import Textarea from '@element/Textarea';
-import Button from '@element/Button';
-import LinkButton from '@element/LinkButton';
 
 import { createQuiz } from 'api/quizzes';
 
@@ -88,15 +87,7 @@ const CreateQuiz = ({ token }: IServerSideProps): ReactElement => {
             />
           </FormGroup>
 
-          <div className="flex mt-auto ml-auto">
-            <LinkButton href="/professor/quizzes" primary={false} className="mr-6">
-              Annuler
-            </LinkButton>
-
-            <Button submit={true} disabled={!valid}>
-              Créer
-            </Button>
-          </div>
+          <FormButtons href="/professor/quizzes" valid={valid} />
         </Form>
       </Container>
     </ProfessorDashboard>

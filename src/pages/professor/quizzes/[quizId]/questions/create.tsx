@@ -19,8 +19,6 @@ import Dropdown from '@element/Dropdown';
 import NumberInput from '@element/NumberInput';
 import EditableRadioInput from '@element/EditableRadioInput';
 import EditableCheckboxInput from '@element/EditableCheckboxInput';
-import LinkButton from '@element/LinkButton';
-import Button from '@element/Button';
 import Textarea from '@element/Textarea';
 
 import { getHeaders } from '@util/authentication.utils';
@@ -34,6 +32,7 @@ import { NotificationContext } from 'context/NotificationContext/NotificationCon
 
 import { addChoices, addComparisonAnswer, addExactAnswers, createChoiceQuestion, createNumericQuestion, createTextualQuestion } from 'api/questions';
 import database from 'database/database';
+import FormButtons from '@module/FormButtons';
 
 interface IServerSideProps {
   quiz: IQuiz;
@@ -387,15 +386,7 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
             </FormGroup>
           </Row>
 
-          <div className="flex mt-auto ml-auto">
-            <LinkButton href={`/professor/quizzes/${quiz.id}`} primary={false} className="mr-6">
-              Annuler
-            </LinkButton>
-
-            <Button submit={true} disabled={!valid}>
-              Créer
-            </Button>
-          </div>
+          <FormButtons href={`/professor/quizzes/${quiz.id}`} valid={valid} />
         </Form>
       </Container>
     </ProfessorDashboard>

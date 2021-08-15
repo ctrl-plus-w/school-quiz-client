@@ -7,13 +7,12 @@ import Title from '@element/Title';
 import Textarea from '@element/Textarea';
 import CheckboxInput from '@element/CheckboxInput';
 import Route from '@element/Route';
-import LinkButton from '@element/LinkButton';
-import Button from '@element/Button';
 
 import Table from '@module/Table';
 import Container from '@module/Container';
 import Form from '@module/Form';
 import FormGroup from '@module/FormGroup';
+import FormButtons from '@module/FormButtons';
 
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
@@ -110,15 +109,7 @@ const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
             />
           </FormGroup>
 
-          <div className="flex mt-auto ml-auto ">
-            <LinkButton href="/professor/quizzes" primary={false} className="mr-6">
-              Annuler
-            </LinkButton>
-
-            <Button submit={true} disabled={!valid}>
-              Modifier
-            </Button>
-          </div>
+          <FormButtons href="/professor/quizzes" valid={valid} update />
         </Form>
 
         <div className="flex flex-col items-start min-h-full mt-16">
