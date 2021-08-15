@@ -1,11 +1,14 @@
 import React, { FunctionComponent } from 'react';
 
+import clsx from 'clsx';
+
 interface IProps {
+  className?: string;
   children?: React.ReactNode;
 }
 
-const FormGroup: FunctionComponent<IProps> = ({ children }: IProps) => {
-  return <div className="form-group flex flex-col">{children}</div>;
+const FormGroup: FunctionComponent<IProps> = ({ children, className }: IProps) => {
+  return <div className={clsx(['form-group flex flex-col', className])}>{children}</div>;
 };
 
 export default FormGroup;
