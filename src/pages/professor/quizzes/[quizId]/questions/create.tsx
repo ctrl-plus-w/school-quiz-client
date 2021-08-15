@@ -123,6 +123,8 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
       if (questionType === 'choiceQuestion') {
         const choices = cqSpecification === 'choix-unique' ? uniqueChoices : multipleChoices;
 
+        if (cqSpecification !== 'choix-unique' && nqAnswerMin >= nqAnswerMax) return false;
+
         const isOneChecked = choices.some(({ checked }) => checked === true);
         const areValuesNotEmpty = choices.every(({ name }) => name !== '');
 
@@ -334,8 +336,20 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
 
                       {nqSpecificationType === 'comparison' ? (
                         <Row className="w-80 justify-between">
-                          <NumberInput label="Minimum" type={nqSpecification} value={nqAnswerMin} setValue={setNqAnswerMin} />
-                          <NumberInput label="Maximum" type={nqSpecification} value={nqAnswerMax} setValue={setNqAnswerMax} />
+                          <NumberInput
+                            label="Minimum"
+                            type={nqSpecification}
+                            value={nqAnswerMin}
+                            setValue={setNqAnswerMin}
+                            error={nqAnswerMin > nqAnswerMax}
+                          />
+                          <NumberInput
+                            label="Maximum"
+                            type={nqSpecification}
+                            value={nqAnswerMax}
+                            setValue={setNqAnswerMax}
+                            error={nqAnswerMax < nqAnswerMin}
+                          />
                         </Row>
                       ) : (
                         <MultipleNumberInput label="Réponses" type={nqSpecification} values={nqAnswers} setValues={setNqAnswers} />

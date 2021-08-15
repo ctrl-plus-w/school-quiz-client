@@ -8,6 +8,8 @@ interface IInputProps {
   placeholder?: string;
   suffix?: string;
 
+  error?: boolean;
+
   min?: number;
   max?: number;
 
@@ -17,7 +19,7 @@ interface IInputProps {
   setValue: Dispatch<SetStateAction<string>>;
 }
 
-const Input = ({ placeholder, suffix, pattern, value, setValue, min, max }: IInputProps): ReactElement => {
+const Input = ({ placeholder, suffix, pattern, value, setValue, min, max, error = false }: IInputProps): ReactElement => {
   const [focus, setFocus] = useState(false);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
@@ -42,10 +44,10 @@ const Input = ({ placeholder, suffix, pattern, value, setValue, min, max }: IInp
   };
 
   return (
-    <div className={clsx(['form-input--ns px-3 mt-2 rounded-sm', focus && 'focus'])}>
+    <div className={clsx(['form-input--ns px-3 mt-2 rounded-sm', focus && 'focus', error && 'error'])}>
       <input
         type="text"
-        className={clsx('w-full py-2 outline-none focus:outline-none', [suffix && 'text-right'])}
+        className={clsx(['w-full py-2 outline-none focus:outline-none', suffix && 'text-right'])}
         onChange={onChange}
         value={value}
         placeholder={placeholder}
@@ -63,6 +65,7 @@ interface IProps {
   placeholder?: string;
   label: string;
   note?: string;
+  error?: boolean;
 
   type: string;
 
@@ -75,7 +78,7 @@ interface IProps {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const NumberInput = ({ label, placeholder, type, className, value, setValue, note, min, max }: IProps): ReactElement => {
+const NumberInput = ({ label, placeholder, type, className, value, setValue, note, min, max, error }: IProps): ReactElement => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -84,7 +87,7 @@ const NumberInput = ({ label, placeholder, type, className, value, setValue, not
   }, [type]);
 
   const getInput = () => {
-    const props = { value, setValue };
+    const props = { value, setValue, error };
 
     switch (type) {
       case 'nombre-entier':

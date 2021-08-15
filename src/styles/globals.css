@@ -64,29 +64,11 @@ div > .form-group:not(:last-child) {
   @apply cursor-not-allowed;
 }
 
-.form-input.error,
-.form-input--no--padding.error,
-.form-input--no--margin.error,
-.form-input--ns.error {
-  @apply border-red-500;
-}
-
 .form-input:hover,
 .form-input--np:hover,
 .form-input--nm:hover,
 .form-input--ns:hover {
   @apply border-blue-600;
-}
-
-.form-input.error:hover,
-.form-input--np.error:hover,
-.form-input--nm.error:hover,
-.form-input--ns.error:hover,
-.form-input:disabled:hover,
-.form-input--np:disabled:hover,
-.form-input--nm:disabled:hover,
-.form-input--ns:disabled:hover {
-  @apply border-red-800;
 }
 
 .form-input:focus,
@@ -100,10 +82,33 @@ div > .form-group:not(:last-child) {
   @apply outline-none border-blue-600 ring ring-blue-200;
 }
 
+.form-input.error,
+.form-input--no--padding.error,
+.form-input--no--margin.error,
+.form-input--ns.error {
+  @apply border-red-500;
+}
+
+.form-input.error:hover,
+.form-input--np.error:hover,
+.form-input--nm.error:hover,
+.form-input--ns.error:hover,
+.form-input:disabled:hover,
+.form-input--np:disabled:hover,
+.form-input--nm:disabled:hover,
+.form-input--ns:disabled:hover {
+  @apply border-red-800;
+}
+
 .form-input.error:focus,
 .form-input--np.error:focus,
-.form-input--nm.error:focus .form-input--ns.error:focus {
-  @apply border-red-800 ring ring-red-200;
+.form-input--nm.error:focus,
+.form-input--ns.error:focus,
+.form-input.error.focus,
+.form-input--np.error.focus,
+.form-input--nm.error.focus,
+.form-input--ns.error.focus {
+  @apply border-red-800 ring ring-red-200 !important;
 }
 
 .link {

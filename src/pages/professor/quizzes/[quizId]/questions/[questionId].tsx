@@ -276,7 +276,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
       if (title === '' || description === '') return false;
 
       if (specificationType === 'exact' && answers.length === 0) return false;
-      if (specificationType === 'comparison' && (answerMin === '' || answerMax === '')) return false;
+      if (specificationType === 'comparison' && (answerMin === '' || answerMax === '' || answerMin >= answerMax)) return false;
 
       if (
         title !== question.title ||
@@ -454,8 +454,8 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
               {specificationType === 'comparison' ? (
                 <Row className="w-80">
-                  <NumberInput label="Minimum" type={specification} value={answerMin} setValue={setAnswerMin} />
-                  <NumberInput label="Maximum" type={specification} value={answerMax} setValue={setAnswerMax} />
+                  <NumberInput label="Minimum" type={specification} value={answerMin} setValue={setAnswerMin} error={answerMax < answerMin} />
+                  <NumberInput label="Maximum" type={specification} value={answerMax} setValue={setAnswerMax} error={answerMin > answerMax} />
                 </Row>
               ) : (
                 <MultipleNumberInput label="Réponses" type={specification} values={answers} setValues={setAnswers} />
