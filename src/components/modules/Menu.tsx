@@ -5,7 +5,7 @@ import { useCookies } from 'react-cookie';
 
 import { v4 as uuidv4 } from 'uuid';
 
-import { LogoutIcon, ChevronRightIcon } from '@heroicons/react/outline';
+import { LogoutIcon, ChevronLeftIcon } from '@heroicons/react/outline';
 
 import MenuItem from '@element/MenuItem';
 import clsx from 'clsx';
@@ -30,7 +30,7 @@ const Menu: FunctionComponent<IProps> = ({ links, logoutButton = false }: IProps
   return (
     <div className="flex flex-col justify-between px-10 py-16 border-r border-gray-300 flex-shrink-0 flex-grow-0 transition-all duration-300">
       <div className="flex justify-start mb-16 cursor-pointer" onClick={() => setClosed((prev) => !prev)}>
-        <ChevronRightIcon className={clsx(['w-7 h-7 transition-all duration-300', closed && 'transform rotate-180'])} />
+        <ChevronLeftIcon className={clsx(['w-7 h-7 transition-all duration-300', closed && 'transform rotate-180'])} />
       </div>
 
       <ul className="flex flex-col gap-6 h-full">
