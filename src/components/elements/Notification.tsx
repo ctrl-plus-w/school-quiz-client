@@ -24,7 +24,7 @@ const Notification: FunctionComponent<IProps> = ({ children, notification, remov
 
   return (
     <div
-      className={clsx(['flex items-center px-3 py-3 mb-4 border rounded-sm cursor-pointer pointer-events-auto', NOTIF.CLASSNAME])}
+      className={clsx(['flex items-center px-3 py-3 mb-4 border rounded-sm cursor-pointer pointer-events-auto shadow-xl', NOTIF.CLASSNAME])}
       onClick={() => removeNotification(notification)}
     >
       {NOTIF.ICON}
