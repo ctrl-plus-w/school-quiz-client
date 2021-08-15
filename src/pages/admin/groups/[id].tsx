@@ -101,7 +101,15 @@ const Group: FunctionComponent<ServerSideProps> = ({ group, labels, token }: Ser
 
         <Input label="Nom" placeholder="Term1" value={name} setValue={setName} />
 
-        <TagsInput label="Labels" placeholder="Labels" data={labels} values={groupLabels} addValue={addLabel} removeValue={removeLabel} />
+        <TagsInput
+          label="Labels"
+          placeholder="Labels"
+          data={labels}
+          values={groupLabels}
+          addValue={addLabel}
+          removeValue={removeLabel}
+          errorMessage="Aucun label trouvé..."
+        />
       </FormGroup>
     </AdminDashboardModelLayout>
   );

@@ -57,6 +57,13 @@ div > .form-group:not(:last-child) {
   @apply flex border border-gray-500 rounded-sm w-full outline-none transition-all duration-150;
 }
 
+.form-input:disabled,
+.form-input--np:disabled,
+.form-input--nm:disabled,
+.form-input--ns:disabled {
+  @apply cursor-not-allowed;
+}
+
 .form-input.error,
 .form-input--no--padding.error,
 .form-input--no--margin.error,
@@ -74,7 +81,11 @@ div > .form-group:not(:last-child) {
 .form-input.error:hover,
 .form-input--np.error:hover,
 .form-input--nm.error:hover,
-.form-input--ns.error:hover {
+.form-input--ns.error:hover,
+.form-input:disabled:hover,
+.form-input--np:disabled:hover,
+.form-input--nm:disabled:hover,
+.form-input--ns:disabled:hover {
   @apply border-red-800;
 }
 

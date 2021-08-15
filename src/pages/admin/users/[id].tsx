@@ -157,7 +157,15 @@ const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }
 
           <Dropdown label="Role" placeholder="Role" values={getRoleDropdownValues()} value={roleSlug} setValue={setRoleSlug} />
 
-          <TagsInput label="Groupes" placeholder="Groupes" data={groups} values={userGroups} addValue={addGroup} removeValue={removeGroup} />
+          <TagsInput
+            label="Groupes"
+            placeholder="Groupes"
+            data={groups}
+            values={userGroups}
+            addValue={addGroup}
+            removeValue={removeGroup}
+            errorMessage="Aucun groupe trouvé..."
+          />
         </FormGroup>
       </Row>
     </AdminDashboardModelLayout>

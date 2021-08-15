@@ -11,6 +11,7 @@ import Helper from './Helper';
 interface IProps {
   label: string;
   placeholder: string;
+  errorMessage?: string;
 
   className?: string;
 
@@ -23,7 +24,9 @@ interface IProps {
   removeValue: (instance: IBasicModel) => void;
 }
 
-const TagsInput: FunctionComponent<IProps> = ({ className, label, placeholder, values, addValue, removeValue, data }: IProps) => {
+const TagsInput: FunctionComponent<IProps> = ({ className, label, placeholder, values, addValue, removeValue, data, errorMessage }: IProps) => {
+  const [noData] = useState(values.length === 0);
+
   const [tempValue, setTempValue] = useState('');
   const [completion, setCompletion] = useState('');
   const [isValid, setIsValid] = useState(false);
@@ -71,25 +74,28 @@ const TagsInput: FunctionComponent<IProps> = ({ className, label, placeholder, v
         <div className="flex items-center">
           <span className="uppercase mr-2">{label}</span>
 
-          <Helper>
-            <div className="flex flex-col border border-gray-500 rounded-sm px-2 py-2">
-              {data.map((instance) => (
-                <p className="text-black font-normal py-1 px-1" key={uuidv4()}>
-                  {instance.name}
-                </p>
-              ))}
-            </div>
-          </Helper>
+          {!noData && (
+            <Helper>
+              <div className="flex flex-col border border-gray-500 rounded-sm px-2 py-2">
+                {data.map((instance) => (
+                  <p className="text-black font-normal py-1 px-1" key={uuidv4()}>
+                    {instance.name}
+                  </p>
+                ))}
+              </div>
+            </Helper>
+          )}
         </div>
 
         <div className="relative">
           <input
             type="text"
             className={clsx(['form-input', isValid && 'text-green-600'])}
-            placeholder={placeholder}
+            placeholder={noData ? errorMessage : placeholder}
             onKeyDown={handleInput}
             value={tempValue}
             onChange={onChange}
+            disabled={noData}
           />
 
           <p className="absolute top-1/2 left-0 transform -translate-y-1/2 pointer-events-none w-full px-3 py-2">
