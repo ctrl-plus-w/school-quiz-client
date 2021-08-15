@@ -98,8 +98,8 @@ const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
           <FormGroup className="mb-6">
             <Title level={2}>Informations générales</Title>
 
-            <Input label="Titre" value={title} setValue={setTitle} />
-            <Textarea label="Description" value={description} setValue={setDescription} />
+            <Input label="Titre" value={title} setValue={setTitle} maxLength={25} />
+            <Textarea label="Description" value={description} setValue={setDescription} maxLength={120} />
 
             <CheckboxInput
               label="Options supplémentaires"
