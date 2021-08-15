@@ -1,14 +1,14 @@
-import React, { FunctionComponent, useState } from 'react';
-
+import { FunctionComponent, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { useCookies } from 'react-cookie';
-
 import { v4 as uuidv4 } from 'uuid';
+
+import React from 'react';
+import clsx from 'clsx';
 
 import { LogoutIcon, ChevronLeftIcon } from '@heroicons/react/outline';
 
 import MenuItem from '@element/MenuItem';
-import clsx from 'clsx';
 
 interface IProps {
   links: Array<ILink>;

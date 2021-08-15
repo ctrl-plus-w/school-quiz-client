@@ -1,7 +1,9 @@
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { AxiosRequestConfig } from 'axios';
-import database from 'database/database';
-import roles from '@constant/roles';
+
+import database from '@database/database';
+
+import ROLES from '@constant/roles';
 
 export const getHeaders = (token: string): AxiosRequestConfig => {
   return { headers: { Authorization: `Bearer ${token}` } };
@@ -32,4 +34,4 @@ export const getServerSidePropsFunction = (rolePermission: number): GetServerSid
   };
 };
 
-export const getServerSidePropsAdminFunction = getServerSidePropsFunction(roles.ADMIN.PERMISSION);
+export const getServerSidePropsAdminFunction = getServerSidePropsFunction(ROLES.ADMIN.PERMISSION);

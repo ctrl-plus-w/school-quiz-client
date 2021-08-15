@@ -1,21 +1,24 @@
-import React, { FormEvent, FunctionComponent, useEffect, useState } from 'react';
+import { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { useCookies } from 'react-cookie';
 
+import React from 'react';
+
+import PasswordInput from '@element/PasswordInput';
 import Button from '@element/Button';
 import Input from '@element/Input';
-import PasswordInput from '@element/PasswordInput';
 import Route from '@element/Route';
 import Title from '@element/Title';
 
 import Layout from '@layout/Default';
 
-import Form from '@module/Form';
-
-import database from 'database/database';
-import roles from '@constant/roles';
 import FormGroup from '@module/FormGroup';
+import Form from '@module/Form';
 import Col from '@module/Col';
+
+import database from '@database/database';
+
+import ROLES from '@constant/roles';
 
 const Login: FunctionComponent = () => {
   const [_cookie, setCookie] = useCookies(['user']);
@@ -52,7 +55,7 @@ const Login: FunctionComponent = () => {
 
       setCookie('user', data.token, { path: '/', maxAge: 3600, sameSite: true });
 
-      const roleObject = Object.values(roles).find(({ slug }) => slug === data.role);
+      const roleObject = Object.values(ROLES).find(({ slug }) => slug === data.role);
       router.push(roleObject?.path || '/');
     } catch (err) {
       if (err) setErrors(['username', 'password']);

@@ -1,5 +1,7 @@
-import React, { FunctionComponent, useContext, useEffect } from 'react';
+import { FunctionComponent, useContext, useEffect } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+
+import React from 'react';
 
 import AdminDashboardModelsLayout from '@layout/AdminDashboardModels';
 
@@ -7,11 +9,11 @@ import Table from '@module/Table';
 
 import { getHeaders } from '@util/authentication.utils';
 
-import roles from '@constant/roles';
+import database from '@database/database';
 
-import { AuthContext } from 'context/AuthContext/AuthContext';
+import { AuthContext } from '@authContext/AuthContext';
 
-import database from 'database/database';
+import ROLES from '@constant/roles';
 
 interface ServerSideProps {
   specificationTypes: Array<IQuestionSpecification>;
@@ -60,7 +62,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const { data: validatedTokenData } = await database.post('/auth/validateToken', {}, getHeaders(token));
     if (!validatedTokenData.valid) throw new Error();
 
-    if (validatedTokenData.rolePermission !== roles.ADMIN.PERMISSION) throw new Error();
+    if (validatedTokenData.rolePermission !== ROLES.ADMIN.PERMISSION) throw new Error();
 
     const { data: specificationTypes } = await database.get('/api/questionSpecifications', getHeaders(token));
     if (!specificationTypes) throw new Error();

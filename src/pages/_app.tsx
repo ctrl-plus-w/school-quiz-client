@@ -1,12 +1,14 @@
 import '../styles/globals.css';
 
-import React, { FunctionComponent } from 'react';
-import type { AppProps } from 'next/app';
+import { FunctionComponent } from 'react';
+import { AppProps } from 'next/app';
+
+import React from 'react';
 
 import Notifications from '@module/Notifications';
 
-import NotificationProvider from 'context/NotificationContext/NotificationProvider';
-import AuthProvider from 'context/AuthContext/AuthProvider';
+import NotificationProvider from '@notificationContext/NotificationProvider';
+import AuthProvider from '@authContext/AuthProvider';
 
 const MyApp: FunctionComponent<AppProps> = ({ Component, pageProps }: AppProps) => {
   return (

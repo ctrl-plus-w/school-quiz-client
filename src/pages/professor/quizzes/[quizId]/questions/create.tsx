@@ -1,38 +1,41 @@
-import React, { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
+import { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
+import React from 'react';
+
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
+import FormButtons from '@module/FormButtons';
 import Container from '@module/Container';
-import Form from '@module/Form';
 import FormGroup from '@module/FormGroup';
+import Form from '@module/Form';
 import Row from '@module/Row';
 
+import EditableCheckboxInput from '@element/EditableCheckboxInput';
+import MultipleNumberInput from '@element/MultipleNumberInput';
+import EditableRadioInput from '@element/EditableRadioInput';
+import MultipleTextInput from '@element/MultipleTextInput';
+import CheckboxInput from '@element/CheckboxInput';
+import NumberInput from '@element/NumberInput';
+import RadioInput from '@element/RadioInput';
+import Dropdown from '@element/Dropdown';
+import Textarea from '@element/Textarea';
 import Input from '@element/Input';
 import Title from '@element/Title';
-import RadioInput from '@element/RadioInput';
-import CheckboxInput from '@element/CheckboxInput';
-import MultipleTextInput from '@element/MultipleTextInput';
-import MultipleNumberInput from '@element/MultipleNumberInput';
-import Dropdown from '@element/Dropdown';
-import NumberInput from '@element/NumberInput';
-import EditableRadioInput from '@element/EditableRadioInput';
-import EditableCheckboxInput from '@element/EditableCheckboxInput';
-import Textarea from '@element/Textarea';
 
-import { getHeaders } from '@util/authentication.utils';
 import { nameSlugMapper, parseExactAnswer, parseNumericAnswer, questionTypeFilter, slugMapper } from '@util/mapper.utils';
+import { getHeaders } from '@util/authentication.utils';
 
-import { generateChoices, removeChoices } from 'helpers/question.helper';
-
-import ROLES from '@constant/roles';
-
-import { NotificationContext } from 'context/NotificationContext/NotificationContext';
+import { generateChoices, removeChoices } from '@helpers/question.helper';
 
 import { addChoices, addComparisonAnswer, addExactAnswers, createChoiceQuestion, createNumericQuestion, createTextualQuestion } from 'api/questions';
-import database from 'database/database';
-import FormButtons from '@module/FormButtons';
+
+import database from '@database/database';
+
+import { NotificationContext } from '@notificationContext/NotificationContext';
+
+import ROLES from '@constant/roles';
 
 interface IServerSideProps {
   quiz: IQuiz;

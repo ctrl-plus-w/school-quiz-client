@@ -1,5 +1,6 @@
-import React, { ChangeEvent, ReactElement } from 'react';
+import { ChangeEvent, ReactElement } from 'react';
 
+import React from 'react';
 import clsx from 'clsx';
 
 interface IProps {

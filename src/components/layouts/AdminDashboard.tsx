@@ -1,5 +1,8 @@
-import React, { FunctionComponent } from 'react';
+import { useRouter } from 'next/dist/client/router';
+import { FunctionComponent } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+
+import React from 'react';
 
 import Layout from '@layout/Default';
 
@@ -8,7 +11,6 @@ import DashboardMenu from '@module/DashboardMenu';
 import MenuGroup from '@element/MenuGroup';
 
 import ADMIN_MENUS from '@constant/adminMenu';
-import { useRouter } from 'next/dist/client/router';
 
 interface IProps {
   children?: React.ReactNode;

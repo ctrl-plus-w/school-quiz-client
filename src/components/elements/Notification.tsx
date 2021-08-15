@@ -1,5 +1,6 @@
-import React, { FunctionComponent, useEffect, useRef } from 'react';
+import { FunctionComponent, useEffect, useRef } from 'react';
 
+import React from 'react';
 import clsx from 'clsx';
 
 import NOTIFICATION from '@constant/notification';

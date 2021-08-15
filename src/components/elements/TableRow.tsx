@@ -1,23 +1,24 @@
-import React, { Dispatch, FormEvent, ReactElement, SetStateAction, useContext } from 'react';
+import { Dispatch, FormEvent, ReactElement, SetStateAction, useContext } from 'react';
 import { useRouter } from 'next/dist/client/router';
-
-import clsx from 'clsx';
-
+import { AxiosError } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+
+import React from 'react';
+import clsx from 'clsx';
 
 import { TrashIcon } from '@heroicons/react/outline';
 
 import Button from '@element/Button';
 import Title from '@element/Title';
 
-import useClickOutside from 'hooks/useClickOutside';
-import database from 'database/database';
 import { getHeaders } from '@util/authentication.utils';
-import { AuthContext } from 'context/AuthContext/AuthContext';
-import { AxiosError } from 'axios';
-import { NotificationContext } from 'context/NotificationContext/NotificationContext';
 
-type MapperFunction = (value: any) => string;
+import database from '@database/database';
+
+import { NotificationContext } from '@notificationContext/NotificationContext';
+import { AuthContext } from '@authContext/AuthContext';
+
+import useClickOutside from '@hooks/useClickOutside';
 
 interface IProps<T, K> {
   instance: T;

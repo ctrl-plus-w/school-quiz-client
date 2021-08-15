@@ -19,7 +19,13 @@
       "@layout/*": ["components/layouts/*"],
       "@module/*": ["components/modules/*"],
       "@util/*": ["utils/*"],
-      "@constant/*": ["constants/*"]
+      "@constant/*": ["constants/*"],
+      "@authContext/*": ["context/AuthContext/*"],
+      "@notificationContext/*": ["context/NotificationContext/*"],
+      "@api/*": ["api/*"],
+      "@hooks/*": ["hooks/*"],
+      "@helpers/*": ["helpers/*"],
+      "@database/*": ["database/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

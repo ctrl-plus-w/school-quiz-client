@@ -1,5 +1,7 @@
-import React, { ReactElement, useContext, useEffect } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { ReactElement, useContext, useEffect } from 'react';
+
+import React from 'react';
 
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
@@ -8,11 +10,11 @@ import Table from '@module/Table';
 
 import { getHeaders } from '@util/authentication.utils';
 
+import database from '@database/database';
+
+import { AuthContext } from '@authContext/AuthContext';
+
 import ROLES from '@constant/roles';
-
-import { AuthContext } from 'context/AuthContext/AuthContext';
-
-import database from 'database/database';
 
 interface IServerSideProps {
   events: Array<IEvent>;

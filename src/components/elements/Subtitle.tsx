@@ -1,5 +1,6 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 
+import React from 'react';
 import clsx from 'clsx';
 
 interface IProps {

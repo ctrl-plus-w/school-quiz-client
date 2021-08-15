@@ -1,8 +1,8 @@
-import React, { ChangeEvent, Dispatch, KeyboardEvent, ReactElement, SetStateAction, useState } from 'react';
-
-import clsx from 'clsx';
-
+import { ChangeEvent, Dispatch, KeyboardEvent, ReactElement, SetStateAction, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+
+import React from 'react';
+import clsx from 'clsx';
 
 import { XIcon } from '@heroicons/react/outline';
 

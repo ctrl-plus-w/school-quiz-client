@@ -1,5 +1,7 @@
+import { FunctionComponent } from 'react';
+
+import React from 'react';
 import clsx from 'clsx';
-import React, { FunctionComponent } from 'react';
 
 interface IProps {
   show: boolean;

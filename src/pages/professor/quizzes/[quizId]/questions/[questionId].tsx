@@ -1,6 +1,8 @@
-import React, { Dispatch, FormEvent, ReactElement, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
+import { Dispatch, FormEvent, ReactElement, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
+
+import React from 'react';
 
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
@@ -27,9 +29,7 @@ import { areArraysEquals } from '@util/condition.utils';
 import { getHeaders } from '@util/authentication.utils';
 import { getLength } from '@util/object.utils';
 
-import { choiceSorter, generateChoices, removeChoices as removeStateChoices } from 'helpers/question.helper';
-
-import { NotificationContext } from 'context/NotificationContext/NotificationContext';
+import { choiceSorter, generateChoices, removeChoices as removeStateChoices } from '@helpers/question.helper';
 
 import {
   addChoices,
@@ -42,9 +42,11 @@ import {
   updateComparisonAnswer,
   updateNumericQuestion,
   updateTextualQuestion,
-} from 'api/questions';
+} from '@api/questions';
 
-import database from 'database/database';
+import database from '@database/database';
+
+import { NotificationContext } from '@notificationContext/NotificationContext';
 
 import ROLES from '@constant/roles';
 
@@ -640,7 +642,7 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
         </FormGroup>
       </Row>
 
-      <FormButtons href={`/professor/quizzes/${quiz.id}`} valid={valid}  update/>
+      <FormButtons href={`/professor/quizzes/${quiz.id}`} valid={valid} update />
     </Form>
   );
 };

@@ -1,10 +1,9 @@
-import React, { JSXElementConstructor, ReactElement } from 'react';
-
-import clsx from 'clsx';
+import { JSXElementConstructor, ReactElement } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
 import Link from 'next/link';
-
-import { v4 as uuidv4 } from 'uuid';
+import React from 'react';
+import clsx from 'clsx';
 
 interface IProps {
   path: string;

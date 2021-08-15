@@ -48,3 +48,5 @@ type Choice = {
   name: string;
   checked: boolean;
 };
+
+type MapperFunction = (value: any) => string;

@@ -1,6 +1,7 @@
-import React, { FunctionComponent } from 'react';
-import Link from 'next/link';
+import { FunctionComponent } from 'react';
 
+import Link from 'next/link';
+import React from 'react';
 import clsx from 'clsx';
 
 interface IProps {

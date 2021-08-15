@@ -1,5 +1,7 @@
-import React, { FunctionComponent, useContext, useEffect } from 'react';
+import { FunctionComponent, useContext, useEffect } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+
+import React from 'react';
 
 import AdminDashboardModelsLayout from '@layout/AdminDashboardModels';
 
@@ -7,11 +9,11 @@ import Table from '@module/Table';
 
 import { getHeaders } from '@util/authentication.utils';
 
+import database from '@database/database';
+
+import { AuthContext } from '@authContext/AuthContext';
+
 import ROLES from '@constant/roles';
-
-import { AuthContext } from 'context/AuthContext/AuthContext';
-
-import database from 'database/database';
 
 interface ServerSideProps {
   roles: Array<IRole>;

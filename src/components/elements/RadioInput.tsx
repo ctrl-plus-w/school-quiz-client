@@ -1,8 +1,8 @@
-import React, { Dispatch, ReactElement, SetStateAction } from 'react';
-
-import clsx from 'clsx';
-
+import { Dispatch, ReactElement, SetStateAction } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+
+import React from 'react';
+import clsx from 'clsx';
 
 interface IRadioInputProps {
   name: string;

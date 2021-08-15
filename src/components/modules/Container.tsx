@@ -1,11 +1,12 @@
-import React, { FunctionComponent } from 'react';
-
+import { FunctionComponent } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-import Route from '@element/Route';
-import Subtitle from '@element/Subtitle';
-import Title from '@element/Title';
 import Link from 'next/link';
+import React from 'react';
+
+import Subtitle from '@element/Subtitle';
+import Route from '@element/Route';
+import Title from '@element/Title';
 
 interface IProps {
   children?: React.ReactNode;

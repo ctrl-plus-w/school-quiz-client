@@ -2,7 +2,7 @@ import { AxiosError } from 'axios';
 
 import { getHeaders } from '@util/authentication.utils';
 
-import database from 'database/database';
+import database from '@database/database';
 
 const DEFAULT_API_ERROR_RESPONSE: APIResponse<null> = [null, { status: 400, message: 'Une erreur est survenue ' }];
 

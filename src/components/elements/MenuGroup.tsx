@@ -1,9 +1,9 @@
-import React, { FunctionComponent } from 'react';
-import Link from 'next/link';
-
-import clsx from 'clsx';
-
+import { FunctionComponent } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+
+import Link from 'next/link';
+import React from 'react';
+import clsx from 'clsx';
 
 interface IProps {
   title: string;

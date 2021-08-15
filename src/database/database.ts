@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-import server from '@constant/server';
+import SERVER from '@constant/server';
 
 export default axios.create({
-  baseURL: server.endpoint,
+  baseURL: SERVER.endpoint,
 });

@@ -1,5 +1,6 @@
-import React, { FunctionComponent, MouseEvent } from 'react';
+import { FunctionComponent, MouseEvent } from 'react';
 
+import React from 'react';
 import clsx from 'clsx';
 
 interface IProps {

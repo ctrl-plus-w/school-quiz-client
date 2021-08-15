@@ -1,5 +1,7 @@
-import React, { ReactElement, useContext, useEffect } from 'react';
+import { ReactElement, useContext, useEffect } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+
+import React from 'react';
 
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
@@ -7,14 +9,13 @@ import Container from '@module/Container';
 import Table from '@module/Table';
 
 import { getHeaders } from '@util/authentication.utils';
-
 import { booleanMapper } from '@util/mapper.utils';
 
+import database from '@database/database';
+
+import { AuthContext } from '@authContext/AuthContext';
+
 import ROLES from '@constant/roles';
-
-import { AuthContext } from 'context/AuthContext/AuthContext';
-
-import database from 'database/database';
 
 interface IServerSideProps {
   quizzes: Array<IQuiz>;

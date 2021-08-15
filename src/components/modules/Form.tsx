@@ -1,5 +1,6 @@
-import React, { FormEvent, FunctionComponent } from 'react';
+import { FormEvent, FunctionComponent } from 'react';
 
+import React from 'react';
 import clsx from 'clsx';
 
 interface IProps {

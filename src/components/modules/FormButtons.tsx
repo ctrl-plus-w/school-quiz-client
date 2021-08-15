@@ -1,4 +1,6 @@
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
+
+import React from 'react';
 
 import Button from '@element/Button';
 import LinkButton from '@element/LinkButton';

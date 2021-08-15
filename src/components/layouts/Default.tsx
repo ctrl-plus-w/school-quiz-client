@@ -1,6 +1,7 @@
-import React, { FunctionComponent } from 'react';
-import Head from 'next/head';
+import { FunctionComponent } from 'react';
 
+import Head from 'next/head';
+import React from 'react';
 import clsx from 'clsx';
 
 interface IProps {

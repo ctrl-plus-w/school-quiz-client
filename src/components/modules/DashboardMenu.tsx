@@ -1,7 +1,8 @@
-import React, { FunctionComponent } from 'react';
-
 import { useRouter } from 'next/dist/client/router';
+import { FunctionComponent } from 'react';
 import { useCookies } from 'react-cookie';
+
+import React from 'react';
 
 interface IProps {
   children?: React.ReactNode;

@@ -1,27 +1,29 @@
-import React, { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
-import Input from '@element/Input';
-import Title from '@element/Title';
-import Dropdown from '@element/Dropdown';
-import TagsInput from '@element/TagsInput';
-import PasswordInput from '@element/PasswordInput';
-
-import FormGroup from '@module/FormGroup';
+import React from 'react';
 
 import AdminDashboardModelLayout from '@layout/AdminDashboardModel';
 
-import { getHeaders } from '@util/authentication.utils';
-
-import ROLES from '@constant/roles';
-
-import database from 'database/database';
-
-import { NotificationContext } from 'context/NotificationContext/NotificationContext';
+import FormGroup from '@module/FormGroup';
 import Row from '@module/Row';
+
+import PasswordInput from '@element/PasswordInput';
+import TagsInput from '@element/TagsInput';
+import Dropdown from '@element/Dropdown';
+import Input from '@element/Input';
+import Title from '@element/Title';
+
 import { idNameSlugMapper, stringifyGender } from '@util/mapper.utils';
 import { areArraysEquals } from '@util/condition.utils';
+import { getHeaders } from '@util/authentication.utils';
+
+import database from '@database/database';
+
+import { NotificationContext } from '@notificationContext/NotificationContext';
+
+import ROLES from '@constant/roles';
 
 type ServerSideProps = {
   user: IUser;

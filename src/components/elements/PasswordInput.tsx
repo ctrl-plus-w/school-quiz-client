@@ -1,5 +1,6 @@
-import React, { ChangeEvent, FunctionComponent, MouseEvent, useState } from 'react';
+import { ChangeEvent, FunctionComponent, MouseEvent, useState } from 'react';
 
+import React from 'react';
 import clsx from 'clsx';
 
 import { EyeIcon, EyeOffIcon, CogIcon } from '@heroicons/react/outline';

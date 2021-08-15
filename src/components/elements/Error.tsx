@@ -1,6 +1,8 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 
-import Text from './Text';
+import React from 'react';
+
+import Text from '@element/Text';
 
 interface IProps {
   body: string;

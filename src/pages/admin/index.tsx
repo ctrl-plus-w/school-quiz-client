@@ -1,6 +1,7 @@
-import React, { FunctionComponent } from 'react';
-
+import { FunctionComponent } from 'react';
 import { GetServerSideProps } from 'next';
+
+import React from 'react';
 
 import AdminDashboardLayout from '@layout/AdminDashboard';
 

@@ -1,24 +1,26 @@
-import React, { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
+
+import React from 'react';
+
+import AdminDashboardModelLayout from '@layout/AdminDashboardModel';
+
+import FormGroup from '@module/FormGroup';
 
 import Input from '@element/Input';
 import Title from '@element/Title';
 
-import FormGroup from '@module/FormGroup';
-
-import AdminDashboardModelLayout from '@layout/AdminDashboardModel';
-
 import { getHeaders } from '@util/authentication.utils';
+
+import database from '@database/database';
+
+import { NotificationContext } from '@notificationContext/NotificationContext';
 
 import ROLES from '@constant/roles';
 
-import database from 'database/database';
-
-import { NotificationContext } from 'context/NotificationContext/NotificationContext';
-
 type ServerSideProps = {
-  verificationType: VerificationType;
+  verificationType: IVerificationType;
   token: string;
 };
 

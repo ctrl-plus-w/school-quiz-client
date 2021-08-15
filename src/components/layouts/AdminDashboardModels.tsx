@@ -1,9 +1,11 @@
-import React, { FunctionComponent } from 'react';
+import { useRouter } from 'next/dist/client/router';
+import { FunctionComponent } from 'react';
+
+import React from 'react';
 
 import AdminDashboardLayout from '@layout/AdminDashboard';
 
 import Container from '@module/Container';
-import { useRouter } from 'next/dist/client/router';
 
 interface IProps {
   children?: React.ReactNode;

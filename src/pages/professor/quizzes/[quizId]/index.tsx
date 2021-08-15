@@ -1,32 +1,34 @@
-import React, { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
+import React from 'react';
+
+import { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
+import ProfessorDashboard from '@layout/ProfessorDashboard';
+
+import FormButtons from '@module/FormButtons';
+import FormGroup from '@module/FormGroup';
+import Container from '@module/Container';
+import Table from '@module/Table';
+import Form from '@module/Form';
+
+import CheckboxInput from '@element/CheckboxInput';
+import Textarea from '@element/Textarea';
 import Input from '@element/Input';
 import Title from '@element/Title';
-import Textarea from '@element/Textarea';
-import CheckboxInput from '@element/CheckboxInput';
 import Route from '@element/Route';
-
-import Table from '@module/Table';
-import Container from '@module/Container';
-import Form from '@module/Form';
-import FormGroup from '@module/FormGroup';
-import FormButtons from '@module/FormButtons';
-
-import ProfessorDashboard from '@layout/ProfessorDashboard';
 
 import { getHeaders } from '@util/authentication.utils';
 import { questionTypeMapper } from '@util/mapper.utils';
 
+import { updateQuiz } from '@api/quizzes';
+
+import database from '@database/database';
+
+import { NotificationContext } from '@notificationContext/NotificationContext';
+import { AuthContext } from '@authContext/AuthContext';
+
 import ROLES from '@constant/roles';
-
-import database from 'database/database';
-
-import { updateQuiz } from 'api/quizzes';
-
-import { NotificationContext } from 'context/NotificationContext/NotificationContext';
-import { AuthContext } from 'context/AuthContext/AuthContext';
 
 interface ServerSideProps {
   quiz: IQuiz;

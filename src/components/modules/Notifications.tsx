@@ -1,8 +1,10 @@
-import React, { FunctionComponent, useContext } from 'react';
+import { FunctionComponent, useContext } from 'react';
+
+import React from 'react';
 
 import Notification from '@element/Notification';
 
-import { NotificationContext } from 'context/NotificationContext/NotificationContext';
+import { NotificationContext } from '@notificationContext/NotificationContext';
 
 const Notifications: FunctionComponent = () => {
   const { notifications, removeNotification } = useContext(NotificationContext);

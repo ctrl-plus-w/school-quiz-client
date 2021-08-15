@@ -1,5 +1,7 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
+
 import Link from 'next/link';
+import React from 'react';
 
 const Home: FunctionComponent = () => {
   return (

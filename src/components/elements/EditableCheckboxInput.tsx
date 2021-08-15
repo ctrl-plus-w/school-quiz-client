@@ -1,8 +1,9 @@
-import React, { ChangeEvent, Dispatch, ReactElement, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, ReactElement, SetStateAction, useState } from 'react';
 
+import React from 'react';
 import clsx from 'clsx';
 
-import { choiceSorter } from 'helpers/question.helper';
+import { choiceSorter } from '@helpers/question.helper';
 
 interface IRadioInputProps {
   id: number;

@@ -1,12 +1,14 @@
-import React, { ChangeEvent, Dispatch, KeyboardEvent, ReactElement, SetStateAction, useEffect, useState } from 'react';
-
-import clsx from 'clsx';
-
+import { ChangeEvent, Dispatch, KeyboardEvent, ReactElement, SetStateAction, useEffect, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
+import React from 'react';
+import clsx from 'clsx';
+
 import { XIcon } from '@heroicons/react/outline';
-import regex from '@constant/regex';
+
 import { str } from '@util/mapper.utils';
+
+import REGEX from '@constant/regex';
 
 interface IInputProps {
   placeholder?: string;
@@ -95,7 +97,7 @@ const MultipleNumberInput = ({ className, label, type, placeholder = undefined, 
     e.preventDefault();
     e.stopPropagation();
 
-    if (type === 'date' && !regex.date.test(tempValue)) return setTempValue('');
+    if (type === 'date' && !REGEX.date.test(tempValue)) return setTempValue('');
 
     if (tempValue === '' || values.includes(tempValue)) return;
 
@@ -108,22 +110,22 @@ const MultipleNumberInput = ({ className, label, type, placeholder = undefined, 
 
     switch (type) {
       case 'nombre-entier':
-        return <Input pattern={str(regex.integer)} placeholder="0" {...props} />;
+        return <Input pattern={str(REGEX.integer)} placeholder="0" {...props} />;
 
       case 'nombre-decimal':
-        return <Input pattern={str(regex.float)} placeholder="0.00" {...props} />;
+        return <Input pattern={str(REGEX.float)} placeholder="0.00" {...props} />;
 
       case 'pourcentage':
-        return <Input pattern={str(regex.percent)} placeholder="00" suffix="%" {...props} />;
+        return <Input pattern={str(REGEX.percent)} placeholder="00" suffix="%" {...props} />;
 
       case 'prix':
-        return <Input pattern={str(regex.float)} placeholder="0.00" suffix="€" {...props} />;
+        return <Input pattern={str(REGEX.float)} placeholder="0.00" suffix="€" {...props} />;
 
       case 'date':
-        return <Input pattern={str(regex.dateInput)} placeholder="dd/mm/yyyy" {...props} />;
+        return <Input pattern={str(REGEX.dateInput)} placeholder="dd/mm/yyyy" {...props} />;
 
       default:
-        return <Input pattern={str(regex.float)} placeholder="0" {...props} />;
+        return <Input pattern={str(REGEX.float)} placeholder="0" {...props} />;
     }
   };
 

@@ -1,12 +1,15 @@
-import React, { ReactElement } from 'react';
+import { ReactElement } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+
+import React from 'react';
+
+import ProfessorDashboard from '@layout/ProfessorDashboard';
 
 import { getHeaders } from '@util/authentication.utils';
 
-import roles from '@constant/roles';
+import database from '@database/database';
 
-import database from 'database/database';
-import ProfessorDashboard from '@layout/ProfessorDashboard';
+import ROLES from '@constant/roles';
 
 const Professor = (): ReactElement => {
   return (
@@ -24,7 +27,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
     const { data } = await database.post('/auth/validateToken', {}, getHeaders(token));
     if (!data.valid) throw new Error();
 
-    if (data.rolePermission !== roles.PROFESSOR.PERMISSION) throw new Error();
+    if (data.rolePermission !== ROLES.PROFESSOR.PERMISSION) throw new Error();
 
     return {
       props: {},

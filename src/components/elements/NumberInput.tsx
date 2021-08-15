@@ -1,8 +1,11 @@
-import React, { ChangeEvent, Dispatch, FocusEvent, ReactElement, SetStateAction, useEffect, useState } from 'react';
+import { ChangeEvent, Dispatch, FocusEvent, ReactElement, SetStateAction, useEffect, useState } from 'react';
 
+import React from 'react';
 import clsx from 'clsx';
+
 import { str } from '@util/mapper.utils';
-import regex from '@constant/regex';
+
+import REGEX from '@constant/regex';
 
 interface IInputProps {
   placeholder?: string;
@@ -91,19 +94,19 @@ const NumberInput = ({ label, placeholder, type, className, value, setValue, not
 
     switch (type) {
       case 'nombre-entier':
-        return <Input pattern={str(regex.integer)} placeholder="0" min={min} max={max} {...props} />;
+        return <Input pattern={str(REGEX.integer)} placeholder="0" min={min} max={max} {...props} />;
 
       case 'nombre-decimal':
-        return <Input pattern={str(regex.float)} placeholder="0.00" {...props} />;
+        return <Input pattern={str(REGEX.float)} placeholder="0.00" {...props} />;
 
       case 'pourcentage':
-        return <Input pattern={str(regex.percent)} suffix="%" placeholder="000" {...props} />;
+        return <Input pattern={str(REGEX.percent)} suffix="%" placeholder="000" {...props} />;
 
       case 'prix':
-        return <Input pattern={str(regex.float)} suffix="€" placeholder="0.00" {...props} />;
+        return <Input pattern={str(REGEX.float)} suffix="€" placeholder="0.00" {...props} />;
 
       default:
-        return <Input pattern={str(regex.integer)} placeholder="0" {...props} />;
+        return <Input pattern={str(REGEX.integer)} placeholder="0" {...props} />;
     }
   };
 

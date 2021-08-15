@@ -1,4 +1,6 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
+
+import React from 'react';
 
 interface IProps {
   children?: React.ReactNode;

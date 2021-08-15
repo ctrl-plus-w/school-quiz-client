@@ -1,27 +1,30 @@
-import React, { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
+import { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
+import React from 'react';
+
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
+import FormButtons from '@module/FormButtons';
+import FormGroup from '@module/FormGroup';
 import Container from '@module/Container';
 import Form from '@module/Form';
-import FormGroup from '@module/FormGroup';
-import FormButtons from '@module/FormButtons';
 
-import Input from '@element/Input';
-import Title from '@element/Title';
 import CheckboxInput from '@element/CheckboxInput';
 import Textarea from '@element/Textarea';
-
-import { createQuiz } from 'api/quizzes';
+import Input from '@element/Input';
+import Title from '@element/Title';
 
 import { getHeaders } from '@util/authentication.utils';
 
-import ROLES from '@constant/roles';
+import { createQuiz } from '@api/quizzes';
 
-import database from 'database/database';
-import { NotificationContext } from 'context/NotificationContext/NotificationContext';
+import database from '@database/database';
+
+import { NotificationContext } from '@notificationContext/NotificationContext';
+
+import ROLES from '@constant/roles';
 
 interface IServerSideProps {
   token: string;
