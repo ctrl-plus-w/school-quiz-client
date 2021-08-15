@@ -80,6 +80,32 @@ export const addChoices = async (
   }
 };
 
+export const removeChoices = async (
+  quizId: number,
+  questionId: number,
+  choicesId: Array<number>,
+  token: string
+): Promise<APIResponse<DeleteResponse>> => {
+  try {
+    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/choices`;
+
+    for (const choiceId of choicesId) {
+      await database.delete(`${endpoint}/${choiceId}`, getHeaders(token));
+    }
+
+    return [{ deleted: true }, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+    if (err.response.status === 409) return [null, { status: 409, message: 'Un des choix existe déja.' }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
 export const addExactAnswers = async (
   quizId: number,
   questionId: number,
