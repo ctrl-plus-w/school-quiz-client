@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { choiceSorter } from 'helpers/question.helper';
 import React, { ChangeEvent, Dispatch, ReactElement, SetStateAction, useState } from 'react';
 
@@ -27,8 +28,15 @@ const RadioInput = ({ id, checked, value = '', setValue, setChecked, placeholder
   };
 
   return (
-    <div className="flex mb-0.5">
-      <input type="radio" checked={checked} onChange={handleRadioChange} />
+    <div className="flex items-center mb-1">
+      <label
+        className={clsx([
+          'w-3 h-3 border rounded-full cursor-pointer',
+          checked ? 'bg-gray-500 border-gray-900 text-gray-900' : 'bg-gray-400 border-gray-600 text-gray-600',
+        ])}
+      >
+        <input type="radio" checked={checked} onChange={handleRadioChange} hidden />
+      </label>
 
       <input
         type="text"

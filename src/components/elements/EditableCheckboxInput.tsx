@@ -1,5 +1,8 @@
-import { choiceSorter } from 'helpers/question.helper';
 import React, { ChangeEvent, Dispatch, ReactElement, SetStateAction, useState } from 'react';
+
+import clsx from 'clsx';
+
+import { choiceSorter } from 'helpers/question.helper';
 
 interface IRadioInputProps {
   id: number;
@@ -27,8 +30,15 @@ const CheckboxInput = ({ id, checked, value = '', setValue, setChecked, placehol
   };
 
   return (
-    <div className="flex mb-0.5">
-      <input type="checkbox" checked={checked} onChange={handleCheckboxChange} />
+    <div className="flex items-center mb-1">
+      <label
+        className={clsx([
+          'w-3 h-3 border rounded-sm transition-all duration-100 cursor-pointer hover:ring',
+          checked ? 'bg-green-600 border-green-800 hover:ring-green-200 ' : 'bg-gray-400 border-gray-600 hover:ring-gray-300 ',
+        ])}
+      >
+        <input type="checkbox" checked={checked} onChange={handleCheckboxChange} hidden />
+      </label>
 
       <input
         type="text"
