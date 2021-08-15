@@ -61,16 +61,10 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
   const [choiceAmount, setChoiceAmount] = useState('2');
 
   // The choices of a choice question (radio)
-  const [uniqueChoices, setUniqueChoices] = useState<Array<EditableInputValue>>([
-    { id: 0, name: '', checked: false },
-    { id: 1, name: '', checked: false },
-  ]);
+  const [uniqueChoices, setUniqueChoices] = useState<Array<EditableInputValue>>(generateChoices(2));
 
   // The choices of a choice quetion (checkbox)
-  const [multipleChoices, setMultipleChoices] = useState<Array<EditableInputValue>>([
-    { id: 0, name: '', checked: false },
-    { id: 1, name: '', checked: false },
-  ]);
+  const [multipleChoices, setMultipleChoices] = useState<Array<EditableInputValue>>(generateChoices(2));
 
   // When the amount of choice get updated, add a "blank" object to the choices, so the user can edit it
   useEffect(() => {
