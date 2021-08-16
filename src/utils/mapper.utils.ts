@@ -14,6 +14,10 @@ export const nameMapper = <T extends { name: string }>(instance: T): string => {
   return instance.name;
 };
 
+export const idMapper = <T extends { id: string }>(instance: T): string => {
+  return instance.id;
+};
+
 export const stringifyGender = (gender: boolean | null): string => {
   if (gender === null) return 'undefined';
   return gender ? 'male' : 'female';
@@ -59,7 +63,11 @@ export const parseNumericAnswer = (answer: string, questionSpecificationSlug: st
 };
 
 export const isNull = (el: unknown): boolean => {
-  return el !== null && el !== undefined;
+  return el === null || el === undefined;
 };
 
 export const isNotNull = (el: unknown): boolean => !isNull(el);
+
+export const quizCollaboratorsMapper = (user: IUser): { name: string; slug: string } => {
+  return { name: `${user.firstName} ${user.lastName}`, slug: user.id.toString() };
+};
