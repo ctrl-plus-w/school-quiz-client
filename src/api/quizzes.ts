@@ -43,3 +43,39 @@ export const updateQuiz = async (
     return DEFAULT_API_ERROR_RESPONSE;
   }
 };
+
+export const addCollaborators = async (quizId: number, userIds: Array<number>, token: string): Promise<APIResponse<UpdateResponse>> => {
+  try {
+    const { data: updated } = await database.post(`/api/quizzes/${quizId}/collaborators`, { userIds }, getHeaders(token));
+
+    return [updated, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+    if (err.response.status === 409) return [null, { status: 409, message: 'Un des collaborateurs existe déja.' }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
+export const removeCollaborators = async (quizId: number, userIds: Array<number>, token: string): Promise<APIResponse<RemoveResponse>> => {
+  try {
+    for (const userId of userIds) {
+      await database.delete(`/api/quizzes/${quizId}/collaborators/${userId}`, getHeaders(token));
+    }
+
+    return [{ removed: true }, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+    if (err.response.status === 409) return [null, { status: 409, message: 'Un des collaborateurs existe déja.' }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};

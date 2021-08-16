@@ -11,17 +11,20 @@ import FormGroup from '@module/FormGroup';
 import Container from '@module/Container';
 import Table from '@module/Table';
 import Form from '@module/Form';
+import Row from '@module/Row';
 
 import CheckboxInput from '@element/CheckboxInput';
+import SearchInput from '@element/SearchInput';
 import Textarea from '@element/Textarea';
 import Input from '@element/Input';
 import Title from '@element/Title';
 import Route from '@element/Route';
 
+import { questionTypeMapper, quizCollaboratorsMapper, slugMapper } from '@util/mapper.utils';
 import { getHeaders } from '@util/authentication.utils';
-import { questionTypeMapper } from '@util/mapper.utils';
+import { getLength } from '@util/object.utils';
 
-import { updateQuiz } from '@api/quizzes';
+import { addCollaborators, removeCollaborators, updateQuiz } from '@api/quizzes';
 
 import database from '@database/database';
 
@@ -29,17 +32,21 @@ import { NotificationContext } from '@notificationContext/NotificationContext';
 import { AuthContext } from '@authContext/AuthContext';
 
 import ROLES from '@constant/roles';
+import { areArraysEquals } from '@util/condition.utils';
 
 interface ServerSideProps {
   quiz: IQuiz;
+  professors: Array<IUser>;
   token: string;
 }
 
-const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
+const Quiz = ({ quiz, professors, token }: ServerSideProps): ReactElement => {
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
   const { setToken } = useContext(AuthContext);
+
+  const [quizCollaborators] = useState(quiz.collaborators.map(quizCollaboratorsMapper));
 
   const [valid, setValid] = useState(false);
 
@@ -48,18 +55,27 @@ const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
   const [strict, setStrict] = useState(quiz.strict);
   const [shuffle, setShuffle] = useState(quiz.shuffle);
 
+  const [collaborators, setCollaborators] = useState<Array<{ name: string; slug: string }>>(quizCollaborators);
+
   useEffect(() => setToken(token), []);
 
   useEffect(() => {
     const isValid = (): boolean => {
-      if (title === quiz.title && description === quiz.description && strict === quiz.strict && shuffle === quiz.shuffle) return false;
+      if (
+        title !== quiz.title ||
+        description !== quiz.description ||
+        strict !== quiz.strict ||
+        shuffle !== quiz.shuffle ||
+        !areArraysEquals(collaborators, quizCollaborators)
+      )
+        return true;
 
-      return true;
+      return false;
     };
 
     if (isValid()) setValid(true);
     else setValid(false);
-  }, [title, description, strict, shuffle]);
+  }, [title, description, strict, shuffle, collaborators]);
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
@@ -73,14 +89,47 @@ const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
       strict: strict !== quiz.strict ? strict : undefined,
     };
 
-    const [updatedQuiz, updateQuizError] = await updateQuiz(quiz.id, updateAttributes, token);
+    if (getLength(updateAttributes) > 0) {
+      const [updatedQuiz, updateQuizError] = await updateQuiz(quiz.id, updateAttributes, token);
 
-    if (updateQuizError) {
-      if (updateQuizError.status === 403) router.push('/login');
-      else addNotification({ content: updateQuizError.message, type: 'ERROR' });
+      if (updateQuizError) {
+        if (updateQuizError.status === 403) router.push('/login');
+        else addNotification({ content: updateQuizError.message, type: 'ERROR' });
+      }
+
+      if (!updatedQuiz) return;
     }
 
-    if (!updatedQuiz) return;
+    if (!areArraysEquals(collaborators, quizCollaborators)) {
+      const newCollaborators = collaborators.filter(({ slug }) => !quizCollaborators.some(({ slug: _slug }) => slug === _slug));
+      const oldCollaborators = quizCollaborators.filter(({ slug }) => !collaborators.some(({ slug: _slug }) => slug === _slug));
+
+      if (newCollaborators.length > 0) {
+        const ids = newCollaborators.map(slugMapper).map((id) => parseInt(id));
+
+        const [added, addCollaboratorsError] = await addCollaborators(quiz.id, ids, token);
+
+        if (addCollaboratorsError) {
+          if (addCollaboratorsError.status === 403) router.push('/login');
+          else addNotification({ content: addCollaboratorsError.message, type: 'ERROR' });
+        }
+
+        if (!added) return;
+      }
+
+      if (oldCollaborators.length > 0) {
+        const ids = oldCollaborators.map(slugMapper).map((id) => parseInt(id));
+
+        const [removed, removeCollaboratorsError] = await removeCollaborators(quiz.id, ids, token);
+
+        if (removeCollaboratorsError) {
+          if (removeCollaboratorsError.status === 403) router.push('/login');
+          else addNotification({ content: removeCollaboratorsError.message, type: 'ERROR' });
+        }
+
+        if (!removed) return;
+      }
+    }
 
     addNotification({ content: 'Quiz modifiée.', type: 'INFO' });
     router.push(`/professor/quizzes`);
@@ -96,20 +145,34 @@ const Quiz = ({ quiz, token }: ServerSideProps): ReactElement => {
         <hr className="mb-8 mt-8" />
 
         <Form onSubmit={handleSubmit} full>
-          <FormGroup className="mb-6">
-            <Title level={2}>Informations générales</Title>
+          <Row wrap>
+            <FormGroup className="mb-6">
+              <Title level={2}>Informations générales</Title>
 
-            <Input label="Titre" value={title} setValue={setTitle} maxLength={25} />
-            <Textarea label="Description" value={description} setValue={setDescription} maxLength={120} />
+              <Input label="Titre" value={title} setValue={setTitle} maxLength={25} />
+              <Textarea label="Description" value={description} setValue={setDescription} maxLength={120} />
 
-            <CheckboxInput
-              label="Options supplémentaires"
-              values={[
-                { name: 'Mode strict', checked: strict, setValue: setStrict },
-                { name: 'Mélanger les questions', checked: shuffle, setValue: setShuffle },
-              ]}
-            />
-          </FormGroup>
+              <CheckboxInput
+                label="Options supplémentaires"
+                values={[
+                  { name: 'Mode strict', checked: strict, setValue: setStrict },
+                  { name: 'Mélanger les questions', checked: shuffle, setValue: setShuffle },
+                ]}
+              />
+            </FormGroup>
+
+            <FormGroup>
+              <Title level={2}>Utilisateurs</Title>
+
+              <SearchInput
+                label="Collaborateurs"
+                placeholder="Rechercher..."
+                data={professors.map(quizCollaboratorsMapper)}
+                values={collaborators}
+                setValues={setCollaborators}
+              />
+            </FormGroup>
+          </Row>
 
           <FormButtons href="/professor/quizzes" valid={valid} update />
         </Form>
@@ -148,7 +211,10 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
     if (validatedTokenData.rolePermission !== ROLES.PROFESSOR.PERMISSION) throw new Error();
 
+    const { data: professors } = await database.get('/api/users?role=professeur&self=false', getHeaders(token));
+
     const { data: quiz } = await database.get(`/api/users/${validatedTokenData.userId}/quizzes/${context.query.quizId}`, getHeaders(token));
+
     if (!quiz)
       return {
         redirect: {
@@ -157,7 +223,7 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
         },
       };
 
-    const props: ServerSideProps = { quiz, token };
+    const props: ServerSideProps = { quiz, professors, token };
     return { props };
   } catch (err) {
     return { redirect: { destination: '/', permanent: false } };
