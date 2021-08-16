@@ -46,3 +46,5 @@ type APIResponse<T> = [T | null, { status: number; message: string } | undefined
 type UpdateResponse = { updated: boolean };
 
 type DeleteResponse = { deleted: boolean };
+
+type RemoveResponse = { removed: boolean };
