@@ -134,14 +134,16 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
       verificationTypeSlug: questionVerificationType !== verificationType ? verificationType : undefined,
     };
 
-    const [updated, updateQuestionError] = await updateTextualQuestion(quiz.id, question.id, updateAttributes, token);
+    if (getLength(updateAttributes) > 0) {
+      const [updated, updateQuestionError] = await updateTextualQuestion(quiz.id, question.id, updateAttributes, token);
 
-    if (updateQuestionError) {
-      if (updateQuestionError.status === 403) router.push('/login');
-      else addNotification({ content: updateQuestionError.message, type: 'ERROR' });
+      if (updateQuestionError) {
+        if (updateQuestionError.status === 403) router.push('/login');
+        else addNotification({ content: updateQuestionError.message, type: 'ERROR' });
+      }
+
+      if (!updated) return;
     }
-
-    if (!updated) return;
 
     // Update the question answers
     if (!areArraysEquals(questionAnswersContent, answers)) {
