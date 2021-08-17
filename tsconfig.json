@@ -18,6 +18,7 @@
       "@element/*": ["components/elements/*"],
       "@layout/*": ["components/layouts/*"],
       "@module/*": ["components/modules/*"],
+      "@skeleton/*": ["components/skeletons/*"],
       "@util/*": ["utils/*"],
       "@constant/*": ["constants/*"],
       "@authContext/*": ["context/AuthContext/*"],
@@ -25,7 +26,8 @@
       "@api/*": ["api/*"],
       "@hooks/*": ["hooks/*"],
       "@helpers/*": ["helpers/*"],
-      "@database/*": ["database/*"]
+      "@database/*": ["database/*"],
+      "@redux/*": ["redux/*"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

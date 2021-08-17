@@ -1,24 +1,29 @@
-import { ReactElement } from 'react';
-import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { useSelector } from 'react-redux';
+
+import type { ReactElement } from 'react';
 
 import React from 'react';
 
 import ProfessorDashboard from '@layout/ProfessorDashboard';
+import ProfessorDashboardSkeleton from '@layout/ProfessorDashboardSkeleton';
 
 import Title from '@element/Title';
 
-import { getHeaders } from '@util/authentication.utils';
+import TitleSkeleton from '@skeleton/TitleSkeleton';
+import TextSkeleton from '@skeleton/TextSkeleton';
 
-import database from '@database/database';
+import useAuthentication from '@hooks/useAuthentication';
+
+import { selectUser } from '@redux/userSlice';
 
 import ROLES from '@constant/roles';
 
-interface IProps {
-  user: IUser;
-}
+const Professor = (): ReactElement => {
+  const { state } = useAuthentication(ROLES.PROFESSOR.PERMISSION);
 
-const Professor = ({ user }: IProps): ReactElement => {
-  return (
+  const user = useSelector(selectUser);
+
+  return state === 'FULFILLED' && user ? (
     <ProfessorDashboard>
       <div className="flex flex-col py-12 px-12">
         <Title>Bienvenue, {user.firstName} !</Title>
@@ -28,32 +33,14 @@ const Professor = ({ user }: IProps): ReactElement => {
         </p>
       </div>
     </ProfessorDashboard>
+  ) : (
+    <ProfessorDashboardSkeleton>
+      <div className="flex flex-col items-start py-12 px-12">
+        <TitleSkeleton />
+        <TextSkeleton width={96} className="mt-4" />
+      </div>
+    </ProfessorDashboardSkeleton>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  try {
-    const token = context.req.cookies.user;
-    if (!token) throw new Error();
-
-    const { data } = await database.post('/auth/validateToken', {}, getHeaders(token));
-    if (!data.valid) throw new Error();
-
-    if (data.rolePermission !== ROLES.PROFESSOR.PERMISSION) throw new Error();
-
-    const { data: user } = await database.get(`/api/users/${data.userId}`, getHeaders(token));
-
-    if (!user) throw new Error();
-
-    return { props: { user } };
-  } catch (err) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
 };
 
 export default Professor;

@@ -1,33 +1,48 @@
-import { ReactElement, useContext, useEffect } from 'react';
-import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { useSelector } from 'react-redux';
+
+import type { ReactElement } from 'react';
 
 import React from 'react';
 
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
+import ProfessorDashboardSkeleton from '@layout/ProfessorDashboardSkeleton';
+
 import Container from '@module/Container';
 import Table from '@module/Table';
 
-import { getHeaders } from '@util/authentication.utils';
 import { booleanMapper } from '@util/mapper.utils';
 
-import database from '@database/database';
+import useAuthentication from '@hooks/useAuthentication';
+import useLoadQuizzes from '@hooks/useLoadQuizzes';
 
-import { AuthContext } from '@authContext/AuthContext';
+import { selectQuizzes } from '@redux/quizSlice';
 
 import ROLES from '@constant/roles';
+import ContainerSkeleton from '@skeleton/ContainerSkeleton';
+import TableSkeleton from '@skeleton/TableSkeleton';
 
-interface IServerSideProps {
-  quizzes: Array<IQuiz>;
-  token: string;
-}
+const ProfessorQuizzes = (): ReactElement => {
+  const { state: quizzesState, run } = useLoadQuizzes();
+  const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, run);
 
-const ProfessorQuizzes = ({ quizzes, token }: IServerSideProps): ReactElement => {
-  const { setToken } = useContext(AuthContext);
+  const quizzes = useSelector(selectQuizzes);
 
-  useEffect(() => setToken(token), []);
-
-  return (
+  return authState === 'LOADING' || quizzesState === 'LOADING' ? (
+    <ProfessorDashboardSkeleton>
+      <ContainerSkeleton subtitle>
+        <TableSkeleton
+          attributes={[
+            ['ID', 'id'],
+            ['Title', 'title'],
+            ['Slug', 'slug'],
+            ['Strict', 'strict'],
+            ['Mélanger les questions', 'shuffle'],
+          ]}
+        />
+      </ContainerSkeleton>
+    </ProfessorDashboardSkeleton>
+  ) : (
     <ProfessorDashboard>
       <Container title="Tests" subtitle={{ name: 'Créer un test', path: '/professor/quizzes/create' }}>
         <Table<IQuiz, keyof IQuiz>
@@ -39,37 +54,11 @@ const ProfessorQuizzes = ({ quizzes, token }: IServerSideProps): ReactElement =>
             ['Strict', 'strict', booleanMapper],
             ['Mélanger les questions', 'shuffle', booleanMapper],
           ]}
-          data={quizzes}
+          data={quizzes || []}
         />
       </Container>
     </ProfessorDashboard>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  try {
-    const token = context.req.cookies.user;
-    if (!token) throw new Error();
-
-    const { data: validatedToken } = await database.post('/auth/validateToken', {}, getHeaders(token));
-    if (!validatedToken.valid) throw new Error();
-
-    if (validatedToken.rolePermission !== ROLES.PROFESSOR.PERMISSION) throw new Error();
-
-    const { data: quizzes } = await database.get(`/api/quizzes`, { ...getHeaders(token), params: { userId: validatedToken.userId } });
-    if (!quizzes) throw new Error();
-
-    const props: IServerSideProps = { quizzes, token };
-
-    return { props };
-  } catch (err) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
 };
 
 export default ProfessorQuizzes;
