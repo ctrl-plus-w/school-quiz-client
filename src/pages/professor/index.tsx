@@ -5,16 +5,28 @@ import React from 'react';
 
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
+import Title from '@element/Title';
+
 import { getHeaders } from '@util/authentication.utils';
 
 import database from '@database/database';
 
 import ROLES from '@constant/roles';
 
-const Professor = (): ReactElement => {
+interface IProps {
+  user: IUser;
+}
+
+const Professor = ({ user }: IProps): ReactElement => {
   return (
     <ProfessorDashboard>
-      <h1>Hello World</h1>
+      <div className="flex flex-col py-12 px-12">
+        <Title>Bienvenue, {user.firstName} !</Title>
+
+        <p className="text-gray-600 font-normal mt-4">
+          Vous avez sur cette page les informations globales ainsi que les informations les plus importantes.
+        </p>
+      </div>
     </ProfessorDashboard>
   );
 };
@@ -29,9 +41,11 @@ export const getServerSideProps: GetServerSideProps = async (context: GetServerS
 
     if (data.rolePermission !== ROLES.PROFESSOR.PERMISSION) throw new Error();
 
-    return {
-      props: {},
-    };
+    const { data: user } = await database.get(`/api/users/${data.userId}`, getHeaders(token));
+
+    if (!user) throw new Error();
+
+    return { props: { user } };
   } catch (err) {
     return {
       redirect: {
