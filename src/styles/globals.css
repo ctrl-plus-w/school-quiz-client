@@ -1,8 +1,13 @@
-@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
-
+/* purgecss start ignore */
 @tailwind base;
+
 @tailwind components;
+/* purgecss end ignore */
 @tailwind utilities;
+
+/* purgecss start ignore */
+
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
 
 html,
 body,
