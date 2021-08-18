@@ -6,6 +6,55 @@ import database from '@database/database';
 
 const DEFAULT_API_ERROR_RESPONSE: APIResponse<null> = [null, { status: 400, message: 'Une erreur est survenue ' }];
 
+export const getQuestions = async (quizId: number, token: string): Promise<APIResponse<Array<Question>>> => {
+  try {
+    const { data: questions } = await database.get(`/api/quizzes/${quizId}/questions`, getHeaders(token));
+
+    return [questions, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
+export const getQuestion = async (quizId: number, questionId: number, token: string): Promise<APIResponse<Question>> => {
+  try {
+    const { data: question } = await database.get(`/api/quizzes/${quizId}/questions/${questionId}`, getHeaders(token));
+
+    return [question, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+    if (err.response.status === 404) return [null, { status: 404, message: "Cette question n'existe pas." }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
+export const getSpecifications = async (token: string): Promise<APIResponse<Array<IQuestionSpecification>>> => {
+  try {
+    const { data: questionSpecifications } = await database.get(`/api/questionSpecifications`, getHeaders(token));
+
+    return [questionSpecifications, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
 export const createQuestion = <T>(questionType: QuestionType) => {
   return async <K>(quizId: number, creationAttributes: T, token: string): Promise<APIResponse<K>> => {
     try {

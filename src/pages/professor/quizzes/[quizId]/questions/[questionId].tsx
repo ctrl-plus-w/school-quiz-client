@@ -1,9 +1,9 @@
 import { Dispatch, FormEvent, ReactElement, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
-import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
 import React from 'react';
 
+import ProfessorDashboardSkeleton from '@layout/ProfessorDashboardSkeleton';
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
 import FormButtons from '@module/FormButtons';
@@ -24,9 +24,17 @@ import Dropdown from '@element/Dropdown';
 import Input from '@element/Input';
 import Title from '@element/Title';
 
-import { nameMapper, nameSlugMapper, parseExactAnswer, parseNumericAnswer } from '@util/mapper.utils';
-import { areArraysEquals } from '@util/condition.utils';
-import { getHeaders } from '@util/authentication.utils';
+import CheckboxInputSkeleton from '@skeleton/CheckboxInputSkeleton';
+import FormButtonsSkeleton from '@skeleton/FormButtonsSkeleton';
+import RadioInputSkeleton from '@skeleton/RadioInputSkeleton';
+import FormGroupSkeleton from '@skeleton/FormGroupSkeleton';
+import ContainerSkeleton from '@skeleton/ContainerSkeleton';
+import InputSkeleton from '@skeleton/InputSkeleton';
+import TitleSkeleton from '@skeleton/TitleSkeleton';
+import FormSkeleton from '@skeleton/FormSkeleton';
+
+import { isNull, nameMapper, nameSlugMapper, parseExactAnswer, parseNumericAnswer } from '@util/mapper.utils';
+import { areArraysEquals, isOneLoading } from '@util/condition.utils';
 import { getLength } from '@util/object.utils';
 
 import { choiceSorter, generateChoices, removeChoices as removeStateChoices } from '@helpers/question.helper';
@@ -44,9 +52,18 @@ import {
   updateTextualQuestion,
 } from '@api/questions';
 
-import database from '@database/database';
-
 import { NotificationContext } from '@notificationContext/NotificationContext';
+
+import { selectSpecifications, selectTempQuestion } from '@redux/questionSlice';
+import { selectTempQuiz } from '@redux/quizSlice';
+import useSwitch from '@hooks/useSwitch';
+import { selectToken } from '@redux/authSlice';
+
+import useLoadSpecifications from '@hooks/useLoadSpecifications';
+import useAuthentication from '@hooks/useAuthentication';
+import useLoadQuestion from '@hooks/useLoadQuestion';
+import useAppSelector from '@hooks/useAppSelector';
+import useLoadQuiz from '@hooks/useLoadQuiz';
 
 import ROLES from '@constant/roles';
 
@@ -74,7 +91,14 @@ const QuestionDefaultFields = ({ title, setTitle, description, setDescription, c
   );
 };
 
-interface ITextualQuestionProps extends IServerSideProps {
+interface IQuestionProps {
+  quiz: IQuiz;
+  question: Question;
+  questionSpecifications: Array<IQuestionSpecification>;
+  token: string;
+}
+
+interface ITextualQuestionProps extends IQuestionProps {
   question: IQuestion<ITextualQuestion>;
 }
 
@@ -215,7 +239,7 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
   );
 };
 
-interface INumericQuestionProps extends IServerSideProps {
+interface INumericQuestionProps extends IQuestionProps {
   question: IQuestion<INumericQuestion>;
 }
 
@@ -456,7 +480,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
   );
 };
 
-interface IChoiceQuestionProps extends IServerSideProps {
+interface IChoiceQuestionProps extends IQuestionProps {
   question: IQuestion<IChoiceQuestion>;
 }
 
@@ -649,20 +673,66 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
   );
 };
 
-interface IServerSideProps {
-  quiz: IQuiz;
-  question: Question;
-  questionSpecifications: Array<IQuestionSpecification>;
-  token: string;
-}
+const TypedQuestionSkeleton = (): ReactElement => {
+  return (
+    <FormSkeleton full>
+      <Row wrap>
+        <FormGroupSkeleton>
+          <TitleSkeleton level={2} />
 
-const Question = ({ quiz, question, questionSpecifications, token }: IServerSideProps): ReactElement => {
+          <InputSkeleton maxLength />
+          <InputSkeleton textArea maxLength />
+          <InputSkeleton />
+        </FormGroupSkeleton>
+
+        <FormGroupSkeleton>
+          <TitleSkeleton level={2} />
+
+          <RadioInputSkeleton amount={3} />
+          <CheckboxInputSkeleton />
+        </FormGroupSkeleton>
+      </Row>
+
+      <FormButtonsSkeleton />
+    </FormSkeleton>
+  );
+};
+
+const hooksConfig = {
+  notFoundRedirect: '/professor/quizes',
+};
+
+const Question = (): ReactElement => {
+  const value = useSwitch('p');
+
+  const router = useRouter();
+
+  const { quizId, questionId } = router.query;
+
+  const { state: specificationState, run: runSpecification } = useLoadSpecifications();
+  const { state: quizState, run: runQuiz } = useLoadQuiz(parseInt(quizId as string), hooksConfig);
+  const { state: questionState, run: runQuestion } = useLoadQuestion(parseInt(quizId as string), parseInt(questionId as string), hooksConfig);
+  const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [runQuiz, runQuestion, runSpecification]);
+
+  const token = useAppSelector(selectToken);
+  const question = useAppSelector(selectTempQuestion);
+  const quiz = useAppSelector(selectTempQuiz);
+  const specifications = useAppSelector(selectSpecifications);
+
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setLoading(isOneLoading([quizState, questionState, authState, specificationState]) || isNull(question) || isNull(quiz));
+  }, [quizState, questionState, authState, specificationState]);
+
   const getComponent = (): ReactElement => {
+    if (!question || !quiz || !token) return <></>;
+
     const textualQuestion = question as IQuestion<ITextualQuestion>;
     const numericQuestion = question as IQuestion<INumericQuestion>;
     const choiceQuestion = question as IQuestion<IChoiceQuestion>;
 
-    const props = { quiz, questionSpecifications, token };
+    const props = { quiz, questionSpecifications: specifications, token };
 
     switch (question.questionType) {
       case 'numericQuestion':
@@ -679,13 +749,21 @@ const Question = ({ quiz, question, questionSpecifications, token }: IServerSide
     }
   };
 
-  return (
+  return loading || value ? (
+    <ProfessorDashboardSkeleton>
+      <ContainerSkeleton breadcrumb>
+        <hr className="mt-8 mb-8" />
+
+        <TypedQuestionSkeleton />
+      </ContainerSkeleton>
+    </ProfessorDashboardSkeleton>
+  ) : (
     <ProfessorDashboard>
       <Container
         title="Modifier une question"
         breadcrumb={[
           { name: 'Tests', path: '/professor/quizzes' },
-          { name: quiz.title, path: `/professor/quizzes/${quiz.id}` },
+          { name: quiz?.title || 'Quiz', path: `/professor/quizzes/${quiz?.id || ''}` },
           { name: 'Modifier une question' },
         ]}
       >
@@ -695,40 +773,6 @@ const Question = ({ quiz, question, questionSpecifications, token }: IServerSide
       </Container>
     </ProfessorDashboard>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  const token = context.req.cookies.user;
-
-  try {
-    if (!token) throw new Error();
-
-    const { data: validatedTokenData } = await database.post('/auth/validateToken', {}, getHeaders(token));
-    if (!validatedTokenData.valid) throw new Error();
-
-    if (validatedTokenData.rolePermission !== ROLES.PROFESSOR.PERMISSION) throw new Error();
-
-    const { data: quiz } = await database.get(`/api/quizzes/${context.query.quizId}`, getHeaders(token));
-    const { data: question } = await database.get(`/api/quizzes/${context.query.quizId}/questions/${context.query.questionId}`, getHeaders(token));
-
-    if (!question)
-      return {
-        redirect: {
-          destination: `/professor/quizzes/${question.id}`,
-          permanent: false,
-        },
-      };
-
-    const { data: questionSpecifications } = await database.get('/api/questionSpecifications', {
-      params: { questionType: question.questionType },
-      ...getHeaders(token),
-    });
-
-    const props: IServerSideProps = { quiz, question, questionSpecifications, token };
-    return { props };
-  } catch (err) {
-    return { redirect: { destination: '/', permanent: false } };
-  }
 };
 
 export default Question;

@@ -96,7 +96,7 @@ interface IComparisonAnswer extends DefaultModelProperties {
   answer?: Answer;
 }
 
-type TypedQuestion = NumericQuestion | TextualQuestion | ChoiceQuestion;
+type TypedQuestion = INumericQuestion | ITextualQuestion | IChoiceQuestion;
 
 type VerificationType = 'hybride' | 'automatique' | 'manuel';
 type QuestionType = 'numericQuestion' | 'textualQuestion' | 'choiceQuestion';
