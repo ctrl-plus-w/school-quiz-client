@@ -20,6 +20,7 @@ Order of the imports :
   - Layouts
   - Modules
   - Elements
+- Hooks
 - Utils
 - Helpers
 - Database
