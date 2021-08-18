@@ -22,7 +22,7 @@ import ROLES from '@constant/roles';
 
 const ProfessorEvents = (): ReactElement => {
   const { state: eventsState, run } = useLoadEvents();
-  const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, run);
+  const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [run]);
 
   const events = useSelector(selectEvents);
 

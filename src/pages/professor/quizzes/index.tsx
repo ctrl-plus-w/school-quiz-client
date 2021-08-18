@@ -25,7 +25,7 @@ import ROLES from '@constant/roles';
 
 const ProfessorQuizzes = (): ReactElement => {
   const { state: quizzesState, run } = useLoadQuizzes();
-  const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, run);
+  const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [run]);
 
   const quizzes = useSelector(selectQuizzes);
 

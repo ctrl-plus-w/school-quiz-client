@@ -17,7 +17,7 @@ interface IReturnProperties {
   state: 'LOADING' | 'FULFILLED';
 }
 
-const useAuthentication = (permission: number, cbOrCbs?: () => void | Array<() => void>): IReturnProperties => {
+const useAuthentication = (permission: number, cbs?: (() => void)[]): IReturnProperties => {
   const dispatch = useAppDispatch();
 
   const [cookies] = useCookies();
@@ -62,9 +62,7 @@ const useAuthentication = (permission: number, cbOrCbs?: () => void | Array<() =
       setLoading(false);
 
       // Call the callback
-      if (!cbOrCbs) return;
-
-      const cbs = Array.isArray(cbOrCbs) ? cbOrCbs : [cbOrCbs];
+      if (!cbs) return;
       for (const cb of cbs) cb();
     })();
   }, []);
