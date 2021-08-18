@@ -18,9 +18,10 @@ import useLoadQuizzes from '@hooks/useLoadQuizzes';
 
 import { selectQuizzes } from '@redux/quizSlice';
 
-import ROLES from '@constant/roles';
 import ContainerSkeleton from '@skeleton/ContainerSkeleton';
 import TableSkeleton from '@skeleton/TableSkeleton';
+
+import ROLES from '@constant/roles';
 
 const ProfessorQuizzes = (): ReactElement => {
   const { state: quizzesState, run } = useLoadQuizzes();
