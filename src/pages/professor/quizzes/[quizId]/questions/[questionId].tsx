@@ -719,7 +719,7 @@ const Question = (): ReactElement => {
   const quiz = useAppSelector(selectTempQuiz);
   const specifications = useAppSelector(selectSpecifications);
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setLoading(isOneLoading([quizState, questionState, authState, specificationState]) || isNull(question) || isNull(quiz));
