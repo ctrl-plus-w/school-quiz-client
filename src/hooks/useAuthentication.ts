@@ -10,8 +10,8 @@ import useAppSelector from '@hooks/useAppSelector';
 
 import database from '@database/database';
 
+import { selectToken, setToken } from '@redux/authSlice';
 import { selectUser, setUser } from '@redux/userSlice';
-import { setToken } from '@redux/authSlice';
 
 interface IReturnProperties {
   state: 'LOADING' | 'FULFILLED';
@@ -20,40 +20,42 @@ interface IReturnProperties {
 const useAuthentication = (permission: number, cbOrCbs?: () => void | Array<() => void>): IReturnProperties => {
   const dispatch = useAppDispatch();
 
-  const user = useAppSelector(selectUser);
-
   const [cookies] = useCookies();
 
   const [loading, setLoading] = useState(true);
 
+  const user = useAppSelector(selectUser);
+  const reduxToken = useAppSelector(selectToken);
+
   useEffect(() => {
-    const fail = () => {
-      Router.push('/login');
-    };
+    (async () => {
+      const fail = () => Router.push('/login');
 
-    const token = cookies.user;
-    if (!token) fail();
+      const cookieToken = cookies.user;
 
-    const compute = async () => {
-      // Validate the token
-      try {
-        const { data: tokenValidation } = await database.post('/auth/validateToken', {}, getHeaders(token));
-        if (!tokenValidation.valid) fail();
-        if (tokenValidation.rolePermission !== permission) fail();
+      if (!cookieToken && !reduxToken) fail();
 
-        if (tokenValidation.userId !== user?.id) {
+      if (cookieToken) {
+        // Validate the token
+        try {
+          const { data: tokenValidation } = await database.post('/auth/validateToken', {}, getHeaders(cookieToken));
+          if (!tokenValidation.valid) fail();
+          if (tokenValidation.rolePermission !== permission) fail();
+
           // Store the token into redux
-          dispatch(setToken(token));
+          dispatch(setToken(cookieToken));
 
-          // Fetch the user
-          const { data: fetchedUser } = await database.get(`/api/users/${tokenValidation.userId}`, getHeaders(token));
-          if (!fetchedUser) fail();
+          if (tokenValidation.userId !== user?.id) {
+            // Fetch the user
+            const { data: fetchedUser } = await database.get(`/api/users/${tokenValidation.userId}`, getHeaders(cookieToken));
+            if (!fetchedUser) fail();
 
-          // Store the user into redux
-          dispatch(setUser(fetchedUser));
+            // Store the user into redux
+            dispatch(setUser(fetchedUser));
+          }
+        } catch (err) {
+          fail();
         }
-      } catch (err) {
-        fail();
       }
 
       // Stop the loading
@@ -64,9 +66,7 @@ const useAuthentication = (permission: number, cbOrCbs?: () => void | Array<() =
 
       const cbs = Array.isArray(cbOrCbs) ? cbOrCbs : [cbOrCbs];
       for (const cb of cbs) cb();
-    };
-
-    compute();
+    })();
   }, []);
 
   return { state: loading ? 'LOADING' : 'FULFILLED' };
