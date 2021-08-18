@@ -113,7 +113,7 @@ const Quiz = (): ReactElement => {
 
   // Check some data is getting fetched and if the fetched data is not null.
   useEffect(() => {
-    setLoading(isOneLoading([authState, quizState, usersState]) && isNull(quiz) && !formFilled);
+    setLoading(isOneLoading([authState, quizState, usersState]) || isNull(quiz) || !formFilled);
   }, [authState, quizState, usersState, formFilled]);
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
