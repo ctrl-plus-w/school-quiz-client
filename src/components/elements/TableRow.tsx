@@ -1,7 +1,12 @@
-import { Dispatch, FormEvent, ReactElement, SetStateAction, useContext } from 'react';
 import { useRouter } from 'next/dist/client/router';
-import { AxiosError } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
+import { useContext } from 'react';
+
+import type { Dispatch, FormEvent, ReactElement, SetStateAction } from 'react';
+import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
+import type { AxiosError } from 'axios';
+
+import { useSelector } from 'react-redux';
 
 import React from 'react';
 import clsx from 'clsx';
@@ -11,21 +16,29 @@ import { TrashIcon } from '@heroicons/react/outline';
 import Button from '@element/Button';
 import Title from '@element/Title';
 
+import useAppDispatch from '@hooks/useAppDispatch';
+import useClickOutside from '@hooks/useClickOutside';
+
 import { getHeaders } from '@util/authentication.utils';
 
 import database from '@database/database';
 
 import { NotificationContext } from '@notificationContext/NotificationContext';
-import { AuthContext } from '@authContext/AuthContext';
 
-import useClickOutside from '@hooks/useClickOutside';
+import { selectToken } from '@redux/authSlice';
 
 interface IProps<T, K> {
   instance: T;
-  attributes: Array<[name: string, attribute: K, mapper?: MapperFunction]>;
-  shownElement: number;
+
   apiName: string;
+
+  attributes: Array<[name: string, attribute: K, mapper?: MapperFunction]>;
+
+  shownElement: number;
   setShownElement: Dispatch<SetStateAction<number>>;
+
+  removeFromStore?: ActionCreatorWithPayload<any, any>;
+
   handleClick?: (instance: T) => void;
 }
 
@@ -36,11 +49,15 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
   apiName,
   setShownElement,
   handleClick,
+  removeFromStore,
 }: IProps<T, K>): ReactElement => {
   const router = useRouter();
 
+  const dispatch = useAppDispatch();
+
+  const token = useSelector(selectToken);
+
   const { addNotification } = useContext(NotificationContext);
-  const { token } = useContext(AuthContext);
 
   const updateShownElement = () => {
     if (shownElement === instance.id) {
@@ -61,13 +78,16 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
   const deleteInstance = async (e: FormEvent) => {
     e.preventDefault();
 
+    if (!token) return;
+
     try {
       const request = await database.delete(`/api/${apiName}/${instance.id}`, getHeaders(token));
 
       if (request.status === 200) {
         addNotification({ content: 'Élément supprimé !', type: 'INFO' });
 
-        router.reload();
+        if (removeFromStore) dispatch(removeFromStore(instance.id));
+        else router.reload();
       }
     } catch (_err: any) {
       const err = _err as AxiosError;

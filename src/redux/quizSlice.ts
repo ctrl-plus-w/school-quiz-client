@@ -22,6 +22,10 @@ const clearQuizzesReducer = (state: IQuizState) => {
   state.quizzes = [];
 };
 
+const removeQuizReducer = (state: IQuizState, action: PayloadAction<number>) => {
+  state.quizzes = state.quizzes.filter((quiz) => quiz.id !== action.payload);
+};
+
 const setTempQuizReducer = (state: IQuizState, action: PayloadAction<IQuiz>) => {
   state.tempQuiz = action.payload;
 };
@@ -39,11 +43,12 @@ const quizSlice = createSlice({
     setTempQuiz: setTempQuizReducer,
     clearTempQuiz: clearTempQuizReducer,
     addQuizzes: addQuizzesReducer,
+    removeQuiz: removeQuizReducer,
     clearQuizzes: clearQuizzesReducer,
   },
 });
 
-export const { addQuizzes, clearQuizzes, setTempQuiz, clearTempQuiz } = quizSlice.actions;
+export const { addQuizzes, clearQuizzes, setTempQuiz, clearTempQuiz, removeQuiz } = quizSlice.actions;
 
 export const selectQuizzes = (state: RootState): Array<IQuiz> => state.quiz.quizzes;
 export const selectTempQuiz = (state: RootState): IQuiz | null => state.quiz.tempQuiz;

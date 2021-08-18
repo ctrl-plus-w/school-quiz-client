@@ -16,7 +16,7 @@ import { booleanMapper } from '@util/mapper.utils';
 import useAuthentication from '@hooks/useAuthentication';
 import useLoadQuizzes from '@hooks/useLoadQuizzes';
 
-import { selectQuizzes } from '@redux/quizSlice';
+import { removeQuiz, selectQuizzes } from '@redux/quizSlice';
 
 import ContainerSkeleton from '@skeleton/ContainerSkeleton';
 import TableSkeleton from '@skeleton/TableSkeleton';
@@ -56,6 +56,7 @@ const ProfessorQuizzes = (): ReactElement => {
             ['Mélanger les questions', 'shuffle', booleanMapper],
           ]}
           data={quizzes || []}
+          removeFromStore={removeQuiz}
         />
       </Container>
     </ProfessorDashboard>

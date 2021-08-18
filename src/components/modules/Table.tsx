@@ -1,6 +1,8 @@
 import { ReactElement, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
+import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
+
 import React from 'react';
 import clsx from 'clsx';
 
@@ -11,11 +13,21 @@ type MapperFunction = (value: any) => string;
 interface IProps<T, K> {
   data: Array<T>;
   attributes: Array<[name: string, attribute: K, mapper?: MapperFunction]>;
+
   apiName: string;
+
+  removeFromStore?: ActionCreatorWithPayload<any, any>;
+
   handleClick?: (instance: T) => void;
 }
 
-const Table = <T extends { id: number }, K extends keyof T>({ attributes, data, apiName, handleClick }: IProps<T, K>): ReactElement => {
+const Table = <T extends { id: number }, K extends keyof T>({
+  attributes,
+  data,
+  apiName,
+  handleClick,
+  removeFromStore,
+}: IProps<T, K>): ReactElement => {
   const [shownElement, setShownElement] = useState(-1);
 
   return data.length > 0 ? (
@@ -41,6 +53,7 @@ const Table = <T extends { id: number }, K extends keyof T>({ attributes, data, 
             setShownElement={setShownElement}
             apiName={apiName}
             handleClick={handleClick}
+            removeFromStore={removeFromStore}
           />
         ))}
       </tbody>
