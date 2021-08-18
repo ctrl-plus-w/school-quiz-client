@@ -27,7 +27,6 @@ import useAuthentication from '@hooks/useAuthentication';
 import useAppSelector from '@hooks/useAppSelector';
 import useLoadUsers from '@hooks/useLoadUsers';
 import useLoadQuiz from '@hooks/useLoadQuiz';
-import useSwitch from '@hooks/useSwitch';
 
 import { addCollaborators, removeCollaborators, updateQuiz } from '@api/quizzes';
 
@@ -50,8 +49,6 @@ import TextSkeleton from '@skeleton/TextSkeleton';
 import TableSkeleton from '@skeleton/TableSkeleton';
 
 const Quiz = (): ReactElement => {
-  const value = useSwitch('p');
-
   const router = useRouter();
 
   const { quizId } = router.query;
@@ -182,7 +179,7 @@ const Quiz = (): ReactElement => {
     else router.push('/professor/quizzes');
   };
 
-  return loading || value ? (
+  return loading ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton breadcrumb>
         <hr className="mb-8 mt-8" />
