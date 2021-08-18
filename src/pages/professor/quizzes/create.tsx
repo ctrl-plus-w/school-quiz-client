@@ -1,9 +1,11 @@
-import { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
-import { GetServerSideProps, GetServerSidePropsContext } from 'next';
+import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
+
+import type { FormEvent, ReactElement } from 'react';
 
 import React from 'react';
 
+import ProfessorDashboardSkeleton from '@layout/ProfessorDashboardSkeleton';
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
 import FormButtons from '@module/FormButtons';
@@ -16,11 +18,17 @@ import Textarea from '@element/Textarea';
 import Input from '@element/Input';
 import Title from '@element/Title';
 
-import { getHeaders } from '@util/authentication.utils';
+import CheckboxInputSkeleton from '@skeleton/CheckboxInputSkeleton';
+import FormButtonsSkeleton from '@skeleton/FormButtonsSkeleton';
+import FormGroupSkeleton from '@skeleton/FormGroupSkeleton';
+import ContainerSkeleton from '@skeleton/ContainerSkeleton';
+import TitleSkeleton from '@skeleton/TitleSkeleton';
+import InputSkeleton from '@skeleton/InputSkeleton';
+import FormSkeleton from '@skeleton/FormSkeleton';
+
+import useAuthentication from '@hooks/useAuthentication';
 
 import { createQuiz } from '@api/quizzes';
-
-import database from '@database/database';
 
 import { NotificationContext } from '@notificationContext/NotificationContext';
 
@@ -31,6 +39,8 @@ interface IServerSideProps {
 }
 
 const CreateQuiz = ({ token }: IServerSideProps): ReactElement => {
+  const { state } = useAuthentication(ROLES.PROFESSOR.PERMISSION);
+
   const router = useRouter();
 
   const { addNotification } = useContext(NotificationContext);
@@ -68,7 +78,25 @@ const CreateQuiz = ({ token }: IServerSideProps): ReactElement => {
     }
   };
 
-  return (
+  return state === 'LOADING' ? (
+    <ProfessorDashboardSkeleton>
+      <ContainerSkeleton breadcrumb>
+        <hr className="mb-8 mt-8" />
+
+        <FormSkeleton full>
+          <FormGroupSkeleton>
+            <TitleSkeleton level={2} />
+
+            <InputSkeleton maxLength />
+            <InputSkeleton textArea maxLength />
+            <CheckboxInputSkeleton />
+          </FormGroupSkeleton>
+
+          <FormButtonsSkeleton />
+        </FormSkeleton>
+      </ContainerSkeleton>
+    </ProfessorDashboardSkeleton>
+  ) : (
     <ProfessorDashboard>
       <Container title="Créer un test" breadcrumb={[{ name: 'Tests', path: '/professor/quizzes' }, { name: 'Créer un test' }]}>
         <hr className="mb-8 mt-8" />
@@ -95,29 +123,6 @@ const CreateQuiz = ({ token }: IServerSideProps): ReactElement => {
       </Container>
     </ProfessorDashboard>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  try {
-    const token = context.req.cookies.user;
-    if (!token) throw new Error();
-
-    const { data } = await database.post('/auth/validateToken', {}, getHeaders(token));
-    if (!data.valid) throw new Error();
-
-    if (data.rolePermission !== ROLES.PROFESSOR.PERMISSION) throw new Error();
-
-    const props: IServerSideProps = { token };
-
-    return { props };
-  } catch (err) {
-    return {
-      redirect: {
-        destination: '/login',
-        permanent: false,
-      },
-    };
-  }
 };
 
 export default CreateQuiz;
