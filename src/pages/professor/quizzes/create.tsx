@@ -27,19 +27,20 @@ import InputSkeleton from '@skeleton/InputSkeleton';
 import FormSkeleton from '@skeleton/FormSkeleton';
 
 import useAuthentication from '@hooks/useAuthentication';
+import useAppSelector from '@hooks/useAppSelector';
 
 import { createQuiz } from '@api/quizzes';
 
 import { NotificationContext } from '@notificationContext/NotificationContext';
 
+import { selectToken } from '@redux/authSlice';
+
 import ROLES from '@constant/roles';
 
-interface IServerSideProps {
-  token: string;
-}
-
-const CreateQuiz = ({ token }: IServerSideProps): ReactElement => {
+const CreateQuiz = (): ReactElement => {
   const { state } = useAuthentication(ROLES.PROFESSOR.PERMISSION);
+
+  const token = useAppSelector(selectToken);
 
   const router = useRouter();
 
@@ -63,12 +64,13 @@ const CreateQuiz = ({ token }: IServerSideProps): ReactElement => {
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
 
+    if (!valid || !token) return;
+
     const [created, error] = await createQuiz({ title, description, strict, shuffle }, token);
 
     if (created) {
       addNotification({ content: 'Test créé.', type: 'INFO' });
       router.push('/professor/quizzes');
-      return;
     } else if (error) {
       if (error.status === 403) {
         router.push('/login');
