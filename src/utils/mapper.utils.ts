@@ -68,6 +68,6 @@ export const isNull = (el: unknown): boolean => {
 
 export const isNotNull = (el: unknown): boolean => !isNull(el);
 
-export const quizCollaboratorsMapper = (user: IUser): { name: string; slug: string } => {
+export const quizCollaboratorsMapper = (user: IUser): IBasicModel => {
   return { name: `${user.firstName} ${user.lastName}`, slug: user.id.toString() };
 };
