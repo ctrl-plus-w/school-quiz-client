@@ -3,6 +3,7 @@ import React from 'react';
 import { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 
+import ProfessorDashboardSkeleton from '@layout/ProfessorDashboardSkeleton';
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
 import FormButtons from '@module/FormButtons';
@@ -19,11 +20,22 @@ import Input from '@element/Input';
 import Title from '@element/Title';
 import Route from '@element/Route';
 
-import { isNull, questionTypeMapper, quizCollaboratorsMapper, slugMapper } from '@util/mapper.utils';
+import CheckboxInputSkeleton from '@skeleton/CheckboxInputSkeleton';
+import FormButtonsSkeleton from '@skeleton/FormButtonsSkeleton';
+import FormGroupSkeleton from '@skeleton/FormGroupSkeleton';
+import ContainerSkeleton from '@skeleton/ContainerSkeleton';
+import TitleSkeleton from '@skeleton/TitleSkeleton';
+import TableSkeleton from '@skeleton/TableSkeleton';
+import InputSkeleton from '@skeleton/InputSkeleton';
+import FormSkeleton from '@skeleton/FormSkeleton';
+import TextSkeleton from '@skeleton/TextSkeleton';
+
+import { questionTypeMapper, quizCollaboratorsMapper, slugMapper } from '@util/mapper.utils';
 import { areArraysEquals, isOneLoading } from '@util/condition.utils';
 import { getLength } from '@util/object.utils';
 
 import useAuthentication from '@hooks/useAuthentication';
+import useLoadQuestions from '@hooks/useLoadQuestions';
 import useAppSelector from '@hooks/useAppSelector';
 import useLoadUsers from '@hooks/useLoadUsers';
 import useLoadQuiz from '@hooks/useLoadQuiz';
@@ -32,21 +44,12 @@ import { addCollaborators, removeCollaborators, updateQuiz } from '@api/quizzes'
 
 import { NotificationContext } from '@notificationContext/NotificationContext';
 
+import { removeQuestion, selectQuestions } from '@redux/questionSlice';
 import { selectProfessors } from '@redux/userSlice';
 import { selectTempQuiz } from '@redux/quizSlice';
 import { selectToken } from '@redux/authSlice';
 
 import ROLES from '@constant/roles';
-import ProfessorDashboardSkeleton from '@layout/ProfessorDashboardSkeleton';
-import ContainerSkeleton from '@skeleton/ContainerSkeleton';
-import FormSkeleton from '@skeleton/FormSkeleton';
-import FormGroupSkeleton from '@skeleton/FormGroupSkeleton';
-import TitleSkeleton from '@skeleton/TitleSkeleton';
-import InputSkeleton from '@skeleton/InputSkeleton';
-import CheckboxInputSkeleton from '@skeleton/CheckboxInputSkeleton';
-import FormButtonsSkeleton from '@skeleton/FormButtonsSkeleton';
-import TextSkeleton from '@skeleton/TextSkeleton';
-import TableSkeleton from '@skeleton/TableSkeleton';
 
 const Quiz = (): ReactElement => {
   const router = useRouter();
@@ -55,8 +58,10 @@ const Quiz = (): ReactElement => {
 
   const { state: usersState, run: runUsers } = useLoadUsers('professeur');
   const { state: quizState, run: runQuizzes } = useLoadQuiz(parseInt(quizId as string), { notFoundRedirect: '/professor/quizzes' });
-  const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [runQuizzes, runUsers]);
+  const { state: questionState, run: runQuestion } = useLoadQuestions(parseInt(quizId as string));
+  const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [runQuizzes, runQuestion, runUsers]);
 
+  const questions = useAppSelector(selectQuestions);
   const quiz = useAppSelector(selectTempQuiz);
   const token = useAppSelector(selectToken);
   const professors = useAppSelector(selectProfessors);
@@ -113,8 +118,8 @@ const Quiz = (): ReactElement => {
 
   // Check some data is getting fetched and if the fetched data is not null.
   useEffect(() => {
-    setLoading(isOneLoading([authState, quizState, usersState]) || isNull(quiz) || !formFilled);
-  }, [authState, quizState, usersState, formFilled]);
+    setLoading(isOneLoading([authState, quizState, usersState, questionState]) || !formFilled);
+  }, [authState, quizState, usersState, questionState, formFilled]);
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
@@ -179,7 +184,7 @@ const Quiz = (): ReactElement => {
     else router.push('/professor/quizzes');
   };
 
-  return loading ? (
+  return loading || !quiz || !questions ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton breadcrumb>
         <hr className="mb-8 mt-8" />
@@ -260,7 +265,7 @@ const Quiz = (): ReactElement => {
 
         <div className="flex flex-col items-start min-h-full mt-16">
           <Title level={2}>Questions</Title>
-          <Route to={`/professor/quizzes/${quiz?.id}/questions/create`} className="mt-2">
+          <Route to={`/professor/quizzes/${quiz.id}/questions/create`} className="mt-2">
             Créer une question
           </Route>
 
@@ -271,9 +276,10 @@ const Quiz = (): ReactElement => {
               ['Description', 'description'],
               ['Type de question', 'questionType', questionTypeMapper],
             ]}
-            data={quiz?.questions || []}
-            apiName={`quizzes/${quiz?.id}/questions`}
+            data={questions}
+            apiName={`quizzes/${quiz.id}/questions`}
             handleClick={handleClick}
+            removeFromStore={removeQuestion}
           />
         </div>
       </Container>

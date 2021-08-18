@@ -26,6 +26,10 @@ const clearQuestionsReducer = (state: IQuestionState) => {
   state.questions = [];
 };
 
+const removeQuestionReducer = (state: IQuestionState, action: PayloadAction<number>) => {
+  state.questions = state.questions.filter((question) => question.id !== action.payload);
+};
+
 const setTempQuestionReducer = (state: IQuestionState, action: PayloadAction<Question>) => {
   state.tempQuestion = action.payload;
 };
@@ -52,6 +56,7 @@ const questionSlice = createSlice({
     clearTempQuestion: clearTempQuestionReducer,
 
     addQuestions: addQuestionsReducer,
+    removeQuestion: removeQuestionReducer,
     clearQuestions: clearQuestionsReducer,
 
     addSpecifications: addSpecificationsReducer,
@@ -59,7 +64,8 @@ const questionSlice = createSlice({
   },
 });
 
-export const { addQuestions, clearQuestions, setTempQuestion, clearTempQuestion, addSpecifications, clearSpecifications } = questionSlice.actions;
+export const { addQuestions, clearQuestions, setTempQuestion, clearTempQuestion, addSpecifications, clearSpecifications, removeQuestion } =
+  questionSlice.actions;
 
 export const selectQuestions = (state: RootState): Array<Question> => state.question.questions;
 export const selectTempQuestion = (state: RootState): Question | null => state.question.tempQuestion;
