@@ -1,9 +1,9 @@
 import { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
-import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
 import React from 'react';
 
+import ProfessorDashboardSkeleton from '@layout/ProfessorDashboardSkeleton';
 import ProfessorDashboard from '@layout/ProfessorDashboard';
 
 import FormButtons from '@module/FormButtons';
@@ -24,31 +24,55 @@ import Textarea from '@element/Textarea';
 import Input from '@element/Input';
 import Title from '@element/Title';
 
-import { nameSlugMapper, parseExactAnswer, parseNumericAnswer, questionTypeFilter, slugMapper } from '@util/mapper.utils';
-import { getHeaders } from '@util/authentication.utils';
+import ContainerSkeleton from '@skeleton/ContainerSkeleton';
+import FormSkeleton from '@skeleton/FormSkeleton';
+import FormGroupSkeleton from '@skeleton/FormGroupSkeleton';
+import TitleSkeleton from '@skeleton/TitleSkeleton';
+import InputSkeleton from '@skeleton/InputSkeleton';
+import CheckboxInputSkeleton from '@skeleton/CheckboxInputSkeleton';
+import RadioInputSkeleton from '@skeleton/RadioInputSkeleton';
+
+import useLoadSpecifications from '@hooks/useLoadSpecifications';
+import useAuthentication from '@hooks/useAuthentication';
+import useAppSelector from '@hooks/useAppSelector';
+import useLoadQuiz from '@hooks/useLoadQuiz';
+
+import { isNull, nameSlugMapper, parseExactAnswer, parseNumericAnswer, questionTypeFilter } from '@util/mapper.utils';
+import { isOneLoading } from '@util/condition.utils';
 
 import { generateChoices, removeChoices } from '@helpers/question.helper';
 
-import { addChoices, addComparisonAnswer, addExactAnswers, createChoiceQuestion, createNumericQuestion, createTextualQuestion } from 'api/questions';
-
-import database from '@database/database';
+import { addChoices, addComparisonAnswer, addExactAnswers, createChoiceQuestion, createNumericQuestion, createTextualQuestion } from '@api/questions';
 
 import { NotificationContext } from '@notificationContext/NotificationContext';
 
+import { selectSpecifications } from '@redux/questionSlice';
+import { selectTempQuiz } from '@redux/quizSlice';
+import { selectToken } from '@redux/authSlice';
+
 import ROLES from '@constant/roles';
 
-interface IServerSideProps {
-  quiz: IQuiz;
-  questionSpecifications: Array<IQuestionSpecification>;
-  token: string;
-}
-
-const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSideProps): ReactElement => {
+const CreateQuizQuestion = (): ReactElement => {
   const router = useRouter();
+
+  const { quizId } = router.query;
+
+  const { state: specificationState, run: runSpecification } = useLoadSpecifications();
+  const { state: quizState, run: runQuiz } = useLoadQuiz(parseInt(quizId as string));
+  const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [runQuiz, runSpecification]);
+
+  const token = useAppSelector(selectToken);
+  const quiz = useAppSelector(selectTempQuiz);
+  const questionSpecifications = useAppSelector(selectSpecifications);
 
   const { addNotification } = useContext(NotificationContext);
 
+  const [loading, setLoading] = useState(true);
   const [valid, setValid] = useState(false);
+
+  useEffect(() => {
+    setLoading(isOneLoading([specificationState, quizState, authState]) || isNull(quiz));
+  }, [specificationState, quizState, authState]);
 
   // The basic question properties
   const [title, setTitle] = useState('');
@@ -95,12 +119,32 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
   const [nqSpecificationType, setNqSpecificationType] = useState<'exact' | 'comparison'>('exact');
 
   // The question specifications of the numeric and choice question (fetched on the database and formatted).
-  const [nqSpecifications] = useState(questionSpecifications.filter(questionTypeFilter('numericQuestion')).map(nameSlugMapper));
-  const [cqSpecifications] = useState(questionSpecifications.filter(questionTypeFilter('choiceQuestion')).map(nameSlugMapper));
+  const [nqSpecifications, setNqSpecifications] = useState<Array<IBasicModel>>([]);
+  const [cqSpecifications, setCqSpecifications] = useState<Array<IBasicModel>>([]);
 
   // The numeric and choice question specification
-  const [nqSpecification, setNqSpecification] = useState(slugMapper(nqSpecifications[0]));
-  const [cqSpecification, setCqSpecification] = useState(slugMapper(cqSpecifications[0]));
+  const [nqSpecification, setNqSpecification] = useState('');
+  const [cqSpecification, setCqSpecification] = useState('');
+
+  useEffect(() => {
+    if (!questionSpecifications) return;
+
+    setNqSpecifications(() => {
+      const filteredSpecifications = questionSpecifications.filter(questionTypeFilter('numericQuestion')).map(nameSlugMapper);
+
+      if (filteredSpecifications.length > 0) setNqSpecification(filteredSpecifications[0].slug);
+
+      return filteredSpecifications;
+    });
+
+    setCqSpecifications(() => {
+      const filteredSpecifications = questionSpecifications.filter(questionTypeFilter('choiceQuestion')).map(nameSlugMapper);
+
+      if (filteredSpecifications.length > 0) setCqSpecification(filteredSpecifications[0].slug);
+
+      return filteredSpecifications;
+    });
+  }, [questionSpecifications]);
 
   // When the creation properties of the question get updated, make calculation to see if it is valid or not
   useEffect(() => {
@@ -141,6 +185,8 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
   }, [title, uniqueChoices, multipleChoices, cqSpecification, tqAnswers, nqAnswers, nqAnswerMin, nqAnswerMax]);
 
   const textualQuestionComputations = async (): Promise<void> => {
+    if (!quiz || !token) return;
+
     const verificationTypeSlug = verificationType;
     const creationAttributes: TextualQuestionCreationAttributes = { title, description, accentSensitive, caseSensitive, verificationTypeSlug };
 
@@ -168,6 +214,8 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
   };
 
   const numericQuestionComputations = async (): Promise<void> => {
+    if (!quiz || !token) return;
+
     const questionSpecificationSlug = nqSpecification;
     const creationAttributes: NumericQuestionCreationAttributes = { title, description, questionSpecificationSlug };
 
@@ -214,6 +262,8 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
   };
 
   const choiceQuestionComputations = async (): Promise<void> => {
+    if (!quiz || !token) return;
+
     const questionSpecificationSlug = cqSpecification;
     const creationAttributes: ChoiceQuestionCreationAttributes = { title, description, shuffle, questionSpecificationSlug };
 
@@ -251,7 +301,38 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
     if (questionType === 'textualQuestion') textualQuestionComputations();
   };
 
-  return (
+  return loading || !quiz ? (
+    <ProfessorDashboardSkeleton>
+      <ContainerSkeleton breadcrumb>
+        <hr className="mb-8 mt-8" />
+
+        <FormSkeleton full>
+          <Row wrap>
+            <FormGroupSkeleton>
+              <TitleSkeleton level={2} />
+
+              <InputSkeleton maxLength />
+              <InputSkeleton textArea maxLength />
+
+              <RadioInputSkeleton amount={3} big />
+            </FormGroupSkeleton>
+
+            <FormGroupSkeleton>
+              <TitleSkeleton level={2} />
+
+              <InputSkeleton />
+
+              <CheckboxInputSkeleton amount={1} />
+
+              <InputSkeleton />
+
+              <RadioInputSkeleton />
+            </FormGroupSkeleton>
+          </Row>
+        </FormSkeleton>
+      </ContainerSkeleton>
+    </ProfessorDashboardSkeleton>
+  ) : (
     <ProfessorDashboard>
       <Container
         title="Créer une question"
@@ -395,34 +476,4 @@ const CreateQuizQuestion = ({ quiz, questionSpecifications, token }: IServerSide
     </ProfessorDashboard>
   );
 };
-
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  const token = context.req.cookies.user;
-
-  try {
-    if (!token) throw new Error();
-
-    const { data: validatedTokenData } = await database.post('/auth/validateToken', {}, getHeaders(token));
-    if (!validatedTokenData.valid) throw new Error();
-
-    if (validatedTokenData.rolePermission !== ROLES.PROFESSOR.PERMISSION) throw new Error();
-
-    const { data: questionSpecifications } = await database.get('/api/questionSpecifications', getHeaders(token));
-
-    const { data: quiz } = await database.get(`/api/quizzes/${context.query.quizId}`, getHeaders(token));
-    if (!quiz)
-      return {
-        redirect: {
-          destination: `/professor/quizzes/${quiz.id}`,
-          permanent: false,
-        },
-      };
-
-    const props: IServerSideProps = { quiz, questionSpecifications, token };
-    return { props };
-  } catch (err) {
-    return { redirect: { destination: '/', permanent: false } };
-  }
-};
-
 export default CreateQuizQuestion;
