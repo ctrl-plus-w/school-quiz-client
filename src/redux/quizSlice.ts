@@ -6,10 +6,12 @@ import { RootState } from '@redux/store';
 
 interface IQuizState {
   quizzes: Array<IQuiz>;
+  tempQuiz: IQuiz | null;
 }
 
 const initialState: IQuizState = {
   quizzes: [],
+  tempQuiz: null,
 };
 
 const addQuizzesReducer = (state: IQuizState, action: PayloadAction<Array<IQuiz>>) => {
@@ -20,19 +22,30 @@ const clearQuizzesReducer = (state: IQuizState) => {
   state.quizzes = [];
 };
 
+const setTempQuizReducer = (state: IQuizState, action: PayloadAction<IQuiz>) => {
+  state.tempQuiz = action.payload;
+};
+
+const clearTempQuizReducer = (state: IQuizState) => {
+  state.tempQuiz = null;
+};
+
 const quizSlice = createSlice({
   name: 'quiz',
 
   initialState: initialState,
 
   reducers: {
+    setTempQuiz: setTempQuizReducer,
+    clearTempQuiz: clearTempQuizReducer,
     addQuizzes: addQuizzesReducer,
     clearQuizzes: clearQuizzesReducer,
   },
 });
 
-export const { addQuizzes, clearQuizzes } = quizSlice.actions;
+export const { addQuizzes, clearQuizzes, setTempQuiz, clearTempQuiz } = quizSlice.actions;
 
-export const selectQuizzes = (state: RootState): Array<IQuiz> | null => state.quiz.quizzes;
+export const selectQuizzes = (state: RootState): Array<IQuiz> => state.quiz.quizzes;
+export const selectTempQuiz = (state: RootState): IQuiz | null => state.quiz.tempQuiz;
 
 export default quizSlice.reducer;

@@ -1,7 +1,6 @@
 import React from 'react';
 
 import { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
-import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
 import ProfessorDashboard from '@layout/ProfessorDashboard';
@@ -20,47 +19,85 @@ import Input from '@element/Input';
 import Title from '@element/Title';
 import Route from '@element/Route';
 
-import { questionTypeMapper, quizCollaboratorsMapper, slugMapper } from '@util/mapper.utils';
-import { getHeaders } from '@util/authentication.utils';
+import { isNull, questionTypeMapper, quizCollaboratorsMapper, slugMapper } from '@util/mapper.utils';
+import { areArraysEquals, isOneLoading } from '@util/condition.utils';
 import { getLength } from '@util/object.utils';
+
+import useAuthentication from '@hooks/useAuthentication';
+import useAppSelector from '@hooks/useAppSelector';
+import useLoadUsers from '@hooks/useLoadUsers';
+import useLoadQuiz from '@hooks/useLoadQuiz';
+import useSwitch from '@hooks/useSwitch';
 
 import { addCollaborators, removeCollaborators, updateQuiz } from '@api/quizzes';
 
-import database from '@database/database';
-
 import { NotificationContext } from '@notificationContext/NotificationContext';
-import { AuthContext } from '@authContext/AuthContext';
+
+import { selectProfessors } from '@redux/userSlice';
+import { selectTempQuiz } from '@redux/quizSlice';
+import { selectToken } from '@redux/authSlice';
 
 import ROLES from '@constant/roles';
-import { areArraysEquals } from '@util/condition.utils';
+import ProfessorDashboardSkeleton from '@layout/ProfessorDashboardSkeleton';
+import ContainerSkeleton from '@skeleton/ContainerSkeleton';
+import FormSkeleton from '@skeleton/FormSkeleton';
+import FormGroupSkeleton from '@skeleton/FormGroupSkeleton';
+import TitleSkeleton from '@skeleton/TitleSkeleton';
+import InputSkeleton from '@skeleton/InputSkeleton';
+import CheckboxInputSkeleton from '@skeleton/CheckboxInputSkeleton';
+import FormButtonsSkeleton from '@skeleton/FormButtonsSkeleton';
+import TextSkeleton from '@skeleton/TextSkeleton';
+import TableSkeleton from '@skeleton/TableSkeleton';
 
-interface ServerSideProps {
-  quiz: IQuiz;
-  professors: Array<IUser>;
-  token: string;
-}
+const Quiz = (): ReactElement => {
+  const value = useSwitch('p');
 
-const Quiz = ({ quiz, professors, token }: ServerSideProps): ReactElement => {
   const router = useRouter();
 
+  const { quizId } = router.query;
+
+  const { state: usersState, run: runUsers } = useLoadUsers('professeur');
+  const { state: quizState, run: runQuizzes } = useLoadQuiz(parseInt(quizId as string), { notFoundRedirect: '/professor/quizzes' });
+  const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [runQuizzes, runUsers]);
+
+  const quiz = useAppSelector(selectTempQuiz);
+  const token = useAppSelector(selectToken);
+  const professors = useAppSelector(selectProfessors);
+
   const { addNotification } = useContext(NotificationContext);
-  const { setToken } = useContext(AuthContext);
 
-  const [quizCollaborators] = useState(quiz.collaborators.map(quizCollaboratorsMapper));
-
+  const [loading, setLoading] = useState(true);
+  const [formFilled, setFormFilled] = useState(false);
   const [valid, setValid] = useState(false);
 
-  const [title, setTitle] = useState(quiz.title);
-  const [description, setDescription] = useState(quiz.description);
-  const [strict, setStrict] = useState(quiz.strict);
-  const [shuffle, setShuffle] = useState(quiz.shuffle);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [strict, setStrict] = useState(false);
+  const [shuffle, setShuffle] = useState(false);
 
-  const [collaborators, setCollaborators] = useState<Array<{ name: string; slug: string }>>(quizCollaborators);
+  const [quizCollaborators, setQuizCollaborators] = useState<Array<IBasicModel>>([]);
+  const [collaborators, setCollaborators] = useState<Array<IBasicModel>>([]);
 
-  useEffect(() => setToken(token), []);
+  // When the quiz get loaded, set the state values.
+  useEffect(() => {
+    if (!quiz) return;
 
+    setTitle(quiz.title);
+    setDescription(quiz.description);
+    setStrict(quiz.strict);
+    setShuffle(quiz.shuffle);
+
+    setQuizCollaborators(quiz.collaborators.map(quizCollaboratorsMapper));
+    setCollaborators(quiz.collaborators.map(quizCollaboratorsMapper));
+
+    setFormFilled(true);
+  }, [quiz]);
+
+  // Check the validity of the form.
   useEffect(() => {
     const isValid = (): boolean => {
+      if (!quiz) return false;
+
       if (
         title !== quiz.title ||
         description !== quiz.description ||
@@ -77,10 +114,15 @@ const Quiz = ({ quiz, professors, token }: ServerSideProps): ReactElement => {
     else setValid(false);
   }, [title, description, strict, shuffle, collaborators]);
 
+  // Check some data is getting fetched and if the fetched data is not null.
+  useEffect(() => {
+    setLoading(isOneLoading([authState, quizState, usersState]) && isNull(quiz) && !formFilled);
+  }, [authState, quizState, usersState, formFilled]);
+
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
 
-    if (!valid) return;
+    if (!valid || !quiz || !token) return;
 
     const updateAttributes: AllOptional<QuizCreationAttributes> = {
       title: title !== quiz.title ? title : undefined,
@@ -136,10 +178,52 @@ const Quiz = ({ quiz, professors, token }: ServerSideProps): ReactElement => {
   };
 
   const handleClick = (instance: Question) => {
-    router.push({ pathname: `${router.pathname}/questions/[questionId]`, query: { quizId: quiz.id, questionId: instance.id } });
+    if (quiz) router.push({ pathname: `${router.pathname}/questions/[questionId]`, query: { quizId: quiz.id, questionId: instance.id } });
+    else router.push('/professor/quizzes');
   };
 
-  return (
+  return loading || value ? (
+    <ProfessorDashboardSkeleton>
+      <ContainerSkeleton breadcrumb>
+        <hr className="mb-8 mt-8" />
+
+        <FormSkeleton full>
+          <Row wrap>
+            <FormGroupSkeleton className="mb-6">
+              <TitleSkeleton level={2} />
+
+              <InputSkeleton maxLength />
+              <InputSkeleton textArea maxLength />
+
+              <CheckboxInputSkeleton />
+            </FormGroupSkeleton>
+
+            <FormGroupSkeleton>
+              <TitleSkeleton level={2} />
+
+              <InputSkeleton />
+            </FormGroupSkeleton>
+          </Row>
+
+          <FormButtonsSkeleton />
+        </FormSkeleton>
+
+        <div className="flex flex-col items-start min-h-full mt-16">
+          <TitleSkeleton level={2} />
+          <TextSkeleton width={32} height={6} className="mt-2" />
+
+          <TableSkeleton
+            attributes={[
+              ['ID', 'id'],
+              ['Titre', 'title'],
+              ['Description', 'description'],
+              ['Type de question', 'questionType'],
+            ]}
+          />
+        </div>
+      </ContainerSkeleton>
+    </ProfessorDashboardSkeleton>
+  ) : (
     <ProfessorDashboard>
       <Container title="Modifier un test" breadcrumb={[{ name: 'Tests', path: '/professor/quizzes' }, { name: 'Modifier un test' }]}>
         <hr className="mb-8 mt-8" />
@@ -179,7 +263,7 @@ const Quiz = ({ quiz, professors, token }: ServerSideProps): ReactElement => {
 
         <div className="flex flex-col items-start min-h-full mt-16">
           <Title level={2}>Questions</Title>
-          <Route to={`/professor/quizzes/${quiz.id}/questions/create`} className="mt-2">
+          <Route to={`/professor/quizzes/${quiz?.id}/questions/create`} className="mt-2">
             Créer une question
           </Route>
 
@@ -190,44 +274,14 @@ const Quiz = ({ quiz, professors, token }: ServerSideProps): ReactElement => {
               ['Description', 'description'],
               ['Type de question', 'questionType', questionTypeMapper],
             ]}
-            data={quiz.questions}
-            apiName={`quizzes/${quiz.id}/questions`}
+            data={quiz?.questions || []}
+            apiName={`quizzes/${quiz?.id}/questions`}
             handleClick={handleClick}
           />
         </div>
       </Container>
     </ProfessorDashboard>
   );
-};
-
-export const getServerSideProps: GetServerSideProps = async (context: GetServerSidePropsContext) => {
-  const token = context.req.cookies.user;
-
-  try {
-    if (!token) throw new Error();
-
-    const { data: validatedTokenData } = await database.post('/auth/validateToken', {}, getHeaders(token));
-    if (!validatedTokenData.valid) throw new Error();
-
-    if (validatedTokenData.rolePermission !== ROLES.PROFESSOR.PERMISSION) throw new Error();
-
-    const { data: professors } = await database.get('/api/users?role=professeur&self=false', getHeaders(token));
-
-    const { data: quiz } = await database.get(`/api/users/${validatedTokenData.userId}/quizzes/${context.query.quizId}`, getHeaders(token));
-
-    if (!quiz)
-      return {
-        redirect: {
-          destination: '/professor/quizzes',
-          permanent: false,
-        },
-      };
-
-    const props: ServerSideProps = { quiz, professors, token };
-    return { props };
-  } catch (err) {
-    return { redirect: { destination: '/', permanent: false } };
-  }
 };
 
 export default Quiz;
