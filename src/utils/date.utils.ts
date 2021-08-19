@@ -1,4 +1,4 @@
-import { formatNumber } from './mapper.utils';
+import { formatNumber, str } from './mapper.utils';
 
 import { DAYS, MONTHS } from '@constant/date';
 
@@ -230,9 +230,30 @@ export const formatDateTime = (_date: Date | string): string => {
  * @param minutes The new minutes to set
  * @returns A date
  */
-export const setTime = (date: Date, hours: number, minutes: number): Date => {
+export const setTime = (date: Date, hours: number, minutes: number, ms = 0): Date => {
   const tempDate = new Date(date);
   tempDate.setHours(hours);
   tempDate.setMinutes(minutes);
+  tempDate.setMilliseconds(ms);
   return tempDate;
+};
+
+/**
+ * Get an array representing an hour
+ * @param date The date to get the time array from
+ * @returns An array representing an hour, e.g [15, 5] -> 15h05
+ */
+export const getTimeAsArray = (date: Date): [string, string] => {
+  return [formatNumber(str(date.getHours())), formatNumber(str(date.getMinutes()))];
+};
+
+/**
+ * Get an array representing the difference between date as an hour
+ * @param date The younger date
+ * @param date1 The older date to compare
+ * @returns An array representing an hour, e.g [15, 5] -> 15h05
+ */
+export const getTimeArrayFromDifference = (date: Date, date1: Date): [string, string] => {
+  const msDiff = date1.valueOf() - date.valueOf();
+  return [formatNumber(str(Math.floor((msDiff / (1000 * 60 * 60)) % 24))), formatNumber(str(Math.floor((msDiff / (1000 * 60)) % 60)))];
 };
