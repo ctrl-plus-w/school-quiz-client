@@ -48,7 +48,7 @@ const CalendarInput = ({ label, className, value, setValue }: IProps): ReactElem
       </label>
 
       {!hidden && (
-        <div className="absolute bottom-0 transform translate-y-full pt-6">
+        <div className="absolute bottom-0 transform translate-y-full pt-6 bg-white">
           <div className="flex flex-col p-4 border border-gray-300 rounded ring ring-gray-200 shadow-xl">
             <div className="flex justify-between items-center mb-3">
               <button
