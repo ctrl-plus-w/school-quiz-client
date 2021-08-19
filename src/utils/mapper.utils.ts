@@ -72,6 +72,7 @@ export const quizCollaboratorsMapper = (user: IUser): IBasicModel => {
   return { name: `${user.firstName} ${user.lastName}`, slug: user.id.toString() };
 };
 
-export const formatNumber = (num: string): string => {
-  return parseInt(num) < 10 ? `0${parseInt(num)}` : `${num}`;
+export const formatNumber = (num: string | number): string => {
+  if (typeof num === 'string') return parseInt(num) < 10 ? `0${parseInt(num)}` : `${num}`;
+  return num < 10 ? `0${num}` : `${num}`;
 };
