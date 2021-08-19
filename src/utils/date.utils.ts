@@ -1,4 +1,4 @@
-import { MONTHS } from '@constant/date';
+import { DAYS, MONTHS } from '@constant/date';
 
 /**
  * Return a date with the given day changed.
@@ -115,4 +115,53 @@ export const getCalendarDates = (date: Date): Array<Date> => {
   }
 
   return dates;
+};
+
+/**
+ * Check if the date have the same date (not the week day)
+ * @param date The first date to compare
+ * @param date1 The second date to compare
+ * @returns A boolean
+ */
+export const isSameDay = (date: Date, date1: Date): boolean => date.getDate() === date1.getDate();
+
+/**
+ * Check if the date have the same month
+ * @param date The first date to compare
+ * @param date1 The second date to compare
+ * @returns A boolean
+ */
+export const isSameMonth = (date: Date, date1: Date): boolean => date.getMonth() === date1.getMonth();
+
+/**
+ * Check if the date have the same year
+ * @param date The first date to compare
+ * @param date1 The second date to compare
+ * @returns A boolean
+ */
+export const isSameYear = (date: Date, date1: Date): boolean => date.getFullYear() === date1.getFullYear();
+
+/**
+ * Check if the date are the same
+ * @param date The first date to compare
+ * @param date1 The second date to compare
+ * @returns A boolean
+ */
+export const isSameDate = (date: Date, date1: Date): boolean => {
+  for (const func of [isSameDay, isSameMonth, isSameYear]) if (!func(date, date1)) return false;
+  return true;
+};
+
+/**
+ * Format a date into a string
+ * @param date The date to format
+ * @returns A string
+ */
+export const formatDate = (date: Date): string => {
+  const today = new Date();
+
+  if (isSameDate(date, today)) return `Aujourd'hui, ${date.getDate()} ${monthToString(date.getMonth())}`;
+  if (isSameDate(date, incrementDate(today, 1))) return `Demain, ${date.getDate()} ${monthToString(date.getMonth())}`;
+
+  return `${DAYS[date.getDay()]} ${date.getDate()} ${monthToString(date.getMonth())}`;
 };
