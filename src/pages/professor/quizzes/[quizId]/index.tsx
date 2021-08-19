@@ -30,7 +30,7 @@ import InputSkeleton from '@skeleton/InputSkeleton';
 import FormSkeleton from '@skeleton/FormSkeleton';
 import TextSkeleton from '@skeleton/TextSkeleton';
 
-import { questionTypeMapper, quizCollaboratorsMapper, slugMapper } from '@util/mapper.utils';
+import { questionTypeMapper, collaboratorsMapper, slugMapper } from '@util/mapper.utils';
 import { areArraysEquals, isOneLoading } from '@util/condition.utils';
 import { getLength } from '@util/object.utils';
 
@@ -91,8 +91,8 @@ const Quiz = (): ReactElement => {
     setStrict(quiz.strict);
     setShuffle(quiz.shuffle);
 
-    setQuizCollaborators(quiz.collaborators.map(quizCollaboratorsMapper));
-    setCollaborators(quiz.collaborators.map(quizCollaboratorsMapper));
+    setQuizCollaborators(quiz.collaborators.map(collaboratorsMapper));
+    setCollaborators(quiz.collaborators.map(collaboratorsMapper));
 
     setFormFilled(true);
   }, [quiz]);
@@ -255,7 +255,7 @@ const Quiz = (): ReactElement => {
               <SearchInput
                 label="Collaborateurs"
                 placeholder="Rechercher..."
-                data={professors.map(quizCollaboratorsMapper)}
+                data={professors.map(collaboratorsMapper)}
                 values={collaborators}
                 setValues={setCollaborators}
               />

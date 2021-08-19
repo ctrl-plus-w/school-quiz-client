@@ -39,7 +39,8 @@ export const questionTypeFilter =
     return instance.questionType === questionType;
   };
 
-export const str = (val: RegExp): string => {
+export const str = (val: RegExp | number): string => {
+  if (typeof val === 'number') return val.toString();
   return val.toString().slice(1, -1);
 };
 
@@ -68,7 +69,7 @@ export const isNull = (el: unknown): boolean => {
 
 export const isNotNull = (el: unknown): boolean => !isNull(el);
 
-export const quizCollaboratorsMapper = (user: IUser): IBasicModel => {
+export const collaboratorsMapper = (user: IUser): IBasicModel => {
   return { name: `${user.firstName} ${user.lastName}`, slug: user.id.toString() };
 };
 
