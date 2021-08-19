@@ -1,4 +1,30 @@
+import { formatNumber } from './mapper.utils';
+
 import { DAYS, MONTHS } from '@constant/date';
+
+/**
+ * Return a date with the given minutes changed.
+ * @param date The date to modify the minutes.
+ * @param value The new minutes value.
+ * @returns A date
+ */
+export const setMinutes = (date: Date, value: number): Date => {
+  const tempDate = new Date(date);
+  tempDate.setMinutes(value);
+  return tempDate;
+};
+
+/**
+ * Return a date with the given hours changed.
+ * @param date The date to modify the hours.
+ * @param value The new hours value.
+ * @returns A date
+ */
+export const setHours = (date: Date, value: number): Date => {
+  const tempDate = new Date(date);
+  tempDate.setHours(value);
+  return tempDate;
+};
 
 /**
  * Return a date with the given day changed.
@@ -22,6 +48,26 @@ export const setMonth = (date: Date, value: number): Date => {
   const tempDate = new Date(date);
   tempDate.setMonth(value);
   return tempDate;
+};
+
+/**
+ * Return a date with its minutes incremented by the amount.
+ * @param date The date to increment the minutes.
+ * @param amount The amount of minutes to increment the date.
+ * @returns A date
+ */
+export const incrementMinutes = (date: Date, amount: number): Date => {
+  return setMinutes(date, date.getMinutes() + amount);
+};
+
+/**
+ * Return a date with its hours incremented by the amount.
+ * @param date The date to increment the hours.
+ * @param amount The amount of hours to increment the date.
+ * @returns A date
+ */
+export const incrementHours = (date: Date, amount: number): Date => {
+  return setHours(date, date.getHours() + amount);
 };
 
 /**
@@ -157,11 +203,36 @@ export const isSameDate = (date: Date, date1: Date): boolean => {
  * @param date The date to format
  * @returns A string
  */
-export const formatDate = (date: Date): string => {
+export const formatDate = (_date: Date | string): string => {
+  const date = typeof _date === 'string' ? new Date(_date) : _date;
   const today = new Date();
 
   if (isSameDate(date, today)) return `Aujourd'hui, ${date.getDate()} ${monthToString(date.getMonth())}`;
   if (isSameDate(date, incrementDate(today, 1))) return `Demain, ${date.getDate()} ${monthToString(date.getMonth())}`;
 
   return `${DAYS[date.getDay()]} ${date.getDate()} ${monthToString(date.getMonth())}`;
+};
+
+/**
+ * Format a datetime into a string
+ * @param date The datetime to format
+ * @returns A string
+ */
+export const formatDateTime = (_date: Date | string): string => {
+  const date = typeof _date === 'string' ? new Date(_date) : _date;
+  return `${formatDate(_date)} à ${date.getHours()}h${formatNumber(date.getMinutes())}`;
+};
+
+/**
+ * Modify the hours and minutes of a date
+ * @param date The date to modify
+ * @param hours The new hours to set
+ * @param minutes The new minutes to set
+ * @returns A date
+ */
+export const setTime = (date: Date, hours: number, minutes: number): Date => {
+  const tempDate = new Date(date);
+  tempDate.setHours(hours);
+  tempDate.setMinutes(minutes);
+  return tempDate;
 };
