@@ -48,12 +48,12 @@ interface IRole extends DefaultModelProperties {
 }
 
 interface IEvent extends DefaultModelProperties {
-  start: Date;
-  end: Date;
-  countdown: Date;
+  start: string;
+  end: string;
+  countdown: string;
 
   owner?: IUser;
-  collaborators?: Array<IUser>;
+  collaborators: Array<IUser>;
   quiz?: IQuiz;
   group?: IGroup;
 }
