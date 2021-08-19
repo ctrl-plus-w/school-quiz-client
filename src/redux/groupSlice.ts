@@ -33,6 +33,6 @@ const groupSlice = createSlice({
 
 export const { addGroups, clearGroups } = groupSlice.actions;
 
-export const selectGroups = (state: RootState): Array<IGroup> | null => state.group.groups;
+export const selectGroups = (state: RootState): Array<IGroup> => state.group.groups;
 
 export default groupSlice.reducer;
