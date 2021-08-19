@@ -1,4 +1,4 @@
-import { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -21,7 +21,9 @@ import { getHeaders } from '@util/authentication.utils';
 
 import database from '@database/database';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { addInfoNotification } from '@redux/notificationSlice';
 
 import ROLES from '@constant/roles';
 
@@ -35,7 +37,7 @@ type ServerSideProps = {
 const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }: ServerSideProps) => {
   const router = useRouter();
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const [valid, setValid] = useState(false);
 
@@ -125,7 +127,7 @@ const User: FunctionComponent<ServerSideProps> = ({ user, groups, roles, token }
         await database.put(`/api/users/${user.id}`, requestBody, getHeaders(token));
       }
 
-      addNotification({ content: 'Utilisateur modifié.', type: 'INFO' });
+      dispatch(addInfoNotification('Utilisateur modifié.'));
       router.push('/admin/users');
     } catch (err: any) {
       if (err.response && err.response.status === 403) return router.push('/login');

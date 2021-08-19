@@ -1,4 +1,4 @@
-import { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -12,15 +12,16 @@ import TagsInput from '@element/TagsInput';
 import Input from '@element/Input';
 import Title from '@element/Title';
 
+import useAppDispatch from '@hooks/useAppDispatch';
+
 import { getHeaders } from '@util/authentication.utils';
 import { areArraysEquals } from '@util/condition.utils';
 import { idNameSlugMapper } from '@util/mapper.utils';
 
 import database from '@database/database';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
-
 import ROLES from '@constant/roles';
+import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
 type ServerSideProps = {
   group: IGroup;
@@ -30,8 +31,7 @@ type ServerSideProps = {
 
 const Group: FunctionComponent<ServerSideProps> = ({ group, labels, token }: ServerSideProps) => {
   const router = useRouter();
-
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const [valid, setValid] = useState(false);
 
@@ -81,18 +81,18 @@ const Group: FunctionComponent<ServerSideProps> = ({ group, labels, token }: Ser
         await database.put(`/api/groups/${group.id}`, { name }, getHeaders(token));
       }
 
-      addNotification({ content: 'Groupe modifié.', type: 'INFO' });
+      dispatch(addInfoNotification('Groupe modifié.'));
 
       router.push('/admin/groups');
     } catch (err: any) {
       if (!err.response) {
-        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        dispatch(addErrorNotification('Une erreur est survenue.'));
         return router.push('/admin/groups');
       }
 
       if (err.response.status === 403) return router.push('/login');
 
-      if (err.response.status === 409) addNotification({ content: 'Ce groupe existe déja.', type: 'ERROR' });
+      if (err.response.status === 409) dispatch(addErrorNotification('Ce groupe existe déja.'));
     }
   };
 

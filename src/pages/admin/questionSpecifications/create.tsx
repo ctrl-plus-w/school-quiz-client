@@ -1,4 +1,4 @@
-import { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -16,7 +16,9 @@ import { getHeaders } from '@util/authentication.utils';
 
 import database from '@database/database';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
 import ROLES from '@constant/roles';
 
@@ -27,7 +29,7 @@ type ServerSideProps = {
 const CreateQuestionType: FunctionComponent<ServerSideProps> = ({ token }: ServerSideProps) => {
   const router = useRouter();
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const [valid, setValid] = useState(false);
 
@@ -64,23 +66,23 @@ const CreateQuestionType: FunctionComponent<ServerSideProps> = ({ token }: Serve
 
     try {
       if (name === '') {
-        addNotification({ content: 'Veuillez remplire tout les champs', type: 'ERROR' });
+        dispatch(addErrorNotification('Veuilllez remplire tout les champs'));
         return;
       }
 
       await database.post('/api/questionSpecifications', { name, questionType }, getHeaders(token));
 
-      addNotification({ content: 'Spécification créé.', type: 'INFO' });
+      dispatch(addInfoNotification('Spécification créé'));
       router.push('/admin/questionSpecifications');
     } catch (err: any) {
       if (!err.response) {
-        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        dispatch(addErrorNotification('Une erreur est survenue.'));
         return router.push('/admin/questionSpecifications');
       }
 
       if (err.response.status === 403) return router.push('/login');
 
-      if (err.response.status === 409) addNotification({ content: 'Cette spécification existe déja.', type: 'ERROR' });
+      if (err.response.status === 409) dispatch(addErrorNotification('Cette spécification existe déja.'));
     }
   };
 

@@ -1,4 +1,4 @@
-import { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -15,7 +15,9 @@ import { getHeaders } from '@util/authentication.utils';
 
 import database from '@database/database';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
 import ROLES from '@constant/roles';
 
@@ -27,7 +29,7 @@ type ServerSideProps = {
 const VerificationType: FunctionComponent<ServerSideProps> = ({ verificationType, token }: ServerSideProps) => {
   const router = useRouter();
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const [valid, setValid] = useState(false);
 
@@ -47,18 +49,18 @@ const VerificationType: FunctionComponent<ServerSideProps> = ({ verificationType
     try {
       await database.put(`/api/verificationTypes/${verificationType.id}`, { name }, getHeaders(token));
 
-      addNotification({ content: 'Type de vérification modifié.', type: 'INFO' });
+      dispatch(addInfoNotification('Type de vérification modifié.'));
 
       router.push('/admin/verificationTypes');
     } catch (err: any) {
       if (!err.response) {
-        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        dispatch(addErrorNotification('Une erreur est survenue.'));
         return router.push('/admin/verificationTypes');
       }
 
       if (err.response.status === 403) return router.push('/login');
 
-      if (err.response.status === 409) addNotification({ content: 'Ce type de vérification existe déja.', type: 'ERROR' });
+      if (err.response.status === 409) dispatch(addErrorNotification('Ce type de vérification existe déja.'));
     }
   };
 

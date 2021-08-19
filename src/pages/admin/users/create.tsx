@@ -1,4 +1,4 @@
-import { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -17,7 +17,9 @@ import { getHeaders } from '@util/authentication.utils';
 
 import database from '@database/database';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
 import ROLES from '@constant/roles';
 
@@ -28,7 +30,7 @@ type ServerSideProps = {
 const CreateUser: FunctionComponent<ServerSideProps> = ({ token }: ServerSideProps) => {
   const router = useRouter();
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const [valid, setValid] = useState(false);
 
@@ -67,30 +69,30 @@ const CreateUser: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePro
 
     try {
       if (username === '' || firstName === '' || lastName === '' || password === '') {
-        addNotification({ content: 'Veuillez remplire tout les champs', type: 'ERROR' });
+        dispatch(addErrorNotification('Veuilllez remplire tout les champs'));
         return;
       }
 
       if (password.length < 5) {
-        addNotification({ content: 'Le mot de passe est trop court', type: 'ERROR' });
+        dispatch(addErrorNotification('Le mot de passe est trop court'));
         return;
       }
 
       await database.post('/api/users', { username, firstName, lastName, password, gender: getGender(gender) }, getHeaders(token));
 
-      addNotification({ content: 'Utilisateur créé.', type: 'INFO' });
+      dispatch(addInfoNotification('Utilisateur créé.'));
       router.push('/admin/users');
     } catch (err: any) {
       if (!err.response) {
-        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        dispatch(addErrorNotification('Une erreur est survenue.'));
         return router.push('/admin/users');
       }
 
       if (err.response.status === 403) return router.push('/login');
 
-      if (err.response.status === 422) addNotification({ content: 'Un des champs est invalide.', type: 'ERROR' });
+      if (err.response.status === 422) dispatch(addErrorNotification('Un des champs est invalide'));
 
-      if (err.response.status === 409) addNotification({ content: 'Cet utilisateur existe déja.', type: 'ERROR' });
+      if (err.response.status === 409) dispatch(addErrorNotification('Cet utilisateur existe déja.'));
     }
   };
 

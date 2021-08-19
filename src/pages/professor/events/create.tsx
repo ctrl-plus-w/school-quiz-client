@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import type { FormEvent, ReactElement } from 'react';
@@ -40,14 +40,16 @@ import { selectQuizzes } from '@redux/quizSlice';
 import { selectGroups } from '@redux/groupSlice';
 import { selectToken } from '@redux/authSlice';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
 import ROLES from '@constant/roles';
 
 const CreateEvent = (): ReactElement => {
   const router = useRouter();
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const { state: quizState, run: runQuizzes } = useLoadQuizzes();
   const { state: groupState, run: runGroups } = useLoadGroups();
@@ -111,12 +113,12 @@ const CreateEvent = (): ReactElement => {
 
     if (error) {
       if (error.status === 403) router.push('/login');
-      else addNotification({ content: error.message, type: 'ERROR' });
+      else dispatch(addErrorNotification(error.message));
     }
 
     if (!event) return;
 
-    addNotification({ content: 'Événement créé.', type: 'INFO' });
+    dispatch(addInfoNotification('Événement créé.'));
     router.push(`/professor/events`);
   };
 

@@ -1,4 +1,4 @@
-import { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -15,9 +15,10 @@ import { getHeaders } from '@util/authentication.utils';
 
 import database from '@database/database';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
+import useAppDispatch from '@hooks/useAppDispatch';
 
 import ROLES from '@constant/roles';
+import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
 type ServerSideProps = {
   label: ILabel;
@@ -26,8 +27,7 @@ type ServerSideProps = {
 
 const Label: FunctionComponent<ServerSideProps> = ({ label, token }: ServerSideProps) => {
   const router = useRouter();
-
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const [valid, setValid] = useState(false);
 
@@ -46,24 +46,24 @@ const Label: FunctionComponent<ServerSideProps> = ({ label, token }: ServerSideP
 
     try {
       if (label.name === name) {
-        addNotification({ content: 'Vous devez modifier au moins un des champs.', type: 'ERROR' });
+        dispatch(addErrorNotification('Vous devez modifier au moins un des champs.'));
         return;
       }
 
       await database.put(`/api/labels/${label.id}`, { name }, getHeaders(token));
 
-      addNotification({ content: 'Label modifié.', type: 'INFO' });
+      dispatch(addInfoNotification('Label modifié.'));
 
       router.push('/admin/labels');
     } catch (err: any) {
       if (!err.response) {
-        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        dispatch(addErrorNotification('Une erreur est survenue.'));
         return router.push('/admin/labels');
       }
 
       if (err.response.status === 403) return router.push('/login');
 
-      if (err.response.status === 409) addNotification({ content: 'Ce label existe déja.', type: 'ERROR' });
+      if (err.response.status === 409) dispatch(addErrorNotification('Ce label existe déja.'));
     }
   };
 

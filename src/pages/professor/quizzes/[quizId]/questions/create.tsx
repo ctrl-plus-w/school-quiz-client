@@ -1,4 +1,4 @@
-import { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
+import { FormEvent, ReactElement, useEffect, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 
 import React from 'react';
@@ -44,7 +44,9 @@ import { generateChoices, removeChoices } from '@helpers/question.helper';
 
 import { addChoices, addComparisonAnswer, addExactAnswers, createChoiceQuestion, createNumericQuestion, createTextualQuestion } from '@api/questions';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
 import { selectSpecifications } from '@redux/questionSlice';
 import { selectTempQuiz } from '@redux/quizSlice';
@@ -65,7 +67,7 @@ const CreateQuizQuestion = (): ReactElement => {
   const quiz = useAppSelector(selectTempQuiz);
   const questionSpecifications = useAppSelector(selectSpecifications);
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const [loading, setLoading] = useState(true);
   const [valid, setValid] = useState(false);
@@ -194,7 +196,7 @@ const CreateQuizQuestion = (): ReactElement => {
 
     if (questionCreationError) {
       if (questionCreationError.status === 403) router.push('/login');
-      else addNotification({ content: questionCreationError.message, type: 'ERROR' });
+      else dispatch(addErrorNotification(questionCreationError.message));
     }
 
     if (!question) return;
@@ -204,12 +206,12 @@ const CreateQuizQuestion = (): ReactElement => {
 
     if (answersCreationError) {
       if (answersCreationError.status === 403) router.push('/login');
-      else addNotification({ content: answersCreationError.message, type: 'ERROR' });
+      else dispatch(addErrorNotification(answersCreationError.message));
     }
 
     if (!createdAnswers) return;
 
-    addNotification({ content: 'Question créée.', type: 'INFO' });
+    dispatch(addInfoNotification('Question créée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
   };
 
@@ -223,7 +225,7 @@ const CreateQuizQuestion = (): ReactElement => {
 
     if (questionCreationError) {
       if (questionCreationError.status === 403) router.push('/login');
-      else addNotification({ content: questionCreationError.message, type: 'ERROR' });
+      else dispatch(addErrorNotification(questionCreationError.message));
     }
 
     if (!question) return;
@@ -237,7 +239,7 @@ const CreateQuizQuestion = (): ReactElement => {
 
       if (answersCreationError) {
         if (answersCreationError.status === 403) router.push('/login');
-        else addNotification({ content: answersCreationError.message, type: 'ERROR' });
+        else dispatch(addErrorNotification(answersCreationError.message));
       }
 
       if (!createdAnswers) return;
@@ -251,13 +253,13 @@ const CreateQuizQuestion = (): ReactElement => {
 
       if (answerCreationError) {
         if (answerCreationError.status === 403) router.push('/login');
-        else addNotification({ content: answerCreationError.message, type: 'ERROR' });
+        else dispatch(addErrorNotification(answerCreationError.message));
       }
 
       if (!createdAnswer) return;
     }
 
-    addNotification({ content: 'Question créée.', type: 'INFO' });
+    dispatch(addInfoNotification('Question créée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
   };
 
@@ -271,7 +273,7 @@ const CreateQuizQuestion = (): ReactElement => {
 
     if (questionCreationError) {
       if (questionCreationError.status === 403) router.push('/login');
-      else addNotification({ content: questionCreationError.message, type: 'ERROR' });
+      else dispatch(addErrorNotification(questionCreationError.message));
     }
 
     if (!question) return;
@@ -281,12 +283,12 @@ const CreateQuizQuestion = (): ReactElement => {
 
     if (choicesCreationError) {
       if (choicesCreationError.status === 403) router.push('/login');
-      else addNotification({ content: choicesCreationError.message, type: 'ERROR' });
+      else dispatch(addErrorNotification(choicesCreationError.message));
     }
 
     if (!choices) return;
 
-    addNotification({ content: 'Question créée.', type: 'INFO' });
+    dispatch(addInfoNotification('Question créée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
   };
 

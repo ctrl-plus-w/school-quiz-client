@@ -1,4 +1,4 @@
-import { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -15,7 +15,9 @@ import { getHeaders } from '@util/authentication.utils';
 
 import database from '@database/database';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
 import ROLES from '@constant/roles';
 
@@ -26,7 +28,7 @@ type ServerSideProps = {
 const CreateLabel: FunctionComponent<ServerSideProps> = ({ token }: ServerSideProps) => {
   const router = useRouter();
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const [valid, setValid] = useState(false);
 
@@ -45,23 +47,23 @@ const CreateLabel: FunctionComponent<ServerSideProps> = ({ token }: ServerSidePr
 
     try {
       if (name === '') {
-        addNotification({ content: 'Veuillez remplire tout les champs', type: 'ERROR' });
+        dispatch(addErrorNotification('Veuilllez remplire tout les champs'));
         return;
       }
 
       await database.post('/api/labels', { name }, getHeaders(token));
 
-      addNotification({ content: 'Label créé.', type: 'INFO' });
+      dispatch(addInfoNotification('Label créé.'));
       router.push('/admin/labels');
     } catch (err: any) {
       if (!err.response) {
-        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        dispatch(addErrorNotification('Une erreur est survenue.'));
         return router.push('/admin/labels');
       }
 
       if (err.response.status === 403) return router.push('/login');
 
-      if (err.response.status === 409) addNotification({ content: 'Ce label existe déja.', type: 'ERROR' });
+      if (err.response.status === 409) dispatch(addErrorNotification('Ce label existe déja.'));
     }
   };
 

@@ -1,7 +1,7 @@
-import React from 'react';
-
-import { FormEvent, ReactElement, useContext, useEffect, useState } from 'react';
+import { FormEvent, ReactElement, useEffect, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
+
+import React from 'react';
 
 import ProfessorDashboardSkeleton from '@layout/ProfessorDashboardSkeleton';
 import ProfessorDashboard from '@layout/ProfessorDashboard';
@@ -42,7 +42,9 @@ import useLoadQuiz from '@hooks/useLoadQuiz';
 
 import { addCollaborators, removeCollaborators, updateQuiz } from '@api/quizzes';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { addErrorNotification } from '@redux/notificationSlice';
 
 import { removeQuestion, selectQuestions } from '@redux/questionSlice';
 import { selectProfessors } from '@redux/userSlice';
@@ -66,7 +68,7 @@ const Quiz = (): ReactElement => {
   const token = useAppSelector(selectToken);
   const professors = useAppSelector(selectProfessors);
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const [loading, setLoading] = useState(true);
   const [formFilled, setFormFilled] = useState(false);
@@ -138,7 +140,7 @@ const Quiz = (): ReactElement => {
 
       if (updateQuizError) {
         if (updateQuizError.status === 403) router.push('/login');
-        else addNotification({ content: updateQuizError.message, type: 'ERROR' });
+        else dispatch(addErrorNotification(updateQuizError.message));
       }
 
       if (!updatedQuiz) return;
@@ -155,7 +157,7 @@ const Quiz = (): ReactElement => {
 
         if (addCollaboratorsError) {
           if (addCollaboratorsError.status === 403) router.push('/login');
-          else addNotification({ content: addCollaboratorsError.message, type: 'ERROR' });
+          else dispatch(addErrorNotification(addCollaboratorsError.message));
         }
 
         if (!added) return;
@@ -168,14 +170,14 @@ const Quiz = (): ReactElement => {
 
         if (removeCollaboratorsError) {
           if (removeCollaboratorsError.status === 403) router.push('/login');
-          else addNotification({ content: removeCollaboratorsError.message, type: 'ERROR' });
+          else dispatch(addErrorNotification(removeCollaboratorsError.message));
         }
 
         if (!removed) return;
       }
     }
 
-    addNotification({ content: 'Quiz modifiée.', type: 'INFO' });
+    dispatch(addErrorNotification('Quiz modifiée.'));
     router.push(`/professor/quizzes`);
   };
 

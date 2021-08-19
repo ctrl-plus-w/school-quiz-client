@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
+import { useEffect, useState } from 'react';
 
 import type { FormEvent, ReactElement } from 'react';
 
@@ -31,7 +31,9 @@ import useAppSelector from '@hooks/useAppSelector';
 
 import { createQuiz } from '@api/quizzes';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
 import { selectToken } from '@redux/authSlice';
 
@@ -44,7 +46,7 @@ const CreateQuiz = (): ReactElement => {
 
   const router = useRouter();
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const [valid, setValid] = useState(false);
 
@@ -68,16 +70,15 @@ const CreateQuiz = (): ReactElement => {
 
     const [created, error] = await createQuiz({ title, description, strict, shuffle }, token);
 
-    if (created) {
-      addNotification({ content: 'Test créé.', type: 'INFO' });
-      router.push('/professor/quizzes');
-    } else if (error) {
-      if (error.status === 403) {
-        router.push('/login');
-      } else {
-        addNotification({ content: error.message, type: 'ERROR' });
-      }
+    if (error) {
+      if (error.status === 403) router.push('/login');
+      else dispatch(addErrorNotification(error.message));
     }
+
+    if (!created) return;
+
+    dispatch(addInfoNotification('Test créé.'));
+    router.push('/professor/quizzes');
   };
 
   return state === 'LOADING' ? (

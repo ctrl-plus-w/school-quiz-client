@@ -1,4 +1,4 @@
-import { FormEvent, FunctionComponent, useContext, useEffect, useState } from 'react';
+import { FormEvent, FunctionComponent, useEffect, useState } from 'react';
 import { GetServerSideProps, GetServerSidePropsContext } from 'next';
 import { useRouter } from 'next/dist/client/router';
 
@@ -16,7 +16,9 @@ import { getHeaders } from '@util/authentication.utils';
 
 import database from '@database/database';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
 import ROLES from '@constant/roles';
 
@@ -28,7 +30,7 @@ type ServerSideProps = {
 const Role: FunctionComponent<ServerSideProps> = ({ role, token }: ServerSideProps) => {
   const router = useRouter();
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const [valid, setValid] = useState(false);
 
@@ -48,24 +50,24 @@ const Role: FunctionComponent<ServerSideProps> = ({ role, token }: ServerSidePro
 
     try {
       if (parseInt(permission) <= 0) {
-        addNotification({ content: 'La permission ne peut pas être en dessous de 1', type: 'ERROR' });
+        dispatch(addErrorNotification('La permission ne peut pas être en dessous de 1'));
         return;
       }
 
       await database.put(`/api/roles/${role.id}`, { name, permission }, getHeaders(token));
 
-      addNotification({ content: 'Rôle modifié.', type: 'INFO' });
+      dispatch(addInfoNotification('Rôle modifié.'));
 
       router.push('/admin/roles');
     } catch (err: any) {
       if (!err.response) {
-        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        dispatch(addErrorNotification('Une erreur est survenue.'));
         return router.push('/admin/roles');
       }
 
       if (err.response.status === 403) return router.push('/login');
 
-      if (err.response.status === 409) addNotification({ content: 'Ce rôle existe déja.', type: 'ERROR' });
+      if (err.response.status === 409) dispatch(addErrorNotification('Ce rôle existe déja.'));
     }
   };
 

@@ -1,6 +1,5 @@
 import { useRouter } from 'next/dist/client/router';
 import { v4 as uuidv4 } from 'uuid';
-import { useContext } from 'react';
 
 import type { Dispatch, FormEvent, ReactElement, SetStateAction } from 'react';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
@@ -23,9 +22,8 @@ import { getHeaders } from '@util/authentication.utils';
 
 import database from '@database/database';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
-
 import { selectToken } from '@redux/authSlice';
+import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
 interface IProps<T, K> {
   instance: T;
@@ -57,8 +55,6 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
 
   const token = useSelector(selectToken);
 
-  const { addNotification } = useContext(NotificationContext);
-
   const updateShownElement = () => {
     if (shownElement === instance.id) {
       setShownElement(-1);
@@ -84,7 +80,7 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
       const request = await database.delete(`/api/${apiName}/${instance.id}`, getHeaders(token));
 
       if (request.status === 200) {
-        addNotification({ content: 'Élément supprimé !', type: 'INFO' });
+        dispatch(addInfoNotification('Élément supprimé !'));
 
         if (removeFromStore) dispatch(removeFromStore(instance.id));
         else router.reload();
@@ -93,11 +89,11 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
       const err = _err as AxiosError;
 
       if (!err.response) {
-        addNotification({ content: 'Une erreur est survenue.', type: 'ERROR' });
+        dispatch(addErrorNotification('Une erreur est survenue.'));
         return;
       }
 
-      if (err.response.status === 404) addNotification({ content: 'Élément non trouvé.', type: 'ERROR' });
+      if (err.response.status === 404) dispatch(addErrorNotification("Cet élément n'existe pas."));
 
       if (err.response.status === 403) return router.push('/login');
     } finally {

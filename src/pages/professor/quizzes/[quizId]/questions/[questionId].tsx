@@ -1,4 +1,4 @@
-import { Dispatch, FormEvent, ReactElement, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react';
+import { Dispatch, FormEvent, ReactElement, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 
 import React from 'react';
@@ -52,7 +52,9 @@ import {
   updateTextualQuestion,
 } from '@api/questions';
 
-import { NotificationContext } from '@notificationContext/NotificationContext';
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
 import { selectSpecifications, selectTempQuestion } from '@redux/questionSlice';
 import { selectTempQuiz } from '@redux/quizSlice';
@@ -105,7 +107,7 @@ interface ITextualQuestionProps extends IQuestionProps {
 const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITextualQuestionProps): ReactElement => {
   const router = useRouter();
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const [valid, setValid] = useState(false);
 
@@ -163,7 +165,7 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
 
       if (updateQuestionError) {
         if (updateQuestionError.status === 403) router.push('/login');
-        else addNotification({ content: updateQuestionError.message, type: 'ERROR' });
+        else dispatch(addErrorNotification(updateQuestionError.message));
       }
 
       if (!updated) return;
@@ -180,7 +182,7 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
 
         if (addedAnswersError) {
           if (addedAnswersError.status === 403) router.push('/login');
-          else addNotification({ content: addedAnswersError.message, type: 'ERROR' });
+          else dispatch(addErrorNotification(addedAnswersError.message));
         }
 
         if (!added) return;
@@ -192,14 +194,14 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
 
         if (removedAnswersError) {
           if (removedAnswersError.status === 403) router.push('/login');
-          else addNotification({ content: removedAnswersError.message, type: 'ERROR' });
+          else dispatch(addErrorNotification(removedAnswersError.message));
         }
 
         if (!removed) return;
       }
     }
 
-    addNotification({ content: 'Question modifiée.', type: 'INFO' });
+    dispatch(addInfoNotification('Question modifiée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
   };
 
@@ -246,7 +248,7 @@ interface INumericQuestionProps extends IQuestionProps {
 const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INumericQuestionProps): ReactElement => {
   const router = useRouter();
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const questionAnswers = question.answers as Array<IAnswer<IExactAnswer>>;
   const questionAnswer = question.answers[0] as IAnswer<IComparisonAnswer>;
@@ -326,7 +328,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
       if (updateQuestionError) {
         if (updateQuestionError.status === 403) router.push('/login');
-        else addNotification({ content: updateQuestionError.message, type: 'ERROR' });
+        else dispatch(addErrorNotification(updateQuestionError.message));
       }
 
       if (!updated) return;
@@ -348,7 +350,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
         if (answersCreationError) {
           if (answersCreationError.status === 403) router.push('/login');
-          else addNotification({ content: answersCreationError.message, type: 'ERROR' });
+          else dispatch(addErrorNotification(answersCreationError.message));
         }
 
         if (!createdAnswers) return;
@@ -362,7 +364,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
         if (answerCreationError) {
           if (answerCreationError.status === 403) router.push('/login');
-          else addNotification({ content: answerCreationError.message, type: 'ERROR' });
+          else dispatch(addErrorNotification(answerCreationError.message));
         }
 
         if (!createdAnswer) return;
@@ -383,7 +385,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
             if (updateAnswerError) {
               if (updateAnswerError.status === 403) router.push('/login');
-              else addNotification({ content: updateAnswerError.message, type: 'ERROR' });
+              else dispatch(addErrorNotification(updateAnswerError.message));
             }
 
             if (!updated) return;
@@ -395,7 +397,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
           if (addAnswerError) {
             if (addAnswerError.status === 403) router.push('/login');
-            else addNotification({ content: addAnswerError.message, type: 'ERROR' });
+            else dispatch(addErrorNotification(addAnswerError.message));
           }
 
           if (!created) return;
@@ -412,7 +414,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
           if (addAnswersError) {
             if (addAnswersError.status === 403) router.push('/login');
-            else addNotification({ content: addAnswersError.message, type: 'ERROR' });
+            else dispatch(addErrorNotification(addAnswersError.message));
           }
 
           if (!added) return;
@@ -425,7 +427,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
           if (removeAnswersError) {
             if (removeAnswersError.status === 403) router.push('/login');
-            else addNotification({ content: removeAnswersError.message, type: 'ERROR' });
+            else dispatch(addErrorNotification(removeAnswersError.message));
           }
 
           if (!removed) return;
@@ -433,7 +435,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
       }
     }
 
-    addNotification({ content: 'Question modifiée.', type: 'INFO' });
+    dispatch(addInfoNotification('Question modifiée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
   };
 
@@ -487,7 +489,7 @@ interface IChoiceQuestionProps extends IQuestionProps {
 const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoiceQuestionProps): ReactElement => {
   const router = useRouter();
 
-  const { addNotification } = useContext(NotificationContext);
+  const dispatch = useAppDispatch();
 
   const choiceMapper = (choices: Array<IChoice>): Array<EditableInputValue> => {
     return choices.map((choice, index) => ({ id: index, name: choice.name, checked: choice.valid, defaultName: choice.name }));
@@ -582,7 +584,7 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
 
       if (updateQuestionError) {
         if (updateQuestionError.status === 403) router.push('/login');
-        else addNotification({ content: updateQuestionError.message, type: 'ERROR' });
+        else dispatch(addErrorNotification(updateQuestionError.message));
       }
 
       if (!updated) return;
@@ -614,7 +616,7 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
 
           if (removeChoicesError) {
             if (removeChoicesError.status === 403) router.push('/login');
-            else addNotification({ content: removeChoicesError.message, type: 'ERROR' });
+            else dispatch(addErrorNotification(removeChoicesError.message));
           }
 
           if (!removed) return;
@@ -625,7 +627,7 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
 
           if (addChoicesError) {
             if (addChoicesError.status === 403) router.push('/login');
-            else addNotification({ content: addChoicesError.message, type: 'ERROR' });
+            else dispatch(addErrorNotification(addChoicesError.message));
           }
 
           if (!added) return;
@@ -635,14 +637,14 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
 
         if (addChoicesError) {
           if (addChoicesError.status === 403) router.push('/login');
-          else addNotification({ content: addChoicesError.message, type: 'ERROR' });
+          else dispatch(addErrorNotification(addChoicesError.message));
         }
 
         if (!added) return;
       }
     }
 
-    addNotification({ content: 'Question modifiée.', type: 'INFO' });
+    dispatch(addInfoNotification('Question modifiée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
   };
 
