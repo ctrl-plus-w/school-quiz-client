@@ -5,6 +5,14 @@ type QuizCreationAttributes = {
   shuffle: boolean;
 };
 
+type EventCreationAttributes = {
+  start: Date;
+  end: Date;
+  countdown: number;
+  groupId: number;
+  quizId: number;
+};
+
 type QuestionCreationAttributes = {
   title: string;
   description: string;
