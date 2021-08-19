@@ -59,6 +59,7 @@ const Button: FunctionComponent<IProps> = ({
       className={clsx([
         `button flex justify-center items-center py-2 px-8 rounded-sm transition-all duration-300`,
         'shadow-2xl',
+        'transform active:scale-95',
         full && 'w-full',
         disabled && 'opacity-80 cursor-not-allowed',
         primary ? getPrimaryStyle() : getSecondaryStyle(),

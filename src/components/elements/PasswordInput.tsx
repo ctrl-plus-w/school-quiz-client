@@ -71,7 +71,11 @@ const PasswordInput: FunctionComponent<IProps> = ({
           />
 
           <div
-            className=" absolute top-1/2 right-0 h-full px-2.5 transform -translate-y-1/2 flex justify-center items-center cursor-pointer text-gray-600 hover:text-blue-600"
+            className={clsx([
+              'absolute top-1/2 right-0 h-full px-2.5 transform -translate-y-1/2 flex justify-center items-center cursor-pointer text-gray-600 transition-all duration-300',
+              'hover:text-blue-600',
+              'transform active:scale-75',
+            ])}
             onClick={switchPasswordVisibility}
           >
             {showPassword ? <EyeIcon className="h-5 w-5" /> : <EyeOffIcon className="h-5 w-5" />}
