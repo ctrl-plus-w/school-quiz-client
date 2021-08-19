@@ -27,8 +27,6 @@ interface IInputProps {
 }
 
 const Input = ({ placeholder, className = '', suffix, pattern, onKeyDown, value, setValue, min, max }: IInputProps): ReactElement => {
-  const [focus, setFocus] = useState(false);
-
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
     if (e.target.value === '') return setValue('');
 
@@ -41,7 +39,7 @@ const Input = ({ placeholder, className = '', suffix, pattern, onKeyDown, value,
   };
 
   return (
-    <div className={clsx(['form-input--ns px-3 mt-2 rounded-sm', focus && 'focus', className])}>
+    <div className={clsx(['form-input--ns px-3 mt-2 rounded-sm', className])}>
       <input
         type="text"
         className={clsx('w-full py-2 outline-none focus:outline-none', [suffix && 'text-right'])}
@@ -50,8 +48,6 @@ const Input = ({ placeholder, className = '', suffix, pattern, onKeyDown, value,
         placeholder={placeholder}
         onKeyDown={onKeyDown}
         pattern={pattern}
-        onFocus={() => setFocus(true)}
-        onBlur={() => setFocus(false)}
       />
       {suffix && <p className="text-gray-900 text-sm font-normal py-2 ml-1">{suffix}</p>}
     </div>
