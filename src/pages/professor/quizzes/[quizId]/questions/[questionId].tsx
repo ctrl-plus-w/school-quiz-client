@@ -58,7 +58,6 @@ import { addErrorNotification, addInfoNotification } from '@redux/notificationSl
 
 import { selectSpecifications, selectTempQuestion } from '@redux/questionSlice';
 import { selectTempQuiz } from '@redux/quizSlice';
-import useSwitch from '@hooks/useSwitch';
 import { selectToken } from '@redux/authSlice';
 
 import useLoadSpecifications from '@hooks/useLoadSpecifications';
@@ -705,8 +704,6 @@ const hooksConfig = {
 };
 
 const Question = (): ReactElement => {
-  const value = useSwitch('p');
-
   const router = useRouter();
 
   const { quizId, questionId } = router.query;
@@ -751,7 +748,7 @@ const Question = (): ReactElement => {
     }
   };
 
-  return loading || value ? (
+  return loading ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton breadcrumb>
         <hr className="mt-8 mb-8" />
