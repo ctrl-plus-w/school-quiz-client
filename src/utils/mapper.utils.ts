@@ -71,3 +71,7 @@ export const isNotNull = (el: unknown): boolean => !isNull(el);
 export const quizCollaboratorsMapper = (user: IUser): IBasicModel => {
   return { name: `${user.firstName} ${user.lastName}`, slug: user.id.toString() };
 };
+
+export const formatNumber = (num: string): string => {
+  return parseInt(num) < 10 ? `0${parseInt(num)}` : `${num}`;
+};
