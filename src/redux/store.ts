@@ -6,6 +6,7 @@ import quizSlice from '@redux/quizSlice';
 import eventSlice from '@redux/eventSlice';
 import questionSlice from '@redux/questionSlice';
 import groupSlice from '@redux/groupSlice';
+import notificationSlice from './notificationSlice';
 
 const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ const store = configureStore({
     event: eventSlice,
     question: questionSlice,
     group: groupSlice,
+    notification: notificationSlice,
   },
 });
 

@@ -21,7 +21,7 @@ type UINotificationType = 'INFO' | 'ERROR';
 type UINotification = {
   type: UINotificationType;
   content: string;
-  id?: string;
+  id: string;
 };
 
 type DropdownValues = Array<{ name: string; slug: string }>;
