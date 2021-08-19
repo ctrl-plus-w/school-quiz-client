@@ -16,7 +16,9 @@ import TableSkeleton from '@skeleton/TableSkeleton';
 import useAuthentication from '@hooks/useAuthentication';
 import useLoadEvents from '@hooks/useLoadEvents';
 
-import { selectEvents } from '@redux/eventSlice';
+import { formatDateTime } from '@util/date.utils';
+
+import { removeEvent, selectEvents } from '@redux/eventSlice';
 
 import ROLES from '@constant/roles';
 
@@ -29,13 +31,30 @@ const ProfessorEvents = (): ReactElement => {
   return eventsState === 'LOADING' || authState === 'LOADING' ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton subtitle>
-        <TableSkeleton attributes={[['ID', 'id']]} />
+        <TableSkeleton
+          attributes={[
+            ['ID', 'id'],
+            ['Début', 'start'],
+            ['Fin', 'end'],
+            ['Décompte', 'countdown'],
+          ]}
+        />
       </ContainerSkeleton>
     </ProfessorDashboardSkeleton>
   ) : (
     <ProfessorDashboard>
-      <Container title="Événements" subtitle="Créer un événement">
-        <Table<IEvent, keyof IEvent> apiName="events" attributes={[['ID', 'id']]} data={events || []} />
+      <Container title="Événements" subtitle={{ name: 'Créer un événement', path: '/professor/events/create' }}>
+        <Table<IEvent, keyof IEvent>
+          apiName="events"
+          attributes={[
+            ['ID', 'id'],
+            ['Début', 'start', formatDateTime],
+            ['Fin', 'end', formatDateTime],
+            ['Décompte', 'countdown'],
+          ]}
+          data={events || []}
+          removeFromStore={removeEvent}
+        />
       </Container>
     </ProfessorDashboard>
   );
