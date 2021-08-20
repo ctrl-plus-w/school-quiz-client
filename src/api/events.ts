@@ -56,6 +56,27 @@ export const createEvent = async (creationAttributes: EventCreationAttributes, t
   }
 };
 
+export const updateEvent = async (
+  eventId: number,
+  updateAttributes: AllOptional<EventCreationAttributes>,
+  token: string
+): Promise<APIResponse<IEvent>> => {
+  try {
+    const { data: event } = await database.put(`/api/events/${eventId}`, updateAttributes, getHeaders(token));
+
+    return [event, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+    if (err.response.status === 404) return [null, { status: 409, message: "Cet événement n'existe pas ." }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
 export const addCollaborators = async (eventId: number, userIds: Array<number>, token: string): Promise<APIResponse<UpdateResponse>> => {
   try {
     const { data: updated } = await database.post(`/api/events/${eventId}/collaborators`, { userIds }, getHeaders(token));
