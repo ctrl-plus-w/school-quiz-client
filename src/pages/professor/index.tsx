@@ -13,6 +13,7 @@ import TitleSkeleton from '@skeleton/TitleSkeleton';
 import TextSkeleton from '@skeleton/TextSkeleton';
 
 import useAuthentication from '@hooks/useAuthentication';
+import useLoading from '@hooks/useLoading';
 
 import { selectUser } from '@redux/userSlice';
 
@@ -21,9 +22,18 @@ import ROLES from '@constant/roles';
 const Professor = (): ReactElement => {
   const { state } = useAuthentication(ROLES.PROFESSOR.PERMISSION);
 
+  const { loading } = useLoading([state]);
+
   const user = useSelector(selectUser);
 
-  return state === 'FULFILLED' && user ? (
+  return loading || !user ? (
+    <ProfessorDashboardSkeleton>
+      <div className="flex flex-col items-start py-12 px-12">
+        <TitleSkeleton />
+        <TextSkeleton width={96} className="mt-4" />
+      </div>
+    </ProfessorDashboardSkeleton>
+  ) : (
     <ProfessorDashboard>
       <div className="flex flex-col py-12 px-12">
         <Title>Bienvenue, {user.firstName} !</Title>
@@ -33,13 +43,6 @@ const Professor = (): ReactElement => {
         </p>
       </div>
     </ProfessorDashboard>
-  ) : (
-    <ProfessorDashboardSkeleton>
-      <div className="flex flex-col items-start py-12 px-12">
-        <TitleSkeleton />
-        <TextSkeleton width={96} className="mt-4" />
-      </div>
-    </ProfessorDashboardSkeleton>
   );
 };
 

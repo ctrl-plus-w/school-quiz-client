@@ -15,6 +15,7 @@ import { booleanMapper } from '@util/mapper.utils';
 
 import useAuthentication from '@hooks/useAuthentication';
 import useLoadQuizzes from '@hooks/useLoadQuizzes';
+import useLoading from '@hooks/useLoading';
 
 import { removeQuiz, selectQuizzes } from '@redux/quizSlice';
 
@@ -27,9 +28,11 @@ const ProfessorQuizzes = (): ReactElement => {
   const { state: quizzesState, run } = useLoadQuizzes();
   const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [run]);
 
+  const { loading } = useLoading([quizzesState, authState]);
+
   const quizzes = useSelector(selectQuizzes);
 
-  return authState === 'LOADING' || quizzesState === 'LOADING' ? (
+  return loading || !quizzes ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton subtitle>
         <TableSkeleton
@@ -55,7 +58,7 @@ const ProfessorQuizzes = (): ReactElement => {
             ['Strict', 'strict', booleanMapper],
             ['Mélanger les questions', 'shuffle', booleanMapper],
           ]}
-          data={quizzes || []}
+          data={quizzes}
           removeFromStore={removeQuiz}
         />
       </Container>

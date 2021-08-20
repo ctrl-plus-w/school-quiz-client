@@ -37,14 +37,15 @@ import useAuthentication from '@hooks/useAuthentication';
 import useAppSelector from '@hooks/useAppSelector';
 import useLoadQuiz from '@hooks/useLoadQuiz';
 
-import { isNull, nameSlugMapper, parseExactAnswer, parseNumericAnswer, questionTypeFilter } from '@util/mapper.utils';
-import { isOneLoading } from '@util/condition.utils';
+import { nameSlugMapper, parseExactAnswer, parseNumericAnswer, questionTypeFilter } from '@util/mapper.utils';
 
 import { generateChoices, removeChoices } from '@helpers/question.helper';
 
 import { addChoices, addComparisonAnswer, addExactAnswers, createChoiceQuestion, createNumericQuestion, createTextualQuestion } from '@api/questions';
 
 import useAppDispatch from '@hooks/useAppDispatch';
+import useValidation from '@hooks/useValidation';
+import useLoading from '@hooks/useLoading';
 
 import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
@@ -63,18 +64,13 @@ const CreateQuizQuestion = (): ReactElement => {
   const { state: quizState, run: runQuiz } = useLoadQuiz(parseInt(quizId as string));
   const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [runQuiz, runSpecification]);
 
+  const { loading } = useLoading([specificationState, quizState, authState]);
+
   const token = useAppSelector(selectToken);
   const quiz = useAppSelector(selectTempQuiz);
   const questionSpecifications = useAppSelector(selectSpecifications);
 
   const dispatch = useAppDispatch();
-
-  const [loading, setLoading] = useState(true);
-  const [valid, setValid] = useState(false);
-
-  useEffect(() => {
-    setLoading(isOneLoading([specificationState, quizState, authState]) || isNull(quiz));
-  }, [specificationState, quizState, authState]);
 
   // The basic question properties
   const [title, setTitle] = useState('');
@@ -149,10 +145,8 @@ const CreateQuizQuestion = (): ReactElement => {
   }, [questionSpecifications]);
 
   // When the creation properties of the question get updated, make calculation to see if it is valid or not
-  useEffect(() => {
-    const isValid = (): boolean => {
-      if (title === '' || description === '') return false;
-
+  const { valid } = useValidation(
+    () => {
       // Textual question
       if (questionType === 'textualQuestion' && tqAnswers.length === 0) return false;
 
@@ -180,11 +174,10 @@ const CreateQuizQuestion = (): ReactElement => {
       }
 
       return true;
-    };
-
-    if (isValid()) setValid(true);
-    else setValid(false);
-  }, [title, uniqueChoices, multipleChoices, cqSpecification, tqAnswers, nqAnswers, nqAnswerMin, nqAnswerMax]);
+    },
+    [title, uniqueChoices, multipleChoices, cqSpecification, tqAnswers, nqAnswers, nqAnswerMin, nqAnswerMax],
+    [title, description]
+  );
 
   const textualQuestionComputations = async (): Promise<void> => {
     if (!quiz || !token) return;

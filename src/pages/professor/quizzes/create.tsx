@@ -1,5 +1,5 @@
 import { useRouter } from 'next/dist/client/router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import type { FormEvent, ReactElement } from 'react';
 
@@ -32,6 +32,8 @@ import useAppSelector from '@hooks/useAppSelector';
 import { createQuiz } from '@api/quizzes';
 
 import useAppDispatch from '@hooks/useAppDispatch';
+import useValidation from '@hooks/useValidation';
+import useLoading from '@hooks/useLoading';
 
 import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 
@@ -40,28 +42,22 @@ import { selectToken } from '@redux/authSlice';
 import ROLES from '@constant/roles';
 
 const CreateQuiz = (): ReactElement => {
-  const { state } = useAuthentication(ROLES.PROFESSOR.PERMISSION);
-
-  const token = useAppSelector(selectToken);
-
   const router = useRouter();
 
   const dispatch = useAppDispatch();
 
-  const [valid, setValid] = useState(false);
+  const token = useAppSelector(selectToken);
+
+  const { state } = useAuthentication(ROLES.PROFESSOR.PERMISSION);
+
+  const { loading } = useLoading([state]);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [strict, setStrict] = useState(true);
   const [shuffle, setShuffle] = useState(true);
 
-  useEffect(() => {
-    if (title !== '' && description !== '') {
-      setValid(true);
-    } else {
-      setValid(false);
-    }
-  }, [title, description]);
+  const { valid } = useValidation(() => true, [title, description], [title, description]);
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
@@ -81,7 +77,7 @@ const CreateQuiz = (): ReactElement => {
     router.push('/professor/quizzes');
   };
 
-  return state === 'LOADING' ? (
+  return loading ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton breadcrumb>
         <hr className="mb-8 mt-8" />

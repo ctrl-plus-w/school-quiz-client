@@ -15,6 +15,7 @@ import TableSkeleton from '@skeleton/TableSkeleton';
 
 import useAuthentication from '@hooks/useAuthentication';
 import useLoadEvents from '@hooks/useLoadEvents';
+import useLoading from '@hooks/useLoading';
 
 import { formatDateTime } from '@util/date.utils';
 
@@ -26,9 +27,11 @@ const ProfessorEvents = (): ReactElement => {
   const { state: eventsState, run } = useLoadEvents();
   const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [run]);
 
+  const { loading } = useLoading([eventsState, authState]);
+
   const events = useSelector(selectEvents);
 
-  return eventsState === 'LOADING' || authState === 'LOADING' ? (
+  return loading || !events ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton subtitle>
         <TableSkeleton
@@ -52,7 +55,7 @@ const ProfessorEvents = (): ReactElement => {
             ['Fin', 'end', formatDateTime],
             ['Décompte', 'countdown'],
           ]}
-          data={events || []}
+          data={events}
           removeFromStore={removeEvent}
         />
       </Container>

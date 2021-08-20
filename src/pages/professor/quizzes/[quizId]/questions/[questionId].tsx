@@ -33,8 +33,8 @@ import InputSkeleton from '@skeleton/InputSkeleton';
 import TitleSkeleton from '@skeleton/TitleSkeleton';
 import FormSkeleton from '@skeleton/FormSkeleton';
 
-import { isNull, nameMapper, nameSlugMapper, parseExactAnswer, parseNumericAnswer } from '@util/mapper.utils';
-import { areArraysEquals, isOneLoading } from '@util/condition.utils';
+import { nameMapper, nameSlugMapper, parseExactAnswer, parseNumericAnswer } from '@util/mapper.utils';
+import { areArraysEquals } from '@util/condition.utils';
 import { getLength } from '@util/object.utils';
 
 import { choiceSorter, generateChoices, removeChoices as removeStateChoices } from '@helpers/question.helper';
@@ -64,7 +64,9 @@ import useLoadSpecifications from '@hooks/useLoadSpecifications';
 import useAuthentication from '@hooks/useAuthentication';
 import useLoadQuestion from '@hooks/useLoadQuestion';
 import useAppSelector from '@hooks/useAppSelector';
+import useValidation from '@hooks/useValidation';
 import useLoadQuiz from '@hooks/useLoadQuiz';
+import useLoading from '@hooks/useLoading';
 
 import ROLES from '@constant/roles';
 
@@ -108,8 +110,6 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
 
   const dispatch = useAppDispatch();
 
-  const [valid, setValid] = useState(false);
-
   const [title, setTitle] = useState(question.title);
   const [description, setDescription] = useState(question.description);
 
@@ -124,10 +124,8 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
 
   const [answers, setAnswers] = useState(questionAnswersContent);
 
-  useEffect(() => {
-    const isValid = (): boolean => {
-      if (title === '' || description === '') return false;
-
+  const { valid } = useValidation(
+    () => {
       if (
         title === question.title &&
         description === question.description &&
@@ -139,11 +137,10 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
         return false;
 
       return true;
-    };
-
-    if (isValid()) setValid(true);
-    else setValid(false);
-  }, [title, description, verificationType, caseSensitive, accentSensitive, answers]);
+    },
+    [title, description, verificationType, caseSensitive, accentSensitive, answers],
+    [title, description]
+  );
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
@@ -263,8 +260,6 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
   // States
 
-  const [valid, setValid] = useState(false);
-
   const [title, setTitle] = useState(question.title);
   const [description, setDescription] = useState(question.description);
 
@@ -280,10 +275,8 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
   const [answerMin, setAnswerMin] = useState(questionAnswerMin);
   const [answerMax, setAnswerMax] = useState(questionAnswerMax);
 
-  useEffect(() => {
-    const isValid = () => {
-      if (title === '' || description === '') return false;
-
+  const { valid } = useValidation(
+    () => {
       if (specificationType === 'exact' && answers.length === 0) return false;
       if (specificationType === 'comparison' && (answerMin === '' || answerMax === '' || answerMin >= answerMax)) return false;
 
@@ -304,11 +297,10 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
       }
 
       return true;
-    };
-
-    if (isValid()) setValid(true);
-    else setValid(false);
-  }, [title, description, answers, answerMin, answerMax, specification, specificationType]);
+    },
+    [title, description, answers, answerMin, answerMax, specification, specificationType],
+    [title, description]
+  );
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
@@ -498,8 +490,6 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
   const [specifications] = useState(questionSpecifications.map(nameSlugMapper));
   const [questionSpecification] = useState(question.typedQuestion.questionSpecification?.slug);
 
-  const [valid, setValid] = useState(false);
-
   const [title, setTitle] = useState(question.title);
   const [description, setDescription] = useState(question.description);
 
@@ -512,8 +502,8 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
   const [uniqueChoices, setUniqueChoices] = useState(questionChoices);
   const [multipleChoices, setMultipleChoices] = useState(questionChoices);
 
-  useEffect(() => {
-    const isValid = (): boolean => {
+  const { valid } = useValidation(
+    () => {
       const choices = specification === 'choix-unique' ? uniqueChoices : multipleChoices;
 
       const questionChoicesName = question.typedQuestion.choices.map(({ name }) => name);
@@ -521,8 +511,6 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
 
       const questionCheckedChoices = question.typedQuestion.choices.filter(({ valid }) => valid).map(nameMapper);
       const checkedChoices = choices.filter(({ checked }) => checked).map(nameMapper);
-
-      if (title === '' || description === '') return false;
 
       if (specification === 'choix-unique' ? uniqueChoices === [] : multipleChoices === []) return false;
 
@@ -541,11 +529,10 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
       if (uniqueChoices.length < 2 || !isOneChecked || !areValuesNotEmpty) return false;
 
       return true;
-    };
-
-    if (isValid()) setValid(true);
-    else setValid(false);
-  }, [title, description, shuffle, specification, uniqueChoices, multipleChoices]);
+    },
+    [title, description, shuffle, specification, uniqueChoices, multipleChoices],
+    [title, description]
+  );
 
   useEffect(() => {
     const choicesLength = specification === 'choix-unique' ? uniqueChoices.length : multipleChoices.length;
@@ -718,11 +705,7 @@ const Question = (): ReactElement => {
   const quiz = useAppSelector(selectTempQuiz);
   const specifications = useAppSelector(selectSpecifications);
 
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(isOneLoading([quizState, questionState, authState, specificationState]) || isNull(question) || isNull(quiz));
-  }, [quizState, questionState, authState, specificationState]);
+  const { loading } = useLoading([quizState, questionState, authState, specificationState], [question, quiz, specifications]);
 
   const getComponent = (): ReactElement => {
     if (!question || !quiz || !token) return <></>;

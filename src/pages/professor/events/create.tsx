@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 import type { FormEvent, ReactElement } from 'react';
 
@@ -30,9 +30,11 @@ import useAuthentication from '@hooks/useAuthentication';
 import useAppSelector from '@hooks/useAppSelector';
 import useLoadQuizzes from '@hooks/useLoadQuizzes';
 import useLoadGroups from '@hooks/useLoadGroups';
+import useValidation from '@hooks/useValidation';
+import useLoading from '@hooks/useLoading';
 
 import { incrementHours, incrementMinutes, setTime } from '@util/date.utils';
-import { areDatesEquals, isOneLoading } from '@util/condition.utils';
+import { areDatesEquals } from '@util/condition.utils';
 
 import { createEvent } from '@api/events';
 
@@ -55,12 +57,7 @@ const CreateEvent = (): ReactElement => {
   const { state: groupState, run: runGroups } = useLoadGroups();
   const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [runGroups, runQuizzes]);
 
-  const [loading, setLoading] = useState(true);
-  const [valid, setValid] = useState(false);
-
-  useEffect(() => {
-    setLoading(isOneLoading([authState, groupState, quizState]));
-  }, [authState, groupState, quizState]);
+  const { loading } = useLoading([quizState, authState, groupState]);
 
   const token = useAppSelector(selectToken);
   const groups = useAppSelector(selectGroups);
@@ -72,21 +69,18 @@ const CreateEvent = (): ReactElement => {
   const [group, setGroup] = useState('');
   const [quiz, setQuiz] = useState('');
 
-  useEffect(() => {
-    const isValid = (): boolean => {
+  const { valid } = useValidation(
+    () => {
       if (areDatesEquals(date, new Date()) || date.valueOf() < new Date().valueOf()) return false;
 
       if (parseInt(start[0]) === 0 && parseInt(start[1]) === 0) return false;
       if (parseInt(duration[0]) === 0 && parseInt(duration[1]) === 0) return false;
 
-      if (group === '' || quiz === '') return false;
-
       return true;
-    };
-
-    if (isValid()) setValid(true);
-    else setValid(false);
-  }, [date, start, duration, group, quiz]);
+    },
+    [date, start, duration, group, quiz],
+    [group, quiz]
+  );
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -122,7 +116,7 @@ const CreateEvent = (): ReactElement => {
     router.push(`/professor/events`);
   };
 
-  return loading || !groups ? (
+  return loading || !groups || !quizzes ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton breadcrumb>
         <hr className="mt-8 mb-8" />

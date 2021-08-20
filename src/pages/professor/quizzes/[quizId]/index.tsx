@@ -31,7 +31,7 @@ import FormSkeleton from '@skeleton/FormSkeleton';
 import TextSkeleton from '@skeleton/TextSkeleton';
 
 import { questionTypeMapper, collaboratorsMapper, slugMapper } from '@util/mapper.utils';
-import { areArraysEquals, isOneLoading } from '@util/condition.utils';
+import { areArraysEquals } from '@util/condition.utils';
 import { getLength } from '@util/object.utils';
 
 import useAuthentication from '@hooks/useAuthentication';
@@ -43,6 +43,8 @@ import useLoadQuiz from '@hooks/useLoadQuiz';
 import { addCollaborators, removeCollaborators, updateQuiz } from '@api/quizzes';
 
 import useAppDispatch from '@hooks/useAppDispatch';
+import useValidation from '@hooks/useValidation';
+import useLoading from '@hooks/useLoading';
 
 import { addErrorNotification } from '@redux/notificationSlice';
 
@@ -58,21 +60,21 @@ const Quiz = (): ReactElement => {
 
   const { quizId } = router.query;
 
+  const dispatch = useAppDispatch();
+
   const { state: usersState, run: runUsers } = useLoadUsers('professeur');
   const { state: quizState, run: runQuizzes } = useLoadQuiz(parseInt(quizId as string), { notFoundRedirect: '/professor/quizzes' });
   const { state: questionState, run: runQuestion } = useLoadQuestions(parseInt(quizId as string));
   const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [runQuizzes, runQuestion, runUsers]);
+
+  const { loading } = useLoading([usersState, quizState, questionState, authState]);
 
   const questions = useAppSelector(selectQuestions);
   const quiz = useAppSelector(selectTempQuiz);
   const token = useAppSelector(selectToken);
   const professors = useAppSelector(selectProfessors);
 
-  const dispatch = useAppDispatch();
-
-  const [loading, setLoading] = useState(true);
   const [formFilled, setFormFilled] = useState(false);
-  const [valid, setValid] = useState(false);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -98,30 +100,20 @@ const Quiz = (): ReactElement => {
   }, [quiz]);
 
   // Check the validity of the form.
-  useEffect(() => {
-    const isValid = (): boolean => {
-      if (!quiz) return false;
+  const { valid } = useValidation(() => {
+    if (!quiz) return false;
 
-      if (
-        title !== quiz.title ||
-        description !== quiz.description ||
-        strict !== quiz.strict ||
-        shuffle !== quiz.shuffle ||
-        !areArraysEquals(collaborators, quizCollaborators)
-      )
-        return true;
+    if (
+      title !== quiz.title ||
+      description !== quiz.description ||
+      strict !== quiz.strict ||
+      shuffle !== quiz.shuffle ||
+      !areArraysEquals(collaborators, quizCollaborators)
+    )
+      return true;
 
-      return false;
-    };
-
-    if (isValid()) setValid(true);
-    else setValid(false);
+    return false;
   }, [title, description, strict, shuffle, collaborators]);
-
-  // Check some data is getting fetched and if the fetched data is not null.
-  useEffect(() => {
-    setLoading(isOneLoading([authState, quizState, usersState, questionState]) || !formFilled);
-  }, [authState, quizState, usersState, questionState, formFilled]);
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
@@ -186,7 +178,7 @@ const Quiz = (): ReactElement => {
     else router.push('/professor/quizzes');
   };
 
-  return loading || !quiz || !questions ? (
+  return loading || !formFilled || !quiz || !questions ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton breadcrumb>
         <hr className="mb-8 mt-8" />
