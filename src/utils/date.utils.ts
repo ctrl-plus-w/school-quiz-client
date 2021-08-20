@@ -71,6 +71,17 @@ export const incrementHours = (date: Date, amount: number): Date => {
 };
 
 /**
+ * Return a date with its hours and minutes incremented by the given amount.
+ * @param date The date to increment the time from
+ * @param hours The amount of hours to increment
+ * @param minutes The amount of minutes to increment
+ * @returns A date
+ */
+export const incrementTime = (date: Date, hours: number, minutes: number): Date => {
+  return incrementHours(incrementMinutes(date, minutes), hours);
+};
+
+/**
  * Return a date with its date incremented by the amount.
  * @param date The date to increment the day.
  * @param amount The amount of days to increment the date.
@@ -164,6 +175,16 @@ export const getCalendarDates = (date: Date): Array<Date> => {
 };
 
 /**
+ * Check if the date have the hours and minutes
+ * @param date The first date to compare
+ * @param date1 The second date to compare
+ * @returns A boolean
+ */
+export const isSameTime = (date: Date, date1: Date): boolean => {
+  return date.getHours() === date1.getHours() && date.getMinutes() === date1.getMinutes();
+};
+
+/**
  * Check if the date have the same date (not the week day)
  * @param date The first date to compare
  * @param date1 The second date to compare
@@ -230,10 +251,11 @@ export const formatDateTime = (_date: Date | string): string => {
  * @param minutes The new minutes to set
  * @returns A date
  */
-export const setTime = (date: Date, hours: number, minutes: number, ms = 0): Date => {
+export const setTime = (date: Date, hours: number, minutes: number, seconds = 0, ms = 0): Date => {
   const tempDate = new Date(date);
   tempDate.setHours(hours);
   tempDate.setMinutes(minutes);
+  tempDate.setSeconds(seconds);
   tempDate.setMilliseconds(ms);
   return tempDate;
 };
