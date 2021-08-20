@@ -10,6 +10,7 @@ interface IProps {
   error?: boolean;
 
   maxLength?: number;
+  readonly?: boolean;
 
   className?: string;
 
@@ -17,7 +18,7 @@ interface IProps {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Input = ({ label, error = false, placeholder, className, value, setValue, note, maxLength }: IProps): ReactElement => {
+const Input = ({ label, error = false, placeholder, className, value, setValue, note, maxLength, readonly = false }: IProps): ReactElement => {
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setValue(e.target.value);
   };
@@ -37,6 +38,7 @@ const Input = ({ label, error = false, placeholder, className, value, setValue, 
           onChange={onChange}
           autoComplete="off"
           maxLength={maxLength}
+          readOnly={readonly}
         />
 
         {maxLength && (

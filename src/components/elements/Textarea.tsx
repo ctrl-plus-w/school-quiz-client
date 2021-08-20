@@ -9,6 +9,7 @@ interface IProps {
   note?: string;
 
   maxLength?: number;
+  readonly?: boolean;
 
   className?: string;
 
@@ -16,7 +17,7 @@ interface IProps {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Textarea = ({ label, placeholder, className, value, setValue, note, maxLength }: IProps): ReactElement => {
+const Textarea = ({ label, placeholder, className, value, setValue, note, maxLength, readonly = false }: IProps): ReactElement => {
   const onChange = (e: ChangeEvent<HTMLTextAreaElement>): void => {
     setValue(e.target.value);
   };
@@ -35,6 +36,7 @@ const Textarea = ({ label, placeholder, className, value, setValue, note, maxLen
           onChange={onChange}
           autoComplete="off"
           maxLength={maxLength}
+          readOnly={readonly}
         ></textarea>
 
         {maxLength && (

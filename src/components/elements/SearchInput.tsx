@@ -16,6 +16,7 @@ interface IProps {
   placeholder?: string;
   errorMessage?: string;
   maxResults?: number;
+  disabled?: boolean;
 
   values: Array<{ name: string; slug: string }>;
   setValues: Dispatch<SetStateAction<Array<{ name: string; slug: string }>>>;
@@ -30,6 +31,7 @@ const SearchInput = ({
   maxResults = 7,
   className,
   readonly = false,
+  disabled = false,
   data,
   values,
   setValues,
@@ -116,7 +118,7 @@ const SearchInput = ({
             onChange={handleInputChange}
             onKeyDown={handleInputKeydown}
             onFocus={handleFocus}
-            disabled={noData}
+            disabled={noData || disabled}
           />
 
           {hidden || filteredData.length === 0 ? null : (
@@ -139,9 +141,11 @@ const SearchInput = ({
             <div className="flex justify-between bg-gray-200 border border-gray-500 rounded-sm" key={uuidv4()}>
               <p className="px-2 py-1">{instance.name}</p>
 
-              <button className="px-2 py-1" onClick={() => removeValue(instance)}>
-                <XIcon className="w-5 h-5" />
-              </button>
+              {!disabled && (
+                <button className="px-2 py-1" onClick={() => removeValue(instance)}>
+                  <XIcon className="w-5 h-5" />
+                </button>
+              )}
             </div>
           );
         })}
