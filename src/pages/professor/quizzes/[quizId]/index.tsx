@@ -49,7 +49,7 @@ import useLoading from '@hooks/useLoading';
 import { addErrorNotification } from '@redux/notificationSlice';
 
 import { removeQuestion, selectQuestions } from '@redux/questionSlice';
-import { selectProfessors } from '@redux/userSlice';
+import { selectProfessors, selectUser } from '@redux/userSlice';
 import { selectTempQuiz } from '@redux/quizSlice';
 import { selectToken } from '@redux/authSlice';
 
@@ -69,6 +69,7 @@ const Quiz = (): ReactElement => {
 
   const { loading } = useLoading([usersState, quizState, questionState, authState]);
 
+  const user = useAppSelector(selectUser);
   const questions = useAppSelector(selectQuestions);
   const quiz = useAppSelector(selectTempQuiz);
   const token = useAppSelector(selectToken);
@@ -84,9 +85,11 @@ const Quiz = (): ReactElement => {
   const [quizCollaborators, setQuizCollaborators] = useState<Array<IBasicModel>>([]);
   const [collaborators, setCollaborators] = useState<Array<IBasicModel>>([]);
 
+  const [isOwner, setIsOwner] = useState(false);
+
   // When the quiz get loaded, set the state values.
   useEffect(() => {
-    if (!quiz) return;
+    if (!quiz || !user) return;
 
     setTitle(quiz.title);
     setDescription(quiz.description);
@@ -96,8 +99,10 @@ const Quiz = (): ReactElement => {
     setQuizCollaborators(quiz.collaborators.map(collaboratorsMapper));
     setCollaborators(quiz.collaborators.map(collaboratorsMapper));
 
+    setIsOwner(quiz.owner.id === user.id);
+
     setFormFilled(true);
-  }, [quiz]);
+  }, [quiz, user]);
 
   // Check the validity of the form.
   const { valid } = useValidation(() => {
@@ -118,7 +123,7 @@ const Quiz = (): ReactElement => {
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
 
-    if (!valid || !quiz || !token) return;
+    if (!valid || !quiz || !token || !isOwner) return;
 
     const updateAttributes: AllOptional<QuizCreationAttributes> = {
       title: title !== quiz.title ? title : undefined,
@@ -178,7 +183,7 @@ const Quiz = (): ReactElement => {
     else router.push('/professor/quizzes');
   };
 
-  return loading || !formFilled || !quiz || !questions ? (
+  return loading || !formFilled || !quiz || !questions || !user ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton breadcrumb>
         <hr className="mb-8 mt-8" />
@@ -229,8 +234,8 @@ const Quiz = (): ReactElement => {
             <FormGroup className="mb-6">
               <Title level={2}>Informations générales</Title>
 
-              <Input label="Titre" value={title} setValue={setTitle} maxLength={25} />
-              <Textarea label="Description" value={description} setValue={setDescription} maxLength={120} />
+              <Input label="Titre" value={title} setValue={setTitle} maxLength={25} readonly={!isOwner} />
+              <Textarea label="Description" value={description} setValue={setDescription} maxLength={120} readonly={!isOwner} />
 
               <CheckboxInput
                 label="Options supplémentaires"
@@ -238,6 +243,7 @@ const Quiz = (): ReactElement => {
                   { name: 'Mode strict', checked: strict, setValue: setStrict },
                   { name: 'Mélanger les questions', checked: shuffle, setValue: setShuffle },
                 ]}
+                readonly={!isOwner}
               />
             </FormGroup>
 
@@ -250,11 +256,12 @@ const Quiz = (): ReactElement => {
                 data={professors.map(collaboratorsMapper)}
                 values={collaborators}
                 setValues={setCollaborators}
+                disabled={!isOwner}
               />
             </FormGroup>
           </Row>
 
-          <FormButtons href="/professor/quizzes" valid={valid} update />
+          {isOwner && <FormButtons href="/professor/quizzes" valid={valid} update />}
         </Form>
 
         <div className="flex flex-col items-start min-h-full mt-16">
