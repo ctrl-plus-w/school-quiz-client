@@ -1,5 +1,3 @@
-import { useSelector } from 'react-redux';
-
 import type { ReactElement } from 'react';
 
 import React from 'react';
@@ -21,6 +19,8 @@ import { formatDateTime } from '@util/date.utils';
 
 import { removeEvent, selectEvents } from '@redux/eventSlice';
 
+import useAppSelector from '@hooks/useAppSelector';
+
 import ROLES from '@constant/roles';
 
 const ProfessorEvents = (): ReactElement => {
@@ -29,9 +29,9 @@ const ProfessorEvents = (): ReactElement => {
 
   const { loading } = useLoading([eventsState, authState]);
 
-  const events = useSelector(selectEvents);
+  const events = useAppSelector(selectEvents);
 
-  return loading || !events ? (
+  return loading || !events  ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton subtitle>
         <TableSkeleton
