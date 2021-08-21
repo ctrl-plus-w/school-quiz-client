@@ -158,7 +158,7 @@ const CreateEvent = (): ReactElement => {
 
             <Dropdown label="Groupe" placeholder="Aucun groupe sélectionné" values={groups} value={group} setValue={setGroup} />
 
-            <CalendarInput label="Date" value={date} setValue={setDate} />
+            <CalendarInput label="Date" value={date} setValue={setDate} onlyFuture />
 
             <Row className="w-80">
               <TimeInput label="Début" value={start} setValue={setStart} />
