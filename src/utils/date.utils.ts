@@ -193,6 +193,16 @@ export const isSameTime = (date: Date, date1: Date): boolean => {
 export const isSameDay = (date: Date, date1: Date): boolean => date.getDate() === date1.getDate();
 
 /**
+ * Check if the date have the same date and time
+ * @param date The first date to compare
+ * @param date1 The second date to compare
+ * @returns A boolean
+ */
+export const isSameDateTime = (date: Date, date1: Date): boolean => {
+  return isSameDate(date, date1) && isSameTime(date, date1);
+};
+
+/**
  * Check if the date have the same month
  * @param date The first date to compare
  * @param date1 The second date to compare
