@@ -50,3 +50,5 @@ type Choice = {
 };
 
 type MapperFunction = (value: any) => string;
+
+type BadgeType = 'DEFAULT' | 'WARNING' | 'ERROR' | 'SUCCESS' | 'INFO';

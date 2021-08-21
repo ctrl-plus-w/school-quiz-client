@@ -226,7 +226,11 @@ const Quiz = (): ReactElement => {
     </ProfessorDashboardSkeleton>
   ) : (
     <ProfessorDashboard>
-      <Container title="Modifier un test" breadcrumb={[{ name: 'Tests', path: '/professor/quizzes' }, { name: 'Modifier un test' }]}>
+      <Container
+        title="Modifier un test"
+        breadcrumb={[{ name: 'Tests', path: '/professor/quizzes' }, { name: 'Modifier un test' }]}
+        badge={{ content: isOwner ? 'Propriétaire' : 'Collaborateur', type: 'INFO' }}
+      >
         <hr className="mb-8 mt-8" />
 
         <Form onSubmit={handleSubmit} full>

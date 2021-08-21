@@ -247,7 +247,11 @@ const Event = (): ReactElement => {
     </ProfessorDashboardSkeleton>
   ) : (
     <ProfessorDashboard>
-      <Container title="Modifier un quiz" breadcrumb={[{ name: 'Événement', path: '/professor/events' }, { name: 'Modifier un événement' }]}>
+      <Container
+        title="Modifier un quiz"
+        breadcrumb={[{ name: 'Événement', path: '/professor/events' }, { name: 'Modifier un événement' }]}
+        badge={{ content: isOwner ? 'Propriétaire' : 'Collaborateur', type: 'INFO' }}
+      >
         <Bar />
 
         <Form onSubmit={handleSubmit} full>

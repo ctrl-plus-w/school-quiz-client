@@ -7,15 +7,17 @@ import React from 'react';
 import Subtitle from '@element/Subtitle';
 import Route from '@element/Route';
 import Title from '@element/Title';
+import Badge from '@element/Badge';
 
 interface IProps {
   children?: React.ReactNode;
   title: string;
   subtitle?: { name: string; path: string } | string;
   breadcrumb?: Array<{ name: string; path?: string }>;
+  badge?: { type: BadgeType; content: string };
 }
 
-const Container: FunctionComponent<IProps> = ({ children, title, subtitle, breadcrumb }: IProps) => {
+const Container: FunctionComponent<IProps> = ({ children, title, subtitle, breadcrumb, badge }: IProps) => {
   const getSubtitleElement = () => {
     if (subtitle) {
       return typeof subtitle === 'string' ? (
@@ -50,7 +52,12 @@ const Container: FunctionComponent<IProps> = ({ children, title, subtitle, bread
     <div className="relative flex flex-col py-12 px-12 h-full">
       <div className="flex flex-col items-start">
         {getBreadcrumbElement()}
-        <Title>{title}</Title>
+
+        <div className="flex items-center">
+          <Title>{title}</Title>
+          {badge && <Badge {...badge} />}
+        </div>
+
         {getSubtitleElement()}
       </div>
 
