@@ -16,6 +16,7 @@ interface IProps {
   placeholder?: string;
   errorMessage?: string;
   maxResults?: number;
+
   disabled?: boolean;
 
   values: Array<{ name: string; slug: string }>;
@@ -113,12 +114,13 @@ const SearchInput = ({
           <input
             type="text"
             placeholder={noData ? errorMessage : placeholder}
-            className="form-input--nm"
+            className={clsx(['form-input--nm', (readonly || noData) && 'readonly'])}
             value={value}
             onChange={handleInputChange}
             onKeyDown={handleInputKeydown}
             onFocus={handleFocus}
-            disabled={noData || disabled}
+            disabled={disabled}
+            readOnly={noData}
           />
 
           {hidden || filteredData.length === 0 ? null : (
