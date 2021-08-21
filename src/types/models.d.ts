@@ -52,7 +52,7 @@ interface IEvent extends DefaultModelProperties {
   end: string;
   countdown: string;
 
-  owner?: IUser;
+  owner: IUser;
   collaborators: Array<IUser>;
   quiz?: IQuiz;
   group?: IGroup;
