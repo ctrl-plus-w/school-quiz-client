@@ -70,12 +70,13 @@ interface IProps {
   onlyFuture?: boolean;
 
   className?: string;
+  readonly?: boolean;
 
   value: Date;
   setValue: Dispatch<SetStateAction<Date>>;
 }
 
-const CalendarInput = ({ label, className, value, setValue, onlyFuture = false }: IProps): ReactElement => {
+const CalendarInput = ({ label, className, value, setValue, onlyFuture = false, readonly = false }: IProps): ReactElement => {
   const [hidden, setHidden] = useState(true);
 
   const { container } = useClickOutside<HTMLDivElement>(() => setHidden(true));
@@ -92,14 +93,17 @@ const CalendarInput = ({ label, className, value, setValue, onlyFuture = false }
           <p className="uppercase">{label}</p>
         </div>
 
-        <div className={clsx(['form-input cursor-pointer', !hidden && 'focus'])} onClick={() => setHidden((prev) => !prev)}>
+        <div
+          className={clsx(['form-input', !hidden && 'focus', readonly ? 'cursor-not-allowed' : 'cursor-pointer'])}
+          onClick={() => !readonly && setHidden((prev) => !prev)}
+        >
           <p className="font-normal text-sm">{formatDate(value)}</p>
         </div>
       </label>
 
-      {!hidden && (
-        <div className="absolute bottom-0 transform translate-y-full pt-6 bg-white">
-          <div className="flex flex-col p-4 border border-gray-300 rounded ring ring-gray-200 shadow-xl">
+      {!hidden && !readonly && (
+        <div className="absolute bottom-0 transform translate-y-full pt-6 ">
+          <div className="flex flex-col p-4 border border-gray-300 rounded ring ring-gray-200 bg-white shadow-xl">
             <div className="flex justify-between items-center mb-3">
               <button
                 className="p-2 hover:text-blue-600 transform active:scale-75 transition-all duration-300"

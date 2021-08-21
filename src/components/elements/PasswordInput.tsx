@@ -16,6 +16,7 @@ interface IProps {
   error?: boolean;
 
   className?: string;
+  readonly?: boolean;
 
   generator?: boolean;
 
@@ -32,6 +33,7 @@ const PasswordInput: FunctionComponent<IProps> = ({
   setValue,
   note,
   generator = false,
+  readonly = false,
 }: IProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -58,16 +60,17 @@ const PasswordInput: FunctionComponent<IProps> = ({
         <div className="flex items-center">
           <p className="uppercase mr-2">{label}</p>
 
-          {generator && <CogIcon className="h-4 w-4 cursor-pointer hover:text-blue-500 transition duration-300" onClick={setPassword} />}
+          {generator && !readonly && <CogIcon className="h-4 w-4 cursor-pointer hover:text-blue-500 transition duration-300" onClick={setPassword} />}
         </div>
 
         <div className="relative group">
           <input
             type={showPassword ? 'text' : 'password'}
-            className={clsx(['form-input', error && 'error'])}
+            className={clsx(['form-input', error && 'error', readonly && 'readonly'])}
             placeholder={placeholder}
             value={value}
             onChange={onChange}
+            readOnly={readonly}
           />
 
           <div

@@ -55,8 +55,8 @@ const Dropdown: FunctionComponent<IProps> = ({ className, label, placeholder = '
         <div className={clsx(['relative', readonly ? 'cursor-not-allowed' : 'cursor-pointer'])} ref={container}>
           <div
             className={clsx([
-              'z-20 relative border rounded-sm w-full py-2 px-3 mt-2 hover:border-blue-600',
-              isHidden ? 'border-gray-500' : 'border-blue-600 ring ring-blue-200',
+              'form-input--nb border',
+              !readonly ? (isHidden ? 'border-gray-500' : 'border-blue-600 ring ring-blue-200') : 'border-gray-500 hover:border-red-600',
             ])}
             onClick={switchState}
           >

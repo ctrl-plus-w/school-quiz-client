@@ -50,6 +50,10 @@ div > .form-group:not(:last-child) {
   @apply flex border border-gray-500 rounded-sm w-full py-2 px-3 mt-2 outline-none transition-all duration-150;
 }
 
+.form-input--nb {
+  @apply flex rounded-sm w-full py-2 px-3 mt-2 outline-none transition-all duration-150;
+}
+
 .form-input--np  {
   @apply flex border border-gray-500 rounded-sm w-full mt-2 outline-none transition-all duration-150;
 }
@@ -63,46 +67,64 @@ div > .form-group:not(:last-child) {
 }
 
 .form-input:disabled,
+.form-input--nb:disabled,
 .form-input--np:disabled,
 .form-input--nm:disabled,
-.form-input--ns:disabled {
+.form-input--ns:disabled,
+.form-input.readonly,
+.form-input--nb.readonly,
+.form-input--np.readonly,
+.form-input--nm.readonly,
+.form-input--ns.readonly,
+.form-input.readonly > input,
+.form-input--nb.readonly > input,
+.form-input--np.readonly > input,
+.form-input--nm.readonly > input,
+.form-input--ns.readonly > input {
   @apply cursor-not-allowed;
 }
 
 .form-input:hover,
+.form-input--nb:hover,
 .form-input--np:hover,
 .form-input--nm:hover,
 .form-input--ns:hover {
   @apply border-blue-600;
 }
 
-.form-input:focus,
-.form-input--np:focus,
-.form-input--nm:focus,
-.form-input--ns:focus,
-.form-input:focus-within,
-.form-input--np:focus-within,
-.form-input--nm:focus-within,
-.form-input--ns:focus-within,
-.form-input.focus,
-.form-input--np.focus,
-.form-input--nm.focus,
-.form-input--ns.focus {
+.form-input:not(.readonly):focus,
+.form-input--nb:not(.readonly):focus,
+.form-input--np:not(.readonly):focus,
+.form-input--nm:not(.readonly):focus,
+.form-input--ns:not(.readonly):focus,
+.form-input:not(.readonly):focus-within,
+.form-input--nb:not(.readonly):focus-within,
+.form-input--np:not(.readonly):focus-within,
+.form-input--nm:not(.readonly):focus-within,
+.form-input--ns:not(.readonly):focus-within,
+.form-input.focus:not(.readonly),
+.form-input--nb.focus:not(.readonly),
+.form-input--np.focus:not(.readonly),
+.form-input--nm.focus:not(.readonly),
+.form-input--ns.focus:not(.readonly) {
   @apply outline-none border-blue-600 ring ring-blue-200;
 }
 
 .form-input.error,
-.form-input--no--padding.error,
-.form-input--no--margin.error,
+.form-input--nb.error,
+.form-input--np.error,
+.form-input--nm.error,
 .form-input--ns.error {
   @apply border-red-500;
 }
 
 .form-input.error:hover,
+.form-input--nb.error:hover,
 .form-input--np.error:hover,
 .form-input--nm.error:hover,
 .form-input--ns.error:hover,
 .form-input:disabled:hover,
+.form-input--nb:disabled:hover,
 .form-input--np:disabled:hover,
 .form-input--nm:disabled:hover,
 .form-input--ns:disabled:hover {
@@ -110,10 +132,12 @@ div > .form-group:not(:last-child) {
 }
 
 .form-input.error:focus,
+.form-input--nb.error:focus,
 .form-input--np.error:focus,
 .form-input--nm.error:focus,
 .form-input--ns.error:focus,
 .form-input.error.focus,
+.form-input--nb.error.focus,
 .form-input--np.error.focus,
 .form-input--nm.error.focus,
 .form-input--ns.error.focus {

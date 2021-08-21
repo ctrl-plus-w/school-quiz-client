@@ -30,7 +30,7 @@ const Textarea = ({ label, placeholder, className, value, setValue, note, maxLen
         </div>
 
         <textarea
-          className="form-input"
+          className={clsx(['form-input', readonly && 'readonly'])}
           placeholder={placeholder}
           value={value}
           onChange={onChange}

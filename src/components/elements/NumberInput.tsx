@@ -18,11 +18,13 @@ interface IInputProps {
 
   pattern: string;
 
+  readonly: boolean;
+
   value: string;
   setValue: Dispatch<SetStateAction<string>>;
 }
 
-const Input = ({ placeholder, suffix, pattern, value, setValue, min, max, error = false }: IInputProps): ReactElement => {
+const Input = ({ placeholder, suffix, pattern, value, setValue, min, max, error = false, readonly }: IInputProps): ReactElement => {
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
     if (e.target.value === '') return setValue('');
 
@@ -42,12 +44,13 @@ const Input = ({ placeholder, suffix, pattern, value, setValue, min, max, error 
     <div className={clsx(['form-input--ns px-3 mt-2 rounded-sm', error && 'error'])}>
       <input
         type="text"
-        className={clsx(['w-full py-2 outline-none focus:outline-none', suffix && 'text-right'])}
+        className={clsx(['w-full py-2 outline-none focus:outline-none', suffix && 'text-right', readonly && 'readonly'])}
         onChange={onChange}
         value={value}
         placeholder={placeholder}
         pattern={pattern}
         onBlur={onBlur}
+        readOnly={readonly}
       />
 
       {suffix && <p className="text-gray-900 text-sm font-normal py-2 ml-1">{suffix}</p>}
@@ -68,11 +71,13 @@ interface IProps {
 
   className?: string;
 
+  readonly?: boolean;
+
   value: string;
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const NumberInput = ({ label, placeholder, type, className, value, setValue, note, min, max, error }: IProps): ReactElement => {
+const NumberInput = ({ label, placeholder, type, className, value, setValue, note, min, max, error, readonly = false }: IProps): ReactElement => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -81,7 +86,7 @@ const NumberInput = ({ label, placeholder, type, className, value, setValue, not
   }, [type]);
 
   const getInput = () => {
-    const props = { value, setValue, error };
+    const props = { value, setValue, error, readonly };
 
     switch (type) {
       case 'nombre-entier':

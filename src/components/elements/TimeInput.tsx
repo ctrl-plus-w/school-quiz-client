@@ -13,12 +13,13 @@ interface IProps {
   label: string;
 
   className?: string;
+  readonly?: boolean;
 
   value: [string, string];
   setValue: Dispatch<SetStateAction<[string, string]>>;
 }
 
-const TimeInput = ({ label, className, value, setValue }: IProps): ReactElement => {
+const TimeInput = ({ label, className, value, setValue, readonly = false }: IProps): ReactElement => {
   const [hours, setHours] = useState(formatNumber(value[0]));
   const [minutes, setMinutes] = useState(formatNumber(value[1]));
 
@@ -65,7 +66,7 @@ const TimeInput = ({ label, className, value, setValue }: IProps): ReactElement 
           <p className="uppercase">{label}</p>
         </div>
 
-        <div className="form-input--np items-center">
+        <div className={clsx(['form-input--np items-center', readonly && 'readonly'])}>
           <input
             type="text"
             className="w-full py-2 pr-1 text-right outline-none"
@@ -73,6 +74,7 @@ const TimeInput = ({ label, className, value, setValue }: IProps): ReactElement 
             value={hours}
             onChange={handleHoursChange}
             onBlur={handleHoursBlur}
+            readOnly={readonly}
           />
 
           <p className="font-normal text-black">h</p>
@@ -84,6 +86,7 @@ const TimeInput = ({ label, className, value, setValue }: IProps): ReactElement 
             value={minutes}
             onChange={handleMinutesChange}
             onBlur={handleMinutesBlur}
+            readOnly={readonly}
           />
         </div>
       </label>
