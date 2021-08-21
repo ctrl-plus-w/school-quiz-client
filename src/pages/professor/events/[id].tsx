@@ -37,7 +37,16 @@ import useLoadEvent from '@hooks/useLoadEvent';
 import useLoading from '@hooks/useLoading';
 import useSwitch from '@hooks/useSwitch';
 
-import { getTimeArrayFromDifference, getTimeAsArray, incrementDate, incrementTime, isSameDate, isSameTime, setTime } from '@util/date.utils';
+import {
+  getTimeArrayFromDifference,
+  getTimeAsArray,
+  incrementDate,
+  incrementTime,
+  isSameDate,
+  isSameDateTime,
+  isSameTime,
+  setTime,
+} from '@util/date.utils';
 import { collaboratorsMapper, slugMapper } from '@util/mapper.utils';
 import { areArraysEquals } from '@util/condition.utils';
 import { getLength } from '@util/object.utils';
@@ -46,7 +55,7 @@ import { addCollaborators, removeCollaborators, updateEvent } from '@api/events'
 
 import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
 import { selectTempEvent } from '@redux/eventSlice';
-import { selectProfessors } from '@redux/userSlice';
+import { selectProfessors, selectUser } from '@redux/userSlice';
 import { selectGroups } from '@redux/groupSlice';
 import { selectQuizzes } from '@redux/quizSlice';
 import { selectToken } from '@redux/authSlice';
@@ -68,6 +77,7 @@ const Event = (): ReactElement => {
 
   const { loading } = useLoading([authState, eventState, groupState, quizState, userState]);
 
+  const user = useAppSelector(selectUser);
   const token = useAppSelector(selectToken);
   const event = useAppSelector(selectTempEvent);
   const groups = useAppSelector(selectGroups);
@@ -83,6 +93,8 @@ const Event = (): ReactElement => {
   const [group, setGroup] = useState('');
   const [quiz, setQuiz] = useState('');
   const [collaborators, setCollaborators] = useState<Array<IBasicModel>>([]);
+
+  const [isOwner, setIsOwner] = useState(false);
 
   const { valid } = useValidation(
     () => {
@@ -117,7 +129,7 @@ const Event = (): ReactElement => {
   );
 
   useEffect(() => {
-    if (!event) return;
+    if (!event || !user) return;
 
     const startDate = new Date(event.start);
     const endDate = new Date(event.end);
@@ -134,8 +146,10 @@ const Event = (): ReactElement => {
     eventGroup && setGroup(eventGroup.slug);
     eventQuiz && setQuiz(eventQuiz.slug);
 
+    setIsOwner(event.owner.id === user.id);
+
     setFormFilled(true);
-  }, [event]);
+  }, [event, user]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -146,8 +160,8 @@ const Event = (): ReactElement => {
     const endDate = incrementTime(startDate, parseInt(duration[0]), parseInt(duration[1]));
 
     const updateAttributes: AllOptional<EventCreationAttributes> = {
-      start: startDate,
-      end: endDate,
+      start: !isSameDateTime(new Date(event?.start), startDate) ? startDate : undefined,
+      end: !isSameDateTime(new Date(event?.end), endDate) ? endDate : undefined,
     };
 
     if (getLength(updateAttributes) > 0) {
@@ -252,23 +266,29 @@ const Event = (): ReactElement => {
 
               <Dropdown label="Groupe" placeholder="Aucun groupe sélectionné" values={groups} value={group} setValue={setGroup} readonly />
 
-              <CalendarInput label="Date" value={date} setValue={setDate} onlyFuture />
+              <CalendarInput label="Date" value={date} setValue={setDate} readonly={!isOwner} onlyFuture />
 
               <Row className="w-80">
-                <TimeInput label="Début" value={start} setValue={setStart} />
+                <TimeInput label="Début" value={start} setValue={setStart} readonly={!isOwner} />
 
-                <TimeInput label="Durée" value={duration} setValue={setDuration} />
+                <TimeInput label="Durée" value={duration} setValue={setDuration} readonly={!isOwner} />
               </Row>
             </FormGroup>
 
             <FormGroup>
               <Title level={2}>Utilisateurs</Title>
 
-              <SearchInput label="Collaborateurs" data={professors.map(collaboratorsMapper)} values={collaborators} setValues={setCollaborators} />
+              <SearchInput
+                label="Collaborateurs"
+                data={professors.map(collaboratorsMapper)}
+                values={collaborators}
+                setValues={setCollaborators}
+                disabled={!isOwner}
+              />
             </FormGroup>
           </Row>
 
-          <FormButtons href="/professor/events" valid={valid} update />
+          {isOwner && <FormButtons href="/professor/events" valid={valid} update />}
         </Form>
       </Container>
     </ProfessorDashboard>
