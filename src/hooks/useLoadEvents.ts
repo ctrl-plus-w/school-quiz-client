@@ -2,16 +2,13 @@ import { useEffect, useState } from 'react';
 
 import Router from 'next/router';
 
-import { getHeaders } from '@util/authentication.utils';
-
 import useAppSelector from '@hooks/useAppSelector';
 import useAppDispatch from '@hooks/useAppDispatch';
-
-import database from '@database/database';
 
 import { addEvents, clearEvents } from '@redux/eventSlice';
 import { selectToken } from '@redux/authSlice';
 import { selectUser } from '@redux/userSlice';
+import { getEvents } from '@api/events';
 
 interface IReturnProperties {
   state: 'LOADING' | 'FULFILLED';
@@ -42,8 +39,8 @@ const useLoadEvents = (refetch = false): IReturnProperties => {
 
       dispatch(clearEvents());
 
-      const { data: events } = await database.get('/api/events', { ...getHeaders(token), params: { userId: user.id } });
-      if (!events) return fail();
+      const [events, error] = await getEvents(user.id, token);
+      if (error || !events) return fail();
 
       dispatch(addEvents(events));
       setLoading(false);

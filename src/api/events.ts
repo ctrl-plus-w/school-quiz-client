@@ -6,9 +6,9 @@ import database from '@database/database';
 
 const DEFAULT_API_ERROR_RESPONSE: APIResponse<null> = [null, { status: 400, message: 'Une erreur est survenue ' }];
 
-export const getEvents = async (token: string): Promise<APIResponse<Array<IEvent>>> => {
+export const getEvents = async (userId: number, token: string): Promise<APIResponse<Array<IEvent>>> => {
   try {
-    const { data: events } = await database.get('/api/events', getHeaders(token));
+    const { data: events } = await database.get(`/api/users/${userId}/events`, getHeaders(token));
 
     return [events, undefined];
   } catch (_err) {
