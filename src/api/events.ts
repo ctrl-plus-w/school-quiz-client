@@ -39,6 +39,23 @@ export const getEvent = async (eventId: number, token: string, userId?: number):
   }
 };
 
+export const getStudentEvent = async (token: string): Promise<APIResponse<IEvent>> => {
+  try {
+    const { data: event } = await database.get('/api/events/event', getHeaders(token));
+
+    return [event, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+    if (err.response.status === 404) return [null, { status: 404, message: "L'événement n'a pas été trouvé !" }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
 export const createEvent = async (creationAttributes: EventCreationAttributes, token: string): Promise<APIResponse<IEvent>> => {
   try {
     const { data: event } = await database.post('/api/events', creationAttributes, getHeaders(token));

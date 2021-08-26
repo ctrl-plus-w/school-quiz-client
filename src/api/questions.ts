@@ -39,6 +39,23 @@ export const getQuestion = async (quizId: number, questionId: number, token: str
   }
 };
 
+export const getStudentQuestion = async (token: string): Promise<APIResponse<Question>> => {
+  try {
+    const { data: question } = await database.get(`/api/events/event/question`, getHeaders(token));
+
+    return [question, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+    if (err.response.status === 404) return [null, { status: 404, message: "Cette question n'existe pas." }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
+
 export const getSpecifications = async (token: string): Promise<APIResponse<Array<IQuestionSpecification>>> => {
   try {
     const { data: questionSpecifications } = await database.get(`/api/questionSpecifications`, getHeaders(token));
