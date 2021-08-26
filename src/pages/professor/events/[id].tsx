@@ -179,8 +179,6 @@ const Event = (): ReactElement => {
       const newCollaborators = collaborators.filter(({ slug }) => !event.collaborators.some(({ id }) => id.toString() === slug));
       const oldCollaborators = event.collaborators.filter(({ id }) => !collaborators.some(({ slug }) => id.toString() === slug));
 
-      console.log(newCollaborators, oldCollaborators);
-
       if (newCollaborators.length > 0) {
         const ids = newCollaborators.map(slugMapper).map((id) => parseInt(id));
 
