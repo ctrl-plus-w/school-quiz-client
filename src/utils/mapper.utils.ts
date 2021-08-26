@@ -44,10 +44,14 @@ export const str = (val: RegExp | number): string => {
   return val.toString().slice(1, -1);
 };
 
+export const int = (val: string): number => {
+  return parseInt(val);
+};
+
 export const parseExactAnswer = (answer: string, questionSpecificationSlug: string): string => {
   if (questionSpecificationSlug !== 'date') return answer;
 
-  const [year, month, date] = answer.split('/').map(parseInt);
+  const [date, month, year] = answer.split('/').map(int);
   return new Date(year, month - 1, date).toISOString();
 };
 
@@ -56,7 +60,7 @@ export const parseNumericAnswer = (answer: string, questionSpecificationSlug: st
   if (['nombre-decimal'].includes(questionSpecificationSlug)) return parseFloat(answer);
 
   if (['date'].includes(questionSpecificationSlug)) {
-    const [day, month, year] = answer.split('/').map(parseInt);
+    const [day, month, year] = answer.split('/').map(int);
     return new Date(year, month - 1, day).valueOf();
   }
 
