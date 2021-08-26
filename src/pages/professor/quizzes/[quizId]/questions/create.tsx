@@ -37,7 +37,7 @@ import useAuthentication from '@hooks/useAuthentication';
 import useAppSelector from '@hooks/useAppSelector';
 import useLoadQuiz from '@hooks/useLoadQuiz';
 
-import { nameSlugMapper, parseExactAnswer, parseNumericAnswer, questionTypeFilter } from '@util/mapper.utils';
+import { int, nameSlugMapper, parseExactAnswer, parseNumericAnswer, questionTypeFilter } from '@util/mapper.utils';
 
 import { generateChoices, removeChoices } from '@helpers/question.helper';
 
@@ -158,6 +158,7 @@ const CreateQuizQuestion = (): ReactElement => {
 
         if (nqSpecificationType === 'comparison') {
           if (nqAnswerMin === '' || nqAnswerMax === '') return false;
+          if (int(nqAnswerMin) >= int(nqAnswerMax)) return false;
         }
       }
 
@@ -165,7 +166,7 @@ const CreateQuizQuestion = (): ReactElement => {
       if (questionType === 'choiceQuestion') {
         const choices = cqSpecification === 'choix-unique' ? uniqueChoices : multipleChoices;
 
-        if (cqSpecification !== 'choix-unique' && nqAnswerMin >= nqAnswerMax) return false;
+        // if (cqSpecification !== 'choix-unique' && nqAnswerMin >= nqAnswerMax) return false;
 
         const isOneChecked = choices.some(({ checked }) => checked === true);
         const areValuesNotEmpty = choices.every(({ name }) => name !== '');
