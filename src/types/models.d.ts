@@ -113,6 +113,8 @@ type Question = DefaultModelProperties & {
   userAnswers: Array<IUserAnswer>;
 
   shuffle?: boolean;
+  answeredQuestions?: number;
+  remainingQuestions?: number;
 };
 
 interface IQuestion<T extends ITextualQuestion | INumericQuestion | IChoiceQuestion> extends DefaultModelProperties {
@@ -125,6 +127,9 @@ interface IQuestion<T extends ITextualQuestion | INumericQuestion | IChoiceQuest
 
   answers: Array<IAnswer<IExactAnswer | IComparisonAnswer>>;
   userAnswers: Array<IUserAnswer>;
+
+  answeredQuestions?: number;
+  remainingQuestions?: number;
 }
 
 interface INumericQuestion extends IQuestion {
