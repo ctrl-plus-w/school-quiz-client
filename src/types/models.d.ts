@@ -157,3 +157,8 @@ interface IChoice extends DefaultModelProperties {
 
   valid: boolean;
 }
+
+interface IUserAnswer extends DefaultModelProperties {
+  user?: IUser;
+  question?: Question;
+}
