@@ -81,3 +81,14 @@ export const formatNumber = (num: string | number): string => {
   if (typeof num === 'string') return parseInt(num) < 10 ? `0${parseInt(num)}` : `${num}`;
   return num < 10 ? `0${num}` : `${num}`;
 };
+
+export const shuffle = <T>(arr: Array<T>): Array<T> => {
+  return arr
+    .map((value) => ({ value, _sort: Math.random() }))
+    .sort((a, b) => a._sort - b._sort)
+    .map(({ value }) => value);
+};
+
+export const sortById = <T extends { id: number }>(arr: Array<T>): Array<T> => {
+  return [...arr].sort((a, b) => b.id - a.id);
+};
