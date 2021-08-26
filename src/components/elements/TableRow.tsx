@@ -105,7 +105,7 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
     <tr key={uuidv4()} className="group">
       {attributes.map(([_name, attribute, mapper]) => (
         <td
-          className="px-4 py-3 cursor-pointer text-gray-500 text-sm border-t border-gray-300 group-hover:bg-gray-200 transition-all duration-100"
+          className="px-4 py-3 cursor-pointer text-gray-500 text-sm border-t border-gray-300 group-hover:bg-gray-200 transition-all duration-100 overflow-hidden overflow-ellipsis"
           key={uuidv4()}
           onClick={() => (handleClick ? handleClick(instance) : defaultHandleClick(instance))}
         >

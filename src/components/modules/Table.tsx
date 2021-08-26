@@ -31,11 +31,14 @@ const Table = <T extends { id: number }, K extends keyof T>({
   const [shownElement, setShownElement] = useState(-1);
 
   return data.length > 0 ? (
-    <table className="table-fixed w-full mt-14">
+    <table className="table-fixed w-full mt-14 whitespace-nowrap">
       <thead>
         <tr>
           {attributes.map(([name, slug]) => (
-            <td className={clsx(['px-4 py-3 text-black border-t border-gray-300 text-sm'], slug === 'id' && 'w-2/24')} key={uuidv4()}>
+            <td
+              className={clsx(['px-4 py-3 text-black border-t border-gray-300 text-sm overflow-hidden overflow-ellipsis'], slug === 'id' && 'w-2/24')}
+              key={uuidv4()}
+            >
               {name}
             </td>
           ))}
