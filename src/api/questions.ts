@@ -284,3 +284,26 @@ export const updateComparisonAnswer = async (
     return DEFAULT_API_ERROR_RESPONSE;
   }
 };
+
+export const answerQuestion = async (
+  quizId: number,
+  questionId: number,
+  answerOrAnswers: { answer: string } | { answers: Array<string> },
+  token: string
+): Promise<APIResponse<IUserAnswer | Array<IUserAnswer>>> => {
+  try {
+    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/userAnswers`;
+
+    const { data: createdAnswerOrAnswers } = await database.post(endpoint, answerOrAnswers, getHeaders(token));
+
+    return [createdAnswerOrAnswers, undefined];
+  } catch (_err) {
+    const err = _err as AxiosError;
+
+    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
+
+    if (err.response.status === 403) return [null, { status: 403, message: '' }];
+
+    return DEFAULT_API_ERROR_RESPONSE;
+  }
+};
