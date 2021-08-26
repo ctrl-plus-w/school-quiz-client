@@ -1,7 +1,9 @@
-import { FunctionComponent, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/dist/client/router';
 import { useCookies } from 'react-cookie';
 import { v4 as uuidv4 } from 'uuid';
+
+import { FunctionComponent } from 'react';
 
 import React from 'react';
 import clsx from 'clsx';
@@ -9,6 +11,14 @@ import clsx from 'clsx';
 import { LogoutIcon, ChevronLeftIcon } from '@heroicons/react/outline';
 
 import MenuItem from '@element/MenuItem';
+
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { clearQuestions, clearTempQuestion } from '@redux/questionSlice';
+import { clearEvents, clearTempEvent } from '@redux/eventSlice';
+import { clearQuizzes, clearTempQuiz } from '@redux/quizSlice';
+import { clearGroups } from '@redux/groupSlice';
+import { clearUsers } from '@redux/userSlice';
 
 interface IProps {
   links: Array<ILink>;
@@ -20,10 +30,23 @@ const Menu: FunctionComponent<IProps> = ({ links, logoutButton = false }: IProps
 
   const router = useRouter();
 
+  const dispatch = useAppDispatch();
+
   const [closed, setClosed] = useState(true);
 
   const handleClick = () => {
     removeCookie('user');
+
+    dispatch(clearTempEvent());
+    dispatch(clearTempQuiz());
+    dispatch(clearTempQuestion());
+
+    dispatch(clearEvents());
+    dispatch(clearQuizzes());
+    dispatch(clearQuestions());
+    dispatch(clearGroups());
+    dispatch(clearUsers());
+
     router.push('/login');
   };
 
