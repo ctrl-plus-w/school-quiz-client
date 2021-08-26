@@ -46,8 +46,6 @@ const useLoadStudentQuestion = (config?: { notFoundRedirect?: string; doNotRefet
         if (question) dispatch(setTempQuestion(question));
       };
 
-      console.log(question);
-
       if (!config || (config.doNotRefetch === true && !question) || !config?.doNotRefetch) compute();
 
       if (cbs) for (const cb of cbs) cb();
