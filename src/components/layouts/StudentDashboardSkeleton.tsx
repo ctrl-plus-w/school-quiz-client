@@ -11,9 +11,11 @@ import STUDENT_MENU from '@constant/studentMenu';
 
 interface IProps {
   children?: React.ReactNode;
+
+  hideMenu?: boolean;
 }
 
-const StudentDashboardSkeleton: FunctionComponent<IProps> = ({ children }: IProps) => {
+const StudentDashboardSkeleton: FunctionComponent<IProps> = ({ children, hideMenu = false }: IProps) => {
   const router = useRouter();
 
   const linkMapper = (links: ILink[]) =>
@@ -25,7 +27,7 @@ const StudentDashboardSkeleton: FunctionComponent<IProps> = ({ children }: IProp
 
   return (
     <LayoutSkeleton title="Élève" display="row">
-      <MenuSkeleton logoutButton={true} links={linkMapper(STUDENT_MENU.links)} />
+      {!hideMenu && <MenuSkeleton logoutButton={true} links={linkMapper(STUDENT_MENU.links)} />}
 
       <div className="flex flex-col flex-grow overflow-y-scroll">{children}</div>
     </LayoutSkeleton>
