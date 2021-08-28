@@ -33,7 +33,7 @@ import InputSkeleton from '@skeleton/InputSkeleton';
 import TitleSkeleton from '@skeleton/TitleSkeleton';
 import FormSkeleton from '@skeleton/FormSkeleton';
 
-import { nameMapper, nameSlugMapper, parseExactAnswer, parseNumericAnswer, questionTypeFilter } from '@util/mapper.utils';
+import { nameMapper, nameSlugMapper, parseNumericAnswer, questionTypeFilter, str } from '@util/mapper.utils';
 import { areArraysEquals } from '@util/condition.utils';
 import { getLength } from '@util/object.utils';
 
@@ -69,6 +69,8 @@ import useLoadQuiz from '@hooks/useLoadQuiz';
 import useLoading from '@hooks/useLoading';
 
 import ROLES from '@constant/roles';
+import MultipleCalendarInput from '@element/MultipleCalendarInput';
+import { isSameDate } from '@util/date.utils';
 
 interface IQuestionDefaultFieldsProps {
   title: string;
@@ -267,7 +269,8 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
   const [specificationType, setSpecificationType] = useState<'exact' | 'comparison'>(questionAnswer ? firstAnswerType : 'exact');
 
-  const [answers, setAnswers] = useState(questionAnswersContent);
+  const [answers, setAnswers] = useState(specification !== 'date' ? questionAnswersContent : []);
+  const [dateAnswers, setDateAnswers] = useState(specification === 'date' ? questionAnswersContent.map((answer) => new Date(answer)) : []);
 
   const [questionAnswerMin] = useState(specificationType === 'comparison' ? questionAnswer?.typedAnswer?.greaterThan?.toString() : '');
   const [questionAnswerMax] = useState(specificationType === 'comparison' ? questionAnswer?.typedAnswer?.lowerThan?.toString() : '');
@@ -289,7 +292,8 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
         return true;
 
       if (specificationType === 'exact') {
-        if (areArraysEquals(questionAnswersContent, answers)) return false;
+        if (specification === 'date' && areArraysEquals(questionAnswersContent, dateAnswers.map(str))) return false;
+        if (specification !== 'date' && areArraysEquals(questionAnswersContent, answers)) return false;
       }
 
       if (specificationType === 'comparison') {
@@ -298,9 +302,13 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
       return true;
     },
-    [title, description, answers, answerMin, answerMax, specification, specificationType],
+    [title, description, answers, dateAnswers, answerMin, answerMax, specification, specificationType],
     [title, description]
   );
+
+  useEffect(() => {
+    setAnswers(dateAnswers.map((date) => date.toString()));
+  }, [dateAnswers]);
 
   useEffect(() => {
     if (!questionSpecifications) return;
@@ -339,9 +347,10 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
       }
 
       if (specificationType === 'exact') {
-        const mappedAnswers: Array<ExactAnswerCreationAttributes> = answers.map((answer) => ({
-          answerContent: parseExactAnswer(answer, specification),
-        }));
+        const mappedAnswers: Array<ExactAnswerCreationAttributes> =
+          specification === 'date'
+            ? dateAnswers.map((answer) => ({ answerContent: answer.toISOString() }))
+            : answers.map((answer) => ({ answerContent: answer }));
 
         const [createdAnswers, answersCreationError] = await addExactAnswers(quiz.id, question.id, mappedAnswers, token);
 
@@ -401,8 +410,15 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
         }
       } else {
         // The specification type here is 'exact' so, we add and removed the answers
-        const addedAnswers = answers.filter((answer) => !questionAnswersContent.includes(answer));
-        const removedAnswers = questionAnswers.filter(({ typedAnswer }) => !answers.includes(typedAnswer.answerContent));
+        const addedAnswers =
+          specification === 'date'
+            ? dateAnswers.filter((answer) => !questionAnswersContent.some((_answer) => isSameDate(answer, new Date(_answer)))).map(str)
+            : answers.filter((answer) => !questionAnswersContent.includes(answer));
+
+        const removedAnswers =
+          specification === 'date'
+            ? questionAnswers.filter(({ typedAnswer }) => !dateAnswers.some((_answer) => isSameDate(new Date(typedAnswer.answerContent), _answer)))
+            : questionAnswers.filter(({ typedAnswer }) => !answers.includes(typedAnswer.answerContent));
 
         if (addedAnswers.length > 0) {
           const addAnswersCreationAttributes: Array<ExactAnswerCreationAttributes> = addedAnswers.map((answer) => ({ answerContent: answer }));
@@ -470,7 +486,9 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
             </>
           )}
 
-          {['date'].includes(specification) && <MultipleNumberInput label="Réponses" type={specification} values={answers} setValues={setAnswers} />}
+          {['date'].includes(specification) && (
+            <MultipleCalendarInput label="Réponses" values={dateAnswers} setValues={setDateAnswers} currentClickable />
+          )}
         </FormGroup>
       </Row>
 

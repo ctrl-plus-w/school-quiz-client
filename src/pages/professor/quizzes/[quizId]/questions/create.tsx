@@ -37,7 +37,7 @@ import useAuthentication from '@hooks/useAuthentication';
 import useAppSelector from '@hooks/useAppSelector';
 import useLoadQuiz from '@hooks/useLoadQuiz';
 
-import { int, nameSlugMapper, parseExactAnswer, parseNumericAnswer, questionTypeFilter } from '@util/mapper.utils';
+import { int, nameSlugMapper, parseNumericAnswer, questionTypeFilter } from '@util/mapper.utils';
 
 import { generateChoices, removeChoices } from '@helpers/question.helper';
 
@@ -54,6 +54,7 @@ import { selectTempQuiz } from '@redux/quizSlice';
 import { selectToken } from '@redux/authSlice';
 
 import ROLES from '@constant/roles';
+import MultipleCalendarInput from '@element/MultipleCalendarInput';
 
 const CreateQuizQuestion = (): ReactElement => {
   const router = useRouter();
@@ -108,6 +109,7 @@ const CreateQuizQuestion = (): ReactElement => {
   // - On the numeric question, it store the answers here only if the nqSpecificationType is set to 'exact'.
   const [tqAnswers, setTqAnswers] = useState<string[]>([]);
   const [nqAnswers, setNqAnswers] = useState<string[]>([]);
+  const [nqDateAnswers, setNqDateAnswers] = useState<Date[]>([]);
 
   // The answer min and max of the numeric question when the nqSpecificationType is set to 'comparison'.
   const [nqAnswerMin, setNqAnswerMin] = useState('');
@@ -153,7 +155,9 @@ const CreateQuizQuestion = (): ReactElement => {
       // Numeric question
       if (questionType === 'numericQuestion') {
         if (nqSpecificationType === 'exact') {
-          if (nqAnswers.length === 0) return false;
+          console.log(1);
+          if (nqSpecification === 'date' && nqDateAnswers.length === 0) return false;
+          if (nqSpecification !== 'date' && nqAnswers.length === 0) return false;
         }
 
         if (nqSpecificationType === 'comparison') {
@@ -176,7 +180,7 @@ const CreateQuizQuestion = (): ReactElement => {
 
       return true;
     },
-    [title, uniqueChoices, multipleChoices, cqSpecification, tqAnswers, nqAnswers, nqAnswerMin, nqAnswerMax],
+    [title, uniqueChoices, multipleChoices, cqSpecification, nqSpecification, tqAnswers, nqAnswers, nqDateAnswers, nqAnswerMin, nqAnswerMax],
     [title, description]
   );
 
@@ -225,9 +229,10 @@ const CreateQuizQuestion = (): ReactElement => {
     if (!question) return;
 
     if (nqSpecificationType === 'exact') {
-      const answers: Array<ExactAnswerCreationAttributes> = nqAnswers.map((answer) => ({
-        answerContent: parseExactAnswer(answer, questionSpecificationSlug),
-      }));
+      const answers: Array<ExactAnswerCreationAttributes> =
+        questionSpecificationSlug === 'date'
+          ? nqDateAnswers.map((answer) => ({ answerContent: answer.toISOString() }))
+          : nqAnswers.map((answer) => ({ answerContent: answer }));
 
       const [createdAnswers, answersCreationError] = await addExactAnswers(quiz.id, question.id, answers, token);
 
@@ -437,7 +442,7 @@ const CreateQuizQuestion = (): ReactElement => {
                   )}
 
                   {['date'].includes(nqSpecification) && (
-                    <MultipleNumberInput label="Réponses" type={nqSpecification} values={nqAnswers} setValues={setNqAnswers} />
+                    <MultipleCalendarInput label="Réponses" values={nqDateAnswers} setValues={setNqDateAnswers} currentClickable />
                   )}
                 </>
               )}
