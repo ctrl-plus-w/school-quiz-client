@@ -1,113 +1,37 @@
-import { AxiosError } from 'axios';
-
-import { getHeaders } from '@util/authentication.utils';
-
-import database from '@database/database';
-
-const DEFAULT_API_ERROR_RESPONSE: APIResponse<null> = [null, { status: 400, message: 'Une erreur est survenue ' }];
+import { deleteApiCall, getApiCall, postApiCall, updateApiCall } from '@api/index';
 
 export const getQuestions = async (quizId: number, token: string): Promise<APIResponse<Array<Question>>> => {
-  try {
-    const { data: questions } = await database.get(`/api/quizzes/${quizId}/questions`, getHeaders(token));
-
-    return [questions, undefined];
-  } catch (_err) {
-    const err = _err as AxiosError;
-
-    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-    if (err.response.status === 403) return [null, { status: 403, message: '' }];
-
-    return DEFAULT_API_ERROR_RESPONSE;
-  }
+  const endpoint = `/api/quizzes/${quizId}/questions`;
+  return getApiCall(endpoint, token);
 };
 
 export const getQuestion = async (quizId: number, questionId: number, token: string): Promise<APIResponse<Question>> => {
-  try {
-    const { data: question } = await database.get(`/api/quizzes/${quizId}/questions/${questionId}`, getHeaders(token));
-
-    return [question, undefined];
-  } catch (_err) {
-    const err = _err as AxiosError;
-
-    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-    if (err.response.status === 403) return [null, { status: 403, message: '' }];
-    if (err.response.status === 404) return [null, { status: 404, message: "Cette question n'existe pas." }];
-
-    return DEFAULT_API_ERROR_RESPONSE;
-  }
+  const endpoint = `/api/quizzes/${quizId}/questions/${questionId}`;
+  return getApiCall(endpoint, token, { errors: { '404': "Cette question n'existe pas." } });
 };
 
 export const getStudentQuestion = async (token: string): Promise<APIResponse<Question>> => {
-  try {
-    const { data: question } = await database.get(`/api/events/event/question`, getHeaders(token));
-
-    return [question, undefined];
-  } catch (_err) {
-    const err = _err as AxiosError;
-
-    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-    if (err.response.status === 403) return [null, { status: 403, message: '' }];
-    if (err.response.status === 404) return [null, { status: 404, message: "Cette question n'existe pas." }];
-
-    return DEFAULT_API_ERROR_RESPONSE;
-  }
+  const endpoint = `/api/events/event/question`;
+  return getApiCall(endpoint, token, { errors: { '404': "Cette question n'existe pas." } });
 };
 
 export const getSpecifications = async (token: string): Promise<APIResponse<Array<IQuestionSpecification>>> => {
-  try {
-    const { data: questionSpecifications } = await database.get(`/api/questionSpecifications`, getHeaders(token));
-
-    return [questionSpecifications, undefined];
-  } catch (_err) {
-    const err = _err as AxiosError;
-
-    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-    if (err.response.status === 403) return [null, { status: 403, message: '' }];
-
-    return DEFAULT_API_ERROR_RESPONSE;
-  }
+  const endpoint = `/api/questionSpecifications`;
+  return getApiCall(endpoint, token);
 };
 
 export const createQuestion = <T>(questionType: QuestionType) => {
   return async <K>(quizId: number, creationAttributes: T, token: string): Promise<APIResponse<K>> => {
-    try {
-      const { data: question } = await database.post(`/api/quizzes/${quizId}/questions/${questionType}`, creationAttributes, getHeaders(token));
-
-      return [question, undefined];
-    } catch (_err) {
-      const err = _err as AxiosError;
-
-      if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-      if (err.response.status === 403) return [null, { status: 403, message: '' }];
-      if (err.response.status === 409) return [null, { status: 409, message: 'Cette question existe déja.' }];
-
-      return DEFAULT_API_ERROR_RESPONSE;
-    }
+    const endpoint = `/api/quizzes/${quizId}/questions/${questionType}`;
+    return postApiCall(endpoint, token, { data: creationAttributes, errors: { 409: 'Cette question existe déjà.' } });
   };
 };
 
 export const updateQuestion =
   <T>() =>
   async (quizId: number, questionId: number, updateAttributes: AllOptional<T>, token: string): Promise<APIResponse<UpdateResponse>> => {
-    try {
-      const { data: question } = await database.put(`/api/quizzes/${quizId}/questions/${questionId}`, updateAttributes, getHeaders(token));
-
-      return [question, undefined];
-    } catch (_err) {
-      const err = _err as AxiosError;
-
-      if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-      if (err.response.status === 403) return [null, { status: 403, message: '' }];
-      if (err.response.status === 409) return [null, { status: 409, message: 'Cette question existe déja.' }];
-
-      return DEFAULT_API_ERROR_RESPONSE;
-    }
+    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}`;
+    return updateApiCall(endpoint, token, { data: updateAttributes, errors: { '403': 'Cette question existe déjà.' } });
   };
 
 export const createTextualQuestion = createQuestion<TextualQuestionCreationAttributes>('textualQuestion');
@@ -125,25 +49,10 @@ export const addChoices = async (
   choices: Array<EditableInputValue>,
   token: string
 ): Promise<APIResponse<Array<IChoice>>> => {
-  try {
-    const creationAttributes: Array<ChoiceCreationAttributes> = choices.map(({ checked, name }) => ({ valid: checked, name }));
-    const { data: createdChoices } = await database.post(
-      `/api/quizzes/${quizId}/questions/${questionId}/choices`,
-      creationAttributes,
-      getHeaders(token)
-    );
+  const creationAttributes: Array<ChoiceCreationAttributes> = choices.map(({ checked, name }) => ({ valid: checked, name }));
 
-    return [createdChoices, undefined];
-  } catch (_err) {
-    const err = _err as AxiosError;
-
-    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-    if (err.response.status === 403) return [null, { status: 403, message: '' }];
-    if (err.response.status === 409) return [null, { status: 409, message: 'Un des choix existe déja.' }];
-
-    return DEFAULT_API_ERROR_RESPONSE;
-  }
+  const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/choices`;
+  return postApiCall(endpoint, token, { data: creationAttributes, errors: { 409: 'Un des choix existe déjà.' } });
 };
 
 export const removeChoices = async (
@@ -152,24 +61,8 @@ export const removeChoices = async (
   choicesId: Array<number>,
   token: string
 ): Promise<APIResponse<DeleteResponse>> => {
-  try {
-    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/choices`;
-
-    for (const choiceId of choicesId) {
-      await database.delete(`${endpoint}/${choiceId}`, getHeaders(token));
-    }
-
-    return [{ deleted: true }, undefined];
-  } catch (_err) {
-    const err = _err as AxiosError;
-
-    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-    if (err.response.status === 403) return [null, { status: 403, message: '' }];
-    if (err.response.status === 409) return [null, { status: 409, message: 'Un des choix existe déja.' }];
-
-    return DEFAULT_API_ERROR_RESPONSE;
-  }
+  const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/choices`;
+  return deleteApiCall(endpoint, token, { data: choicesId, errors: { '409': 'Un des choix existe déjà.' } });
 };
 
 export const addExactAnswers = async (
@@ -178,21 +71,8 @@ export const addExactAnswers = async (
   answers: Array<ExactAnswerCreationAttributes>,
   token: string
 ): Promise<APIResponse<Array<Answer>>> => {
-  try {
-    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers/exact`;
-    const { data: createdAnswers } = await database.post(endpoint, answers, getHeaders(token));
-
-    return [createdAnswers, undefined];
-  } catch (_err) {
-    const err = _err as AxiosError;
-
-    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-    if (err.response.status === 403) return [null, { status: 403, message: '' }];
-    if (err.response.status === 409) return [null, { status: 409, message: 'Un des choix existe déja.' }];
-
-    return DEFAULT_API_ERROR_RESPONSE;
-  }
+  const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers/exact`;
+  return postApiCall(endpoint, token, { data: answers });
 };
 
 export const removeExactAnswers = async (
@@ -201,42 +81,13 @@ export const removeExactAnswers = async (
   answersId: Array<number>,
   token: string
 ): Promise<APIResponse<DeleteResponse>> => {
-  try {
-    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers`;
-
-    for (const answerId of answersId) {
-      await database.delete(`${endpoint}/${answerId}`, getHeaders(token));
-    }
-
-    return [{ deleted: true }, undefined];
-  } catch (_err) {
-    const err = _err as AxiosError;
-
-    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-    if (err.response.status === 403) return [null, { status: 403, message: '' }];
-    if (err.response.status === 409) return [null, { status: 409, message: 'Un des choix existe déja.' }];
-
-    return DEFAULT_API_ERROR_RESPONSE;
-  }
+  const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers`;
+  return deleteApiCall(endpoint, token, { data: answersId });
 };
 
 export const clearAnswers = async (quizId: number, questionId: number, token: string): Promise<APIResponse<DeleteResponse>> => {
-  try {
-    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers`;
-
-    await database.delete(endpoint, getHeaders(token));
-
-    return [{ deleted: true }, undefined];
-  } catch (_err) {
-    const err = _err as AxiosError;
-
-    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-    if (err.response.status === 403) return [null, { status: 403, message: '' }];
-
-    return DEFAULT_API_ERROR_RESPONSE;
-  }
+  const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers`;
+  return deleteApiCall(endpoint, token);
 };
 
 export const addComparisonAnswer = async (
@@ -245,21 +96,8 @@ export const addComparisonAnswer = async (
   answer: ComparisonAnswerCreationAttributes,
   token: string
 ): Promise<APIResponse<Answer>> => {
-  try {
-    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers/comparison`;
-    const { data: createdAnswers } = await database.post(endpoint, answer, getHeaders(token));
-
-    return [createdAnswers, undefined];
-  } catch (_err) {
-    const err = _err as AxiosError;
-
-    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-    if (err.response.status === 403) return [null, { status: 403, message: '' }];
-    if (err.response.status === 409) return [null, { status: 409, message: 'Un des choix existe déja.' }];
-
-    return DEFAULT_API_ERROR_RESPONSE;
-  }
+  const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers/comparison`;
+  return postApiCall(endpoint, token, { data: answer, errors: { '409': 'Un des choix existe déja.' } });
 };
 
 export const updateComparisonAnswer = async (
@@ -269,20 +107,9 @@ export const updateComparisonAnswer = async (
   updateAttributes: AllOptional<ComparisonAnswerCreationAttributes>,
   token: string
 ): Promise<APIResponse<UpdateResponse>> => {
-  try {
-    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers/${answerId}`;
-    await database.put(endpoint, updateAttributes, getHeaders(token));
-
-    return [{ updated: true }, undefined];
-  } catch (_err) {
-    const err = _err as AxiosError;
-
-    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-    if (err.response.status === 403) return [null, { status: 403, message: '' }];
-
-    return DEFAULT_API_ERROR_RESPONSE;
-  }
+  const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers/${answerId}`;
+  console.log(token);
+  return updateApiCall(endpoint, token, { data: updateAttributes });
 };
 
 export const answerQuestion = async (
@@ -291,19 +118,6 @@ export const answerQuestion = async (
   answerOrAnswers: { answer: string } | { answers: Array<string> },
   token: string
 ): Promise<APIResponse<IUserAnswer | Array<IUserAnswer>>> => {
-  try {
-    const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/userAnswers`;
-
-    const { data: createdAnswerOrAnswers } = await database.post(endpoint, answerOrAnswers, getHeaders(token));
-
-    return [createdAnswerOrAnswers, undefined];
-  } catch (_err) {
-    const err = _err as AxiosError;
-
-    if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
-
-    if (err.response.status === 403) return [null, { status: 403, message: '' }];
-
-    return DEFAULT_API_ERROR_RESPONSE;
-  }
+  const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/userAnswers`;
+  return postApiCall(endpoint, token, { data: answerOrAnswers });
 };

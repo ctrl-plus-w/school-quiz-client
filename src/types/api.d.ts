@@ -49,7 +49,7 @@ type ComparisonAnswerCreationAttributes = {
   lowerThan: number;
 };
 
-type APIResponse<T> = [T | null, { status: number; message: string } | undefined];
+type APIResponse<T> = [T, undefined] | [undefined, { status: number; message: string }];
 
 type UpdateResponse = { updated: boolean };
 
