@@ -263,7 +263,9 @@ export const formatDate = (_date: Date | string): string => {
   if (isSameDate(date, today)) return `Aujourd'hui, ${date.getDate()} ${monthToString(date.getMonth())}`;
   if (isSameDate(date, incrementDate(today, 1))) return `Demain, ${date.getDate()} ${monthToString(date.getMonth())}`;
 
-  return `${DAYS[date.getDay()]} ${date.getDate()} ${monthToString(date.getMonth())}`;
+  return date.getFullYear() === today.getFullYear()
+    ? `${DAYS[date.getDay()]} ${date.getDate()} ${monthToString(date.getMonth())}`
+    : `${DAYS[date.getDay()]} ${date.getDate()} ${monthToString(date.getMonth())} ${date.getFullYear()}`;
 };
 
 /**
