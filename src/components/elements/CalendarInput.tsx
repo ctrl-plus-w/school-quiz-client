@@ -32,15 +32,20 @@ interface ICellProps {
 
   onlyFuture: boolean;
 
+  currentClickable?: boolean;
+
   handleClick: (date: Date) => void;
 }
 
-const Cell = ({ currentDate, cellDate, onlyFuture, handleClick }: ICellProps): ReactElement => {
+const Cell = ({ currentDate, cellDate, onlyFuture, handleClick, currentClickable }: ICellProps): ReactElement => {
   const defaultClasses = useState('flex justify-center items-center border border-transparent rounded-sm flex-grow w-10 py-1 ');
 
   if (areDatesEquals(currentDate, cellDate)) {
     return (
-      <div className={clsx([defaultClasses, 'bg-blue-600 text-white'])}>
+      <div
+        className={clsx([defaultClasses, 'bg-blue-600 text-white', currentClickable && 'cursor-pointer'])}
+        onClick={() => currentClickable && handleClick(cellDate)}
+      >
         <p>{cellDate.getDate()}</p>
       </div>
     );
@@ -55,6 +60,14 @@ const Cell = ({ currentDate, cellDate, onlyFuture, handleClick }: ICellProps): R
           isSameDate(new Date(), cellDate) ? 'bg-gray-400 text-gray-700' : 'bg-gray-100 text-gray-400',
         ])}
       >
+        {cellDate.getDate()}
+      </div>
+    );
+  }
+
+  if (isSameDate(new Date(), cellDate)) {
+    return (
+      <div className={clsx([defaultClasses, 'cursor-pointer bg-gray-400 text-gray-700'])} onClick={handleClick.bind(this, cellDate)}>
         {cellDate.getDate()}
       </div>
     );
@@ -79,16 +92,30 @@ interface IProps {
 
   onlyFuture?: boolean;
 
+  children?: ReactElement;
   className?: string;
   readonly?: boolean;
+  currentClickable?: boolean;
 
   value: Date;
   setValue: Dispatch<SetStateAction<Date>>;
+
+  cb?: (date: Date) => void;
 }
 
 const BTN_CLASSNAME = 'p-2 hover:text-blue-600 transform active:scale-75 transition-all duration-300';
 
-const CalendarInput = ({ label, className, value, setValue, onlyFuture = false, readonly = false }: IProps): ReactElement => {
+const CalendarInput = ({
+  label,
+  className,
+  children,
+  value,
+  setValue,
+  cb,
+  onlyFuture = false,
+  readonly = false,
+  currentClickable = false,
+}: IProps): ReactElement => {
   const [hidden, setHidden] = useState(true);
 
   const { container } = useClickOutside<HTMLDivElement>(() => setHidden(true));
@@ -96,6 +123,8 @@ const CalendarInput = ({ label, className, value, setValue, onlyFuture = false, 
   const handleClick = (day: Date) => {
     setValue(day);
     setHidden(true);
+
+    cb && cb(day);
   };
 
   return (
@@ -154,7 +183,14 @@ const CalendarInput = ({ label, className, value, setValue, onlyFuture = false, 
               {sliceArray(getCalendarDates(value), 7).map((chunk) => (
                 <div className="flex flex-row flex-nowrap gap-1" key={uuidv4()}>
                   {chunk.map((day) => (
-                    <Cell currentDate={value} cellDate={day} onlyFuture={onlyFuture} handleClick={handleClick} key={uuidv4()} />
+                    <Cell
+                      currentDate={value}
+                      cellDate={day}
+                      onlyFuture={onlyFuture}
+                      currentClickable={currentClickable}
+                      handleClick={handleClick}
+                      key={uuidv4()}
+                    />
                   ))}
                 </div>
               ))}
@@ -162,6 +198,8 @@ const CalendarInput = ({ label, className, value, setValue, onlyFuture = false, 
           </div>
         </div>
       )}
+
+      {children}
     </div>
   );
 };
