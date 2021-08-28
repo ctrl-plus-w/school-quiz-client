@@ -33,7 +33,7 @@ import InputSkeleton from '@skeleton/InputSkeleton';
 import TitleSkeleton from '@skeleton/TitleSkeleton';
 import FormSkeleton from '@skeleton/FormSkeleton';
 
-import { nameMapper, nameSlugMapper, parseExactAnswer, parseNumericAnswer } from '@util/mapper.utils';
+import { nameMapper, nameSlugMapper, parseExactAnswer, parseNumericAnswer, questionTypeFilter } from '@util/mapper.utils';
 import { areArraysEquals } from '@util/condition.utils';
 import { getLength } from '@util/object.utils';
 
@@ -253,7 +253,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
 
   // Constants
 
-  const [specifications] = useState(questionSpecifications.map(nameSlugMapper));
+  const [specifications, setSpecifications] = useState<Array<IBasicModel>>([]);
   const [questionSpecification] = useState(question.typedQuestion.questionSpecification?.slug);
 
   const [questionAnswersContent] = useState(questionAnswers.map(({ typedAnswer }) => typedAnswer.answerContent));
@@ -301,6 +301,12 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
     [title, description, answers, answerMin, answerMax, specification, specificationType],
     [title, description]
   );
+
+  useEffect(() => {
+    if (!questionSpecifications) return;
+
+    setSpecifications(() => questionSpecifications.filter(questionTypeFilter('numericQuestion')).map(nameSlugMapper));
+  }, [questionSpecifications]);
 
   const handleSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
@@ -486,8 +492,8 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
     return choices.map((choice, index) => ({ id: index, name: choice.name, checked: choice.valid, defaultName: choice.name }));
   };
 
+  const [specifications, setSpecifications] = useState<Array<IBasicModel>>([]);
   const [questionChoices] = useState(choiceMapper(question.typedQuestion.choices));
-  const [specifications] = useState(questionSpecifications.map(nameSlugMapper));
   const [questionSpecification] = useState(question.typedQuestion.questionSpecification?.slug);
 
   const [title, setTitle] = useState(question.title);
@@ -533,6 +539,12 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
     [title, description, shuffle, specification, uniqueChoices, multipleChoices],
     [title, description]
   );
+
+  useEffect(() => {
+    if (!questionSpecifications) return;
+
+    setSpecifications(() => questionSpecifications.filter(questionTypeFilter('choiceQuestion')).map(nameSlugMapper));
+  }, [questionSpecifications]);
 
   useEffect(() => {
     const choicesLength = specification === 'choix-unique' ? uniqueChoices.length : multipleChoices.length;
