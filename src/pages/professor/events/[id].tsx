@@ -35,13 +35,13 @@ import useLoadGroups from '@hooks/useLoadGroups';
 import useLoadUsers from '@hooks/useLoadUsers';
 import useLoadEvent from '@hooks/useLoadEvent';
 import useLoading from '@hooks/useLoading';
-import useSwitch from '@hooks/useSwitch';
 
 import {
   getTimeArrayFromDifference,
   getTimeAsArray,
   incrementDate,
   incrementTime,
+  isInFuture,
   isSameDate,
   isSameDateTime,
   isSameTime,
@@ -94,6 +94,7 @@ const Event = (): ReactElement => {
   const [quiz, setQuiz] = useState('');
   const [collaborators, setCollaborators] = useState<Array<IBasicModel>>([]);
 
+  const [isNoMoreEditable] = useState(!isInFuture(new Date(event?.start || Date.now())));
   const [isOwner, setIsOwner] = useState(false);
 
   const { valid } = useValidation(
@@ -210,9 +211,7 @@ const Event = (): ReactElement => {
     router.push('/professor/events');
   };
 
-  const value = useSwitch('p');
-
-  return loading || !formFilled || value ? (
+  return loading || !formFilled || !event ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton breadcrumb>
         <Bar />
@@ -268,12 +267,12 @@ const Event = (): ReactElement => {
 
               <Dropdown label="Groupe" placeholder="Aucun groupe sélectionné" values={groups} value={group} setValue={setGroup} readonly />
 
-              <CalendarInput label="Date" value={date} setValue={setDate} readonly={!isOwner} onlyFuture />
+              <CalendarInput label="Date" value={date} setValue={setDate} readonly={!isOwner || isNoMoreEditable} onlyFuture />
 
               <Row className="w-80">
-                <TimeInput label="Début" value={start} setValue={setStart} readonly={!isOwner} />
+                <TimeInput label="Début" value={start} setValue={setStart} readonly={!isOwner || isNoMoreEditable} />
 
-                <TimeInput label="Durée" value={duration} setValue={setDuration} readonly={!isOwner} />
+                <TimeInput label="Durée" value={duration} setValue={setDuration} readonly={!isOwner || isNoMoreEditable} />
               </Row>
             </FormGroup>
 
@@ -285,12 +284,12 @@ const Event = (): ReactElement => {
                 data={professors.map(collaboratorsMapper)}
                 values={collaborators}
                 setValues={setCollaborators}
-                disabled={!isOwner}
+                disabled={!isOwner || isNoMoreEditable}
               />
             </FormGroup>
           </Row>
 
-          {isOwner && <FormButtons href="/professor/events" valid={valid} update />}
+          {isOwner && !isNoMoreEditable && <FormButtons href="/professor/events" valid={valid} update />}
         </Form>
       </Container>
     </ProfessorDashboard>

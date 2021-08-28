@@ -10,7 +10,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline';
 
 import useClickOutside from '@hooks/useClickOutside';
 
-import { formatDate, getCalendarDates, incrementMonth, isDateInMonth, isSameDate, monthToString, setDate, setTime } from '@util/date.utils';
+import { formatDate, getCalendarDates, incrementMonth, isDateInMonth, isInFuture, isSameDate, monthToString, setDate } from '@util/date.utils';
 import { areDatesEquals } from '@util/condition.utils';
 import { sliceArray } from '@util/array.utils';
 
@@ -36,7 +36,7 @@ const Cell = ({ currentDate, cellDate, onlyFuture, handleClick }: ICellProps): R
     );
   }
 
-  if (onlyFuture && cellDate.valueOf() <= setTime(new Date(), 24, 0, 0, 0).valueOf()) {
+  if (onlyFuture && !isInFuture(cellDate)) {
     return (
       <div
         className={clsx([
