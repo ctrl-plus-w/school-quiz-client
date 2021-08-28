@@ -13,6 +13,7 @@ import Form from '@module/Form';
 import Row from '@module/Row';
 
 import EditableCheckboxInput from '@element/EditableCheckboxInput';
+import MultipleCalendarInput from '@element/MultipleCalendarInput';
 import MultipleNumberInput from '@element/MultipleNumberInput';
 import EditableRadioInput from '@element/EditableRadioInput';
 import MultipleTextInput from '@element/MultipleTextInput';
@@ -24,12 +25,12 @@ import Textarea from '@element/Textarea';
 import Input from '@element/Input';
 import Title from '@element/Title';
 
+import CheckboxInputSkeleton from '@skeleton/CheckboxInputSkeleton';
 import ContainerSkeleton from '@skeleton/ContainerSkeleton';
-import FormSkeleton from '@skeleton/FormSkeleton';
 import FormGroupSkeleton from '@skeleton/FormGroupSkeleton';
 import TitleSkeleton from '@skeleton/TitleSkeleton';
 import InputSkeleton from '@skeleton/InputSkeleton';
-import CheckboxInputSkeleton from '@skeleton/CheckboxInputSkeleton';
+import FormSkeleton from '@skeleton/FormSkeleton';
 import RadioInputSkeleton from '@skeleton/RadioInputSkeleton';
 
 import useLoadSpecifications from '@hooks/useLoadSpecifications';
@@ -37,7 +38,8 @@ import useAuthentication from '@hooks/useAuthentication';
 import useAppSelector from '@hooks/useAppSelector';
 import useLoadQuiz from '@hooks/useLoadQuiz';
 
-import { int, nameSlugMapper, parseNumericAnswer, questionTypeFilter } from '@util/mapper.utils';
+import { int, nameMapper, nameSlugMapper, parseNumericAnswer, questionTypeFilter } from '@util/mapper.utils';
+import { hasDuplicatedElements } from '@util/array.utils';
 
 import { generateChoices, removeChoices } from '@helpers/question.helper';
 
@@ -54,7 +56,6 @@ import { selectTempQuiz } from '@redux/quizSlice';
 import { selectToken } from '@redux/authSlice';
 
 import ROLES from '@constant/roles';
-import MultipleCalendarInput from '@element/MultipleCalendarInput';
 
 const CreateQuizQuestion = (): ReactElement => {
   const router = useRouter();
@@ -176,6 +177,8 @@ const CreateQuizQuestion = (): ReactElement => {
         const areValuesNotEmpty = choices.every(({ name }) => name !== '');
 
         if (uniqueChoices.length < 2 || !isOneChecked || !areValuesNotEmpty) return false;
+
+        if (hasDuplicatedElements(choices.map(nameMapper))) return false;
       }
 
       return true;

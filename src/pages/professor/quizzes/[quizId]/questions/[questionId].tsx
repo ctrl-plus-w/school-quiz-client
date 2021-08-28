@@ -12,6 +12,7 @@ import FormGroup from '@module/FormGroup';
 import Form from '@module/Form';
 import Row from '@module/Row';
 
+import MultipleCalendarInput from '@element/MultipleCalendarInput';
 import EditableCheckboxInput from '@element/EditableCheckboxInput';
 import MultipleNumberInput from '@element/MultipleNumberInput';
 import EditableRadioInput from '@element/EditableRadioInput';
@@ -34,8 +35,10 @@ import TitleSkeleton from '@skeleton/TitleSkeleton';
 import FormSkeleton from '@skeleton/FormSkeleton';
 
 import { nameMapper, nameSlugMapper, parseNumericAnswer, questionTypeFilter, str } from '@util/mapper.utils';
+import { hasDuplicatedElements } from '@util/array.utils';
 import { areArraysEquals } from '@util/condition.utils';
 import { getLength } from '@util/object.utils';
+import { isSameDate } from '@util/date.utils';
 
 import { choiceSorter, generateChoices, removeChoices as removeStateChoices } from '@helpers/question.helper';
 
@@ -69,8 +72,6 @@ import useLoadQuiz from '@hooks/useLoadQuiz';
 import useLoading from '@hooks/useLoading';
 
 import ROLES from '@constant/roles';
-import MultipleCalendarInput from '@element/MultipleCalendarInput';
-import { isSameDate } from '@util/date.utils';
 
 interface IQuestionDefaultFieldsProps {
   title: string;
@@ -551,6 +552,8 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
       const areValuesNotEmpty = choices.every(({ name }) => name !== '');
 
       if (uniqueChoices.length < 2 || !isOneChecked || !areValuesNotEmpty) return false;
+
+      if (hasDuplicatedElements(choices.map(nameMapper))) return false;
 
       return true;
     },
