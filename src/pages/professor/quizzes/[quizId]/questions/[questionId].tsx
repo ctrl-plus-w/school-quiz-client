@@ -717,7 +717,7 @@ const TypedQuestionSkeleton = (): ReactElement => {
 };
 
 const hooksConfig = {
-  notFoundRedirect: '/professor/quizes',
+  notFoundRedirect: '/professor/quizzes',
 };
 
 const Question = (): ReactElement => {
