@@ -35,7 +35,7 @@ import useAppDispatch from '@hooks/useAppDispatch';
 import useValidation from '@hooks/useValidation';
 import useLoading from '@hooks/useLoading';
 
-import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
+import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
 
 import { selectToken } from '@redux/authSlice';
 
@@ -73,7 +73,7 @@ const CreateQuiz = (): ReactElement => {
 
     if (!created) return;
 
-    dispatch(addInfoNotification('Test créé.'));
+    dispatch(addSuccessNotification('Test créé.'));
     router.push('/professor/quizzes');
   };
 

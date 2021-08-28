@@ -44,7 +44,7 @@ import { selectToken } from '@redux/authSlice';
 
 import useAppDispatch from '@hooks/useAppDispatch';
 
-import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
+import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
 
 import ROLES from '@constant/roles';
 
@@ -112,7 +112,7 @@ const CreateEvent = (): ReactElement => {
 
     if (!event) return;
 
-    dispatch(addInfoNotification('Événement créé.'));
+    dispatch(addSuccessNotification('Événement créé.'));
     router.push(`/professor/events`);
   };
 

@@ -54,7 +54,7 @@ import {
 
 import useAppDispatch from '@hooks/useAppDispatch';
 
-import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
+import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
 
 import { selectSpecifications, selectTempQuestion } from '@redux/questionSlice';
 import { selectTempQuiz } from '@redux/quizSlice';
@@ -197,7 +197,7 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
       }
     }
 
-    dispatch(addInfoNotification('Question modifiée.'));
+    dispatch(addSuccessNotification('Question modifiée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
   };
 
@@ -426,7 +426,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
       }
     }
 
-    dispatch(addInfoNotification('Question modifiée.'));
+    dispatch(addSuccessNotification('Question modifiée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
   };
 
@@ -630,7 +630,7 @@ const ChoiceQuestion = ({ quiz, question, questionSpecifications, token }: IChoi
       }
     }
 
-    dispatch(addInfoNotification('Question modifiée.'));
+    dispatch(addSuccessNotification('Question modifiée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
   };
 

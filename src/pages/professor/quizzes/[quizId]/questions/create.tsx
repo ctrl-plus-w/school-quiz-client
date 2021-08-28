@@ -47,7 +47,7 @@ import useAppDispatch from '@hooks/useAppDispatch';
 import useValidation from '@hooks/useValidation';
 import useLoading from '@hooks/useLoading';
 
-import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
+import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
 
 import { selectSpecifications } from '@redux/questionSlice';
 import { selectTempQuiz } from '@redux/quizSlice';
@@ -205,7 +205,7 @@ const CreateQuizQuestion = (): ReactElement => {
 
     if (!createdAnswers) return;
 
-    dispatch(addInfoNotification('Question créée.'));
+    dispatch(addSuccessNotification('Question créée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
   };
 
@@ -253,7 +253,7 @@ const CreateQuizQuestion = (): ReactElement => {
       if (!createdAnswer) return;
     }
 
-    dispatch(addInfoNotification('Question créée.'));
+    dispatch(addSuccessNotification('Question créée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
   };
 
@@ -282,7 +282,7 @@ const CreateQuizQuestion = (): ReactElement => {
 
     if (!choices) return;
 
-    dispatch(addInfoNotification('Question créée.'));
+    dispatch(addSuccessNotification('Question créée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
   };
 

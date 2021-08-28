@@ -53,7 +53,7 @@ import { getLength } from '@util/object.utils';
 
 import { addCollaborators, removeCollaborators, updateEvent } from '@api/events';
 
-import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
+import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
 import { selectTempEvent } from '@redux/eventSlice';
 import { selectProfessors, selectUser } from '@redux/userSlice';
 import { selectGroups } from '@redux/groupSlice';
@@ -207,7 +207,7 @@ const Event = (): ReactElement => {
       }
     }
 
-    dispatch(addInfoNotification('Événement modifié.'));
+    dispatch(addSuccessNotification('Événement modifié.'));
     router.push('/professor/events');
   };
 

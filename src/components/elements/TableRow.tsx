@@ -23,7 +23,7 @@ import { getHeaders } from '@util/authentication.utils';
 import database from '@database/database';
 
 import { selectToken } from '@redux/authSlice';
-import { addErrorNotification, addInfoNotification } from '@redux/notificationSlice';
+import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
 
 interface IProps<T, K> {
   instance: T;
@@ -80,7 +80,7 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
       const request = await database.delete(`/api/${apiName}/${instance.id}`, getHeaders(token));
 
       if (request.status === 200) {
-        dispatch(addInfoNotification('Élément supprimé !'));
+        dispatch(addSuccessNotification('Élément supprimé !'));
 
         if (removeFromStore) dispatch(removeFromStore(instance.id));
         else router.reload();

@@ -46,7 +46,7 @@ import useAppDispatch from '@hooks/useAppDispatch';
 import useValidation from '@hooks/useValidation';
 import useLoading from '@hooks/useLoading';
 
-import { addErrorNotification } from '@redux/notificationSlice';
+import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
 
 import { removeQuestion, selectQuestions } from '@redux/questionSlice';
 import { selectProfessors, selectUser } from '@redux/userSlice';
@@ -174,7 +174,7 @@ const Quiz = (): ReactElement => {
       }
     }
 
-    dispatch(addErrorNotification('Quiz modifiée.'));
+    dispatch(addSuccessNotification('Quiz modifiée.'));
     router.push(`/professor/quizzes`);
   };
 
