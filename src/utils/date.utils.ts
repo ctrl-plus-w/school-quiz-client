@@ -51,6 +51,18 @@ export const setMonth = (date: Date, value: number): Date => {
 };
 
 /**
+ * Return a date with the given year changed.
+ * @param date The date to modify the year.
+ * @param value The new year value.
+ * @returns A date
+ */
+export const setYear = (date: Date, value: number): Date => {
+  const tempDate = new Date(date);
+  tempDate.setFullYear(value);
+  return tempDate;
+};
+
+/**
  * Return a date with its minutes incremented by the amount.
  * @param date The date to increment the minutes.
  * @param amount The amount of minutes to increment the date.
@@ -99,6 +111,16 @@ export const incrementDate = (date: Date, amount: number): Date => {
  */
 export const incrementMonth = (date: Date, amount: number): Date => {
   return setMonth(date, date.getMonth() + amount);
+};
+
+/**
+ * Return a date with its year incremented by the amount.
+ * @param date The date to increment the years.
+ * @param amount The amount of years to increment the date.
+ * @returns A date
+ */
+export const incrementYear = (date: Date, amount: number): Date => {
+  return setYear(date, date.getFullYear() + amount);
 };
 
 /**
