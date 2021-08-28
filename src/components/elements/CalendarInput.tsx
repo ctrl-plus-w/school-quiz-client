@@ -6,11 +6,21 @@ import type { Dispatch, ReactElement, SetStateAction } from 'react';
 import React from 'react';
 import clsx from 'clsx';
 
-import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/outline';
+import { ChevronLeftIcon, ChevronRightIcon, ChevronDoubleLeftIcon, ChevronDoubleRightIcon } from '@heroicons/react/outline';
 
 import useClickOutside from '@hooks/useClickOutside';
 
-import { formatDate, getCalendarDates, incrementMonth, isDateInMonth, isInFuture, isSameDate, monthToString, setDate } from '@util/date.utils';
+import {
+  formatDate,
+  getCalendarDates,
+  incrementMonth,
+  incrementYear,
+  isDateInMonth,
+  isInFuture,
+  isSameDate,
+  monthToString,
+  setDate,
+} from '@util/date.utils';
 import { areDatesEquals } from '@util/condition.utils';
 import { sliceArray } from '@util/array.utils';
 
@@ -76,6 +86,8 @@ interface IProps {
   setValue: Dispatch<SetStateAction<Date>>;
 }
 
+const BTN_CLASSNAME = 'p-2 hover:text-blue-600 transform active:scale-75 transition-all duration-300';
+
 const CalendarInput = ({ label, className, value, setValue, onlyFuture = false, readonly = false }: IProps): ReactElement => {
   const [hidden, setHidden] = useState(true);
 
@@ -105,25 +117,29 @@ const CalendarInput = ({ label, className, value, setValue, onlyFuture = false, 
         <div className="absolute bottom-0 transform translate-y-full pt-6 ">
           <div className="flex flex-col p-4 border border-gray-300 rounded ring ring-gray-200 bg-white shadow-xl">
             <div className="flex justify-between items-center mb-3">
-              <button
-                className="p-2 hover:text-blue-600 transform active:scale-75 transition-all duration-300"
-                type="button"
-                onClick={() => setValue((prev) => setDate(incrementMonth(prev, -1), 1))}
-              >
-                <ChevronLeftIcon className="w-5 h-5" />
-              </button>
+              <div className="flex">
+                <button className={BTN_CLASSNAME} type="button" onClick={() => setValue((prev) => setDate(incrementYear(prev, -1), 1))}>
+                  <ChevronDoubleLeftIcon className="w-5 h-5" />
+                </button>
+
+                <button className={BTN_CLASSNAME} type="button" onClick={() => setValue((prev) => setDate(incrementMonth(prev, -1), 1))}>
+                  <ChevronLeftIcon className="w-5 h-5" />
+                </button>
+              </div>
 
               <p className="text-gray-900 font-semibold py-2">
                 {monthToString(value.getMonth())} {value.getFullYear()}
               </p>
 
-              <button
-                className="p-2 hover:text-blue-600 transform active:scale-75 transition-all duration-300"
-                type="button"
-                onClick={() => setValue((prev) => setDate(incrementMonth(prev, 1), 1))}
-              >
-                <ChevronRightIcon className="w-5 h-5 " />
-              </button>
+              <div className="flex">
+                <button className={BTN_CLASSNAME} type="button" onClick={() => setValue((prev) => setDate(incrementMonth(prev, 1), 1))}>
+                  <ChevronRightIcon className="w-5 h-5 " />
+                </button>
+
+                <button className={BTN_CLASSNAME} type="button" onClick={() => setValue((prev) => setDate(incrementYear(prev, 1), 1))}>
+                  <ChevronDoubleRightIcon className="w-5 h-5 " />
+                </button>
+              </div>
             </div>
 
             <div className="flex flex-col gap-1">
