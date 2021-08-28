@@ -318,5 +318,5 @@ export const getTimeArrayFromDifference = (date: Date, date1: Date): [string, st
  * @returns A boolean
  */
 export const isInFuture = (date: Date): boolean => {
-  return date.valueOf() > setTime(new Date(), 25, 0, 0, 0).valueOf();
+  return date.valueOf() > setTime(new Date(), 24, 0, 0, 0).valueOf();
 };
