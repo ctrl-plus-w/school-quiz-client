@@ -1,4 +1,4 @@
-import { ChangeEvent, Dispatch, ReactElement, SetStateAction, useState } from 'react';
+import { ChangeEvent, Dispatch, ReactElement, SetStateAction, useEffect, useState } from 'react';
 
 import React from 'react';
 import clsx from 'clsx';
@@ -65,7 +65,7 @@ interface IProps {
 }
 
 const EditableRadioInput = ({ label, placeholder, values, setValues, maxLength }: IProps): ReactElement => {
-  const [tempChecked, setTempChecked] = useState(values.find(({ checked }) => checked)?.id || '');
+  const [tempChecked, setTempChecked] = useState(-1);
 
   const setValue = (id: number, value: string): void => {
     setValues((prev) => {
@@ -85,6 +85,11 @@ const EditableRadioInput = ({ label, placeholder, values, setValues, maxLength }
       return el ? [...rest.map(({ ...props }) => ({ ...props, checked: false })), { ...el, checked: true }] : prev;
     });
   };
+
+  useEffect(() => {
+    const checkedValue = values.find(({ checked }) => checked);
+    checkedValue && setTempChecked(checkedValue.id);
+  }, []);
 
   return (
     <div className="form-control flex flex-col w-80">
