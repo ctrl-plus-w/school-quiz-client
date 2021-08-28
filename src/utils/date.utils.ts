@@ -289,3 +289,12 @@ export const getTimeArrayFromDifference = (date: Date, date1: Date): [string, st
   const msDiff = date1.valueOf() - date.valueOf();
   return [formatNumber(str(Math.floor((msDiff / (1000 * 60 * 60)) % 24))), formatNumber(str(Math.floor((msDiff / (1000 * 60)) % 60)))];
 };
+
+/**
+ * Check if the date is after today (at 23:59)
+ * @param date The date to check
+ * @returns A boolean
+ */
+export const isInFuture = (date: Date): boolean => {
+  return date.valueOf() > setTime(new Date(), 25, 0, 0, 0).valueOf();
+};
