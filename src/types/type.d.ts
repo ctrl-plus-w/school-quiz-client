@@ -16,7 +16,7 @@ interface IBasicModel {
   slug: string;
 }
 
-type UINotificationType = 'INFO' | 'ERROR';
+type UINotificationType = 'INFO' | 'ERROR' | 'SUCCESS' | 'WARNING';
 
 type UINotification = {
   type: UINotificationType;

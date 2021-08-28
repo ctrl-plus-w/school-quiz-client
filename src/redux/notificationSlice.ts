@@ -21,6 +21,14 @@ const addErrorNotificationReducer = (state: INotificationState, action: PayloadA
   state.notifications.push({ content: action.payload, type: 'ERROR', id: uuidv4() });
 };
 
+const addWarningNotificationReducer = (state: INotificationState, action: PayloadAction<string>) => {
+  state.notifications.push({ content: action.payload, type: 'WARNING', id: uuidv4() });
+};
+
+const addSuccessNotificationReducer = (state: INotificationState, action: PayloadAction<string>) => {
+  state.notifications.push({ content: action.payload, type: 'SUCCESS', id: uuidv4() });
+};
+
 const addNotificationReducer = (state: INotificationState, action: PayloadAction<UINotification>) => {
   state.notifications.push(action.payload);
 };
@@ -42,12 +50,22 @@ const notificationSlice = createSlice({
     addNotification: addNotificationReducer,
     addInfoNotification: addInfoNotificationReducer,
     addErrorNotification: addErrorNotificationReducer,
+    addWarningNotification: addWarningNotificationReducer,
+    addSuccessNotification: addSuccessNotificationReducer,
     removeNotification: removeNotificationReducer,
     clearNotification: clearNotificationsReducer,
   },
 });
 
-export const { addNotification, clearNotification, removeNotification, addErrorNotification, addInfoNotification } = notificationSlice.actions;
+export const {
+  addNotification,
+  clearNotification,
+  removeNotification,
+  addErrorNotification,
+  addInfoNotification,
+  addSuccessNotification,
+  addWarningNotification,
+} = notificationSlice.actions;
 
 export const selectNotifications = (state: RootState): Array<UINotification> => state.notification.notifications;
 
