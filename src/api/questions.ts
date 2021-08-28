@@ -108,7 +108,6 @@ export const updateComparisonAnswer = async (
   token: string
 ): Promise<APIResponse<UpdateResponse>> => {
   const endpoint = `/api/quizzes/${quizId}/questions/${questionId}/answers/${answerId}`;
-  console.log(token);
   return updateApiCall(endpoint, token, { data: updateAttributes });
 };
 

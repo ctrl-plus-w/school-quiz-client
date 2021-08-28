@@ -72,7 +72,6 @@ export const createApiCall = async <APIReponseType, AttributesType>(
   }
 ): Promise<APIResponse<APIReponseType>> => {
   try {
-    console.log(config.method);
     if (config.method === METHODS.GET) {
       const { data: responseData } = await database.get(endpoint, getHeaders(token));
       return [responseData, undefined];

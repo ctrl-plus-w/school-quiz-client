@@ -156,7 +156,6 @@ const CreateQuizQuestion = (): ReactElement => {
       // Numeric question
       if (questionType === 'numericQuestion') {
         if (nqSpecificationType === 'exact') {
-          console.log(1);
           if (nqSpecification === 'date' && nqDateAnswers.length === 0) return false;
           if (nqSpecification !== 'date' && nqAnswers.length === 0) return false;
         }
