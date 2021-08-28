@@ -39,8 +39,10 @@ export const questionTypeFilter =
     return instance.questionType === questionType;
   };
 
-export const str = (val: RegExp | number): string => {
+export const str = (val: RegExp | number | Date): string => {
   if (typeof val === 'number') return val.toString();
+  if (val instanceof Date) return val.toISOString();
+
   return val.toString().slice(1, -1);
 };
 
