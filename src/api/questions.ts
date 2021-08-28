@@ -84,7 +84,7 @@ export const createQuestion = <T>(questionType: QuestionType) => {
       if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
 
       if (err.response.status === 403) return [null, { status: 403, message: '' }];
-      if (err.response.status === 409) return [null, { status: 409, message: 'Cete question existe déja.' }];
+      if (err.response.status === 409) return [null, { status: 409, message: 'Cette question existe déja.' }];
 
       return DEFAULT_API_ERROR_RESPONSE;
     }
@@ -104,7 +104,7 @@ export const updateQuestion =
       if (!err.response) return DEFAULT_API_ERROR_RESPONSE;
 
       if (err.response.status === 403) return [null, { status: 403, message: '' }];
-      if (err.response.status === 409) return [null, { status: 409, message: 'Cete question existe déja.' }];
+      if (err.response.status === 409) return [null, { status: 409, message: 'Cette question existe déja.' }];
 
       return DEFAULT_API_ERROR_RESPONSE;
     }
