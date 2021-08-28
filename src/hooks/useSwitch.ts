@@ -1,18 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+
+import useKeypress from '@hooks/useKeypress';
 
 const useSwitch = (key: string, defaultValue = false): boolean => {
   const [value, setValue] = useState(defaultValue);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== key) return;
-      setValue((prev) => !prev);
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  useKeypress(key, () => setValue((prev) => !prev));
 
   return value;
 };
