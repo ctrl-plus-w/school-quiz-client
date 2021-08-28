@@ -308,7 +308,7 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
   );
 
   useEffect(() => {
-    setAnswers(dateAnswers.map((date) => date.toString()));
+    specification === 'date' && setAnswers(dateAnswers.map((date) => date.toString()));
   }, [dateAnswers]);
 
   useEffect(() => {
