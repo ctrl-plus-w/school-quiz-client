@@ -151,7 +151,7 @@ const CreateQuizQuestion = (): ReactElement => {
   const { valid } = useValidation(
     () => {
       // Textual question
-      if (questionType === 'textualQuestion' && tqAnswers.length === 0) return false;
+      if (questionType === 'textualQuestion' && verificationType !== 'manuel' && tqAnswers.length === 0) return false;
 
       // Numeric question
       if (questionType === 'numericQuestion') {
@@ -182,12 +182,24 @@ const CreateQuizQuestion = (): ReactElement => {
 
       return true;
     },
-    [title, uniqueChoices, multipleChoices, cqSpecification, nqSpecification, tqAnswers, nqAnswers, nqDateAnswers, nqAnswerMin, nqAnswerMax],
+    [
+      title,
+      uniqueChoices,
+      multipleChoices,
+      cqSpecification,
+      nqSpecification,
+      tqAnswers,
+      nqAnswers,
+      nqDateAnswers,
+      nqAnswerMin,
+      nqAnswerMax,
+      verificationType,
+    ],
     [title, description]
   );
 
   const textualQuestionComputations = async (): Promise<void> => {
-    if (!quiz || !token) return;
+    if (!quiz || !token || !valid) return;
 
     const verificationTypeSlug = verificationType;
     const creationAttributes: TextualQuestionCreationAttributes = { title, description, accentSensitive, caseSensitive, verificationTypeSlug };
@@ -201,15 +213,17 @@ const CreateQuizQuestion = (): ReactElement => {
 
     if (!question) return;
 
-    const answers: Array<ExactAnswerCreationAttributes> = tqAnswers.map((answer) => ({ answerContent: answer }));
-    const [createdAnswers, answersCreationError] = await addExactAnswers(quiz.id, question.id, answers, token);
+    if (verificationType !== 'manuel') {
+      const answers: Array<ExactAnswerCreationAttributes> = tqAnswers.map((answer) => ({ answerContent: answer }));
+      const [createdAnswers, answersCreationError] = await addExactAnswers(quiz.id, question.id, answers, token);
 
-    if (answersCreationError) {
-      if (answersCreationError.status === 403) router.push('/login');
-      else dispatch(addErrorNotification(answersCreationError.message));
+      if (answersCreationError) {
+        if (answersCreationError.status === 403) router.push('/login');
+        else dispatch(addErrorNotification(answersCreationError.message));
+      }
+
+      if (!createdAnswers) return;
     }
-
-    if (!createdAnswers) return;
 
     dispatch(addSuccessNotification('Question créée.'));
     router.push(`/professor/quizzes/${quiz.id}`);
@@ -385,15 +399,19 @@ const CreateQuizQuestion = (): ReactElement => {
                     setValue={setVerificationType}
                   />
 
-                  <CheckboxInput
-                    label="Options supplémentaires"
-                    values={[
-                      { name: 'Sensible à la case', checked: caseSensitive, setValue: setCaseSensitive },
-                      { name: 'Sensible aux accents', checked: accentSensitive, setValue: setAccentSensitive },
-                    ]}
-                  />
+                  {verificationType !== 'manuel' && (
+                    <>
+                      <CheckboxInput
+                        label="Options supplémentaires"
+                        values={[
+                          { name: 'Sensible à la case', checked: caseSensitive, setValue: setCaseSensitive },
+                          { name: 'Sensible aux accents', checked: accentSensitive, setValue: setAccentSensitive },
+                        ]}
+                      />
 
-                  <MultipleTextInput label="Réponses" placeholder="Réponse" values={tqAnswers} setValues={setTqAnswers} maxLength={25} />
+                      <MultipleTextInput label="Réponses" placeholder="Réponse" values={tqAnswers} setValues={setTqAnswers} maxLength={25} />
+                    </>
+                  )}
                 </>
               )}
 

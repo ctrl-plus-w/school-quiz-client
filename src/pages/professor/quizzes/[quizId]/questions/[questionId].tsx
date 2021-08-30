@@ -139,6 +139,8 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
       )
         return false;
 
+      if (verificationType !== 'manuel' && answers.length === 0) return false;
+
       return true;
     },
     [title, description, verificationType, caseSensitive, accentSensitive, answers],
@@ -208,7 +210,9 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
     <Form full={true} onSubmit={handleSubmit}>
       <Row wrap>
         <QuestionDefaultFields {...{ title, setTitle, description, setDescription }}>
-          <MultipleTextInput label="Réponses" placeholder="Réponse" values={answers} setValues={setAnswers} maxLength={25} />
+          {verificationType !== 'manuel' && (
+            <MultipleTextInput label="Réponses" placeholder="Réponse" values={answers} setValues={setAnswers} maxLength={25} />
+          )}
         </QuestionDefaultFields>
 
         <FormGroup>
@@ -225,13 +229,15 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
             setValue={setVerificationType}
           />
 
-          <CheckboxInput
-            label="Options supplémentaires"
-            values={[
-              { name: 'Sensible à la case', checked: caseSensitive, setValue: setCaseSensitive },
-              { name: 'Sensible aux accents', checked: accentSensitive, setValue: setAccentSensitive },
-            ]}
-          />
+          {verificationType !== 'manuel' && (
+            <CheckboxInput
+              label="Options supplémentaires"
+              values={[
+                { name: 'Sensible à la case', checked: caseSensitive, setValue: setCaseSensitive },
+                { name: 'Sensible aux accents', checked: accentSensitive, setValue: setAccentSensitive },
+              ]}
+            />
+          )}
         </FormGroup>
       </Row>
 
