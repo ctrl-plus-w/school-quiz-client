@@ -48,13 +48,16 @@ import { selectTempEvent } from '@redux/eventSlice';
 import { selectToken } from '@redux/authSlice';
 
 import ROLES from '@constant/roles';
+import Textarea from '@element/Textarea';
 
 interface ITextualQuestionProps {
   question: IQuestion<ITextualQuestion>;
   handleSubmit: (answerOrAnswers: { answer: string } | { answers: Array<string> }) => Promise<void>;
+
+  long: boolean;
 }
 
-const TextualQuestion = ({ handleSubmit }: ITextualQuestionProps): ReactElement => {
+const TextualQuestion = ({ handleSubmit, long }: ITextualQuestionProps): ReactElement => {
   const [answer, setAnswer] = useState('');
 
   const { valid } = useValidation(() => true, [answer], [answer]);
@@ -70,7 +73,11 @@ const TextualQuestion = ({ handleSubmit }: ITextualQuestionProps): ReactElement 
   return (
     <Form onSubmit={onSubmit} full>
       <FormGroup>
-        <Input label="Réponse" value={answer} setValue={setAnswer} placeholder="Hello World" />
+        {long ? (
+          <Textarea label="Réponse" value={answer} setValue={setAnswer} placeholder="Hello World" className="w-96" maxLength={750} />
+        ) : (
+          <Input label="Réponse" value={answer} setValue={setAnswer} placeholder="Hello World" />
+        )}
       </FormGroup>
 
       <div className="flex ml-auto mt-auto">
@@ -209,6 +216,7 @@ const Quiz = (): ReactElement => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
+  const [verificationType, setVerificationType] = useState<IVerificationType | undefined>(undefined);
   const [finished, setFinished] = useState(false);
 
   const { state: questionState, run: runQuestion } = useLoadStudentQuestion();
@@ -225,6 +233,15 @@ const Quiz = (): ReactElement => {
   useEffect(() => {
     if (event && event.quiz) dispatch(setTempQuiz(event.quiz));
   }, [event]);
+
+  useEffect(() => {
+    if (!question || !question.typedQuestion) return;
+
+    if (question.questionType === 'textualQuestion') {
+      const textualQuestion = question.typedQuestion as ITextualQuestion;
+      setVerificationType(textualQuestion.verificationType);
+    }
+  }, [question]);
 
   const onBlur = () => {
     if (!event || !event.quiz || !event.quiz.strict) return;
@@ -297,7 +314,11 @@ const Quiz = (): ReactElement => {
         <Bar />
 
         {question.questionType === 'textualQuestion' && (
-          <TextualQuestion question={question as IQuestion<ITextualQuestion>} handleSubmit={handleSubmit} />
+          <TextualQuestion
+            question={question as IQuestion<ITextualQuestion>}
+            handleSubmit={handleSubmit}
+            long={verificationType?.slug === 'manuel'}
+          />
         )}
 
         {question.questionType === 'numericQuestion' && (
