@@ -278,7 +278,9 @@ const Quiz = (): ReactElement => {
 
     setLastWarn(new Date());
 
-    await warn(token);
+    const [data] = await warn(token);
+
+    if (data && data.blocked) setBlocked(true);
 
     dispatch(addErrorNotification('Vous ne devez pas quitter la page sous peine de sanction.'));
   };

@@ -39,7 +39,7 @@ export const removeCollaborators = async (eventId: number, userIds: Array<number
   return deleteApiCall(endpoint, token, { data: userIds, errors: { '409': 'Un des collaborateurs existe déjà.' } });
 };
 
-export const warn = async (token: string): Promise<APIResponse<{ warns: number }>> => {
+export const warn = async (token: string): Promise<APIResponse<{ warns: number; blocked: boolean }>> => {
   const endpoint = `/api/events/event/warn`;
   return postApiCall(endpoint, token, { data: {} });
 };
