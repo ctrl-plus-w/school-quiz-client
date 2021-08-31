@@ -1,3 +1,5 @@
-export default {
-  endpoint: 'http://localhost:3005',
+const SERVER = {
+  ENDPOINT: 'http://localhost:3005',
 };
+
+export default SERVER;
