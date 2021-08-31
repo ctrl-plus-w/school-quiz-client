@@ -35,7 +35,7 @@ const Notification: FunctionComponent<IProps> = ({ children, notification }: IPr
   return (
     <div
       className={clsx([
-        'flex items-center py-3 mb-4 min-w-64 rounded cursor-pointer pointer-events-auto transition-all duration-500',
+        'flex items-center py-3 pr-4 mb-4 min-w-64 rounded cursor-pointer pointer-events-auto transition-all duration-500',
         'bg-white shadow-md border-l-2',
         fade && 'animate-fade-right',
         NOTIF.CLASSNAME,
