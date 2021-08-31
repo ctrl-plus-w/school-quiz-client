@@ -3,6 +3,18 @@ import { formatNumber, str } from './mapper.utils';
 import { DAYS, MONTHS } from '@constant/date';
 
 /**
+ * Return a date with the given seconds changed.
+ * @param date The date to modify the seconds.
+ * @param value The new seconds value.
+ * @returns A date
+ */
+export const setSeconds = (date: Date, value: number): Date => {
+  const tempDate = new Date(date);
+  tempDate.setSeconds(value);
+  return tempDate;
+};
+
+/**
  * Return a date with the given minutes changed.
  * @param date The date to modify the minutes.
  * @param value The new minutes value.
@@ -60,6 +72,16 @@ export const setYear = (date: Date, value: number): Date => {
   const tempDate = new Date(date);
   tempDate.setFullYear(value);
   return tempDate;
+};
+
+/**
+ * Return a date with its seconds incremented by the amount.
+ * @param date The date to increment the seconds.
+ * @param amount The amount of seconds to increment the date.
+ * @returns A date
+ */
+export const incrementSeconds = (date: Date, amount: number): Date => {
+  return setSeconds(date, date.getSeconds() + amount);
 };
 
 /**

@@ -56,6 +56,10 @@ interface IEvent extends DefaultModelProperties {
   collaborators: Array<IUser>;
   quiz?: IQuiz;
   group?: IGroup;
+
+  blocked?: boolean;
+  remainingQuestions?: number;
+  answeredQuestions?: number;
 }
 
 interface IQuiz extends DefaultModelProperties {
@@ -112,9 +116,13 @@ type Question = DefaultModelProperties & {
   answers: Array<IAnswer>;
   userAnswers: Array<IUserAnswer>;
 
+  strict?: boolean;
   shuffle?: boolean;
+
   answeredQuestions?: number;
   remainingQuestions?: number;
+
+  blocked?: boolean;
 };
 
 interface IQuestion<T extends ITextualQuestion | INumericQuestion | IChoiceQuestion> extends DefaultModelProperties {
@@ -130,6 +138,8 @@ interface IQuestion<T extends ITextualQuestion | INumericQuestion | IChoiceQuest
 
   answeredQuestions?: number;
   remainingQuestions?: number;
+
+  blocked?: boolean;
 }
 
 interface INumericQuestion extends IQuestion {

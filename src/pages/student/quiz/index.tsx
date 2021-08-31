@@ -11,12 +11,15 @@ import StudentDashboard from '@layout/StudentDashboard';
 
 import FormGroup from '@module/FormGroup';
 import Container from '@module/Container';
+import Row from '@module/Row';
 
 import CheckboxInputGroup from '@element/CheckboxInputGroup';
 import CalendarInput from '@element/CalendarInput';
 import NumberInput from '@element/NumberInput';
 import RadioInput from '@element/RadioInput';
+import Textarea from '@element/Textarea';
 import Button from '@element/Button';
+import Title from '@element/Title';
 import Input from '@element/Input';
 import Form from '@module/Form';
 import Bar from '@element/Bar';
@@ -38,8 +41,10 @@ import useValidation from '@hooks/useValidation';
 import useLoading from '@hooks/useLoading';
 
 import { nameMapper, nameSlugMapper, shuffle, sortById } from '@util/mapper.utils';
+import { incrementSeconds } from '@util/date.utils';
 
 import { answerQuestion } from '@api/questions';
+import { warn } from '@api/events';
 
 import { addErrorNotification } from '@redux/notificationSlice';
 import { selectTempQuiz, setTempQuiz } from '@redux/quizSlice';
@@ -48,16 +53,49 @@ import { selectTempEvent } from '@redux/eventSlice';
 import { selectToken } from '@redux/authSlice';
 
 import ROLES from '@constant/roles';
-import Textarea from '@element/Textarea';
+
+interface IFormLayoutProps {
+  children: ReactElement;
+  valid: boolean;
+  strict: boolean;
+
+  onSubmit: (e: FormEvent) => void;
+}
+
+const FormLayout = ({ children, onSubmit, valid, strict }: IFormLayoutProps) => {
+  return (
+    <Form onSubmit={onSubmit} full>
+      <Row className="w-full ">
+        <FormGroup>{children}</FormGroup>
+
+        {strict && (
+          <div className="ml-auto mb-auto p-5 bg-red-200 border border-red-300 rounded">
+            <p className="text-sm text-red-600 w-96">
+              Le test est en mode strict, vous ne pouvez donc pas quitter la page, si vous quitter la page plus de 3 fois, vous ne pourrez plus
+              participer au test.
+            </p>
+          </div>
+        )}
+      </Row>
+
+      <div className="flex ml-auto mt-auto">
+        <Button type="success" disabled={!valid} submit>
+          Valider
+        </Button>
+      </div>
+    </Form>
+  );
+};
 
 interface ITextualQuestionProps {
   question: IQuestion<ITextualQuestion>;
   handleSubmit: (answerOrAnswers: { answer: string } | { answers: Array<string> }) => Promise<void>;
 
+  strict: boolean;
   long: boolean;
 }
 
-const TextualQuestion = ({ handleSubmit, long }: ITextualQuestionProps): ReactElement => {
+const TextualQuestion = ({ handleSubmit, long, strict }: ITextualQuestionProps): ReactElement => {
   const [answer, setAnswer] = useState('');
 
   const { valid } = useValidation(() => true, [answer], [answer]);
@@ -71,30 +109,24 @@ const TextualQuestion = ({ handleSubmit, long }: ITextualQuestionProps): ReactEl
   };
 
   return (
-    <Form onSubmit={onSubmit} full>
-      <FormGroup>
-        {long ? (
-          <Textarea label="Réponse" value={answer} setValue={setAnswer} placeholder="Hello World" className="w-96" maxLength={750} />
-        ) : (
-          <Input label="Réponse" value={answer} setValue={setAnswer} placeholder="Hello World" />
-        )}
-      </FormGroup>
-
-      <div className="flex ml-auto mt-auto">
-        <Button type="success" disabled={!valid} submit>
-          Valider
-        </Button>
-      </div>
-    </Form>
+    <FormLayout onSubmit={onSubmit} valid={valid} strict={strict}>
+      {long ? (
+        <Textarea label="Réponse" value={answer} setValue={setAnswer} placeholder="Hello World" className="w-96" maxLength={750} />
+      ) : (
+        <Input label="Réponse" value={answer} setValue={setAnswer} placeholder="Hello World" />
+      )}
+    </FormLayout>
   );
 };
 
 interface INumericQuestionProps {
   question: IQuestion<INumericQuestion>;
   handleSubmit: (answerOrAnswers: { answer: string } | { answers: Array<string> }) => Promise<void>;
+
+  strict: boolean;
 }
 
-const NumericQuestion = ({ question, handleSubmit }: INumericQuestionProps): ReactElement => {
+const NumericQuestion = ({ question, handleSubmit, strict }: INumericQuestionProps): ReactElement => {
   const [specification] = useState(question.typedQuestion.questionSpecification);
 
   const [answer, setAnswer] = useState('');
@@ -124,24 +156,20 @@ const NumericQuestion = ({ question, handleSubmit }: INumericQuestionProps): Rea
   };
 
   return (
-    <Form onSubmit={onSubmit} full>
-      <FormGroup>{getInput()}</FormGroup>
-
-      <div className="flex ml-auto mt-auto">
-        <Button type="success" disabled={!valid} submit>
-          Valider
-        </Button>
-      </div>
-    </Form>
+    <FormLayout onSubmit={onSubmit} valid={valid} strict={strict}>
+      {getInput()}
+    </FormLayout>
   );
 };
 
 interface IChoiceQuestionProps {
   question: IQuestion<IChoiceQuestion>;
   handleSubmit: (answerOrAnswers: { answer: string } | { answers: Array<string> }) => Promise<void>;
+
+  strict: boolean;
 }
 
-const ChoiceQuestion = ({ question, handleSubmit }: IChoiceQuestionProps): ReactElement => {
+const ChoiceQuestion = ({ question, handleSubmit, strict }: IChoiceQuestionProps): ReactElement => {
   const [choices] = useState(shuffle(question.typedQuestion.choices));
   const [specification] = useState(question.typedQuestion.questionSpecification);
 
@@ -182,33 +210,25 @@ const ChoiceQuestion = ({ question, handleSubmit }: IChoiceQuestionProps): React
       </FormGroupSkeleton>
     </FormSkeleton>
   ) : (
-    <Form onSubmit={onSubmit} full>
-      <FormGroup>
-        {specification && specification.slug === 'choix-multiple' ? (
-          <CheckboxInputGroup
-            label="Réponses"
-            values={answers}
-            setValues={setAnswers}
-            data={(question.typedQuestion.shuffle ? choices : sortById(choices)).map(nameSlugMapper)}
-            key={uuidv4()}
-          />
-        ) : (
-          <RadioInput
-            label="Réponse"
-            value={answer}
-            setValue={setAnswer}
-            values={(question.typedQuestion.shuffle ? choices : sortById(choices)).map(nameSlugMapper)}
-            key={uuidv4()}
-          />
-        )}
-      </FormGroup>
-
-      <div className="flex ml-auto mt-auto">
-        <Button type="success" disabled={!valid} submit>
-          Valider
-        </Button>
-      </div>
-    </Form>
+    <FormLayout onSubmit={onSubmit} valid={valid} strict={strict}>
+      {specification && specification.slug === 'choix-multiple' ? (
+        <CheckboxInputGroup
+          label="Réponses"
+          values={answers}
+          setValues={setAnswers}
+          data={(question.typedQuestion.shuffle ? choices : sortById(choices)).map(nameSlugMapper)}
+          key={uuidv4()}
+        />
+      ) : (
+        <RadioInput
+          label="Réponse"
+          value={answer}
+          setValue={setAnswer}
+          values={(question.typedQuestion.shuffle ? choices : sortById(choices)).map(nameSlugMapper)}
+          key={uuidv4()}
+        />
+      )}
+    </FormLayout>
   );
 };
 
@@ -216,6 +236,8 @@ const Quiz = (): ReactElement => {
   const router = useRouter();
   const dispatch = useAppDispatch();
 
+  const [blocked, setBlocked] = useState(false);
+  const [lastWarn, setLastWarn] = useState(new Date(1000, 0, 0, 0));
   const [verificationType, setVerificationType] = useState<IVerificationType | undefined>(undefined);
   const [finished, setFinished] = useState(false);
 
@@ -231,11 +253,16 @@ const Quiz = (): ReactElement => {
   const question = useAppSelector(selectTempQuestion) as IQuestion<TypedQuestion>;
 
   useEffect(() => {
-    if (event && event.quiz) dispatch(setTempQuiz(event.quiz));
+    if (!event) return;
+
+    if (event.quiz) dispatch(setTempQuiz(event.quiz));
+    if (event.remainingQuestions === 0) setFinished(true);
   }, [event]);
 
   useEffect(() => {
     if (!question || !question.typedQuestion) return;
+
+    if (question.blocked) setBlocked(true);
 
     if (question.questionType === 'textualQuestion') {
       const textualQuestion = question.typedQuestion as ITextualQuestion;
@@ -243,10 +270,15 @@ const Quiz = (): ReactElement => {
     }
   }, [question]);
 
-  const onBlur = () => {
-    if (!event || !event.quiz || !event.quiz.strict) return;
+  const onBlur = async () => {
+    if (!event || !event.quiz || !event.quiz.strict || !token || finished || blocked) return;
 
-    // TODO
+    // Prevent from having too much warns in a short time (3 secs interval)
+    if (incrementSeconds(lastWarn, 3).valueOf() > Date.now()) return;
+
+    setLastWarn(new Date());
+
+    await warn(token);
 
     dispatch(addErrorNotification('Vous ne devez pas quitter la page sous peine de sanction.'));
   };
@@ -260,7 +292,7 @@ const Quiz = (): ReactElement => {
   };
 
   const handleSubmit = async (payload: { answer: string } | { answers: Array<string> }): Promise<void> => {
-    if (!quiz || !question || !token) return;
+    if (!quiz || !question || !token || !event || blocked) return;
 
     const [created, error] = await answerQuestion(quiz.id, question.id, payload, token);
 
@@ -271,8 +303,7 @@ const Quiz = (): ReactElement => {
 
     if (!created) return;
 
-    if (question.remainingQuestions === 1) setFinished(true);
-    else runQuestion();
+    runEvent();
   };
 
   if (loading)
@@ -294,7 +325,7 @@ const Quiz = (): ReactElement => {
       </StudentDashboardSkeleton>
     );
 
-  if (!event)
+  if (!event || !quiz)
     return (
       <StudentDashboard>
         <p className="m-auto">Aucun événement trouvé ...</p>
@@ -309,27 +340,43 @@ const Quiz = (): ReactElement => {
     );
 
   return event && question ? (
-    <StudentDashboard hideMenu>
-      <Container title={question.title} subtitle={question.description} badge={getBadge()}>
-        <Bar />
+    <>
+      {blocked && (
+        <div className="z-50 fixed top-0 left-0 flex items-center justify-center w-full h-full bg-black bg-opacity-75">
+          <div className="flex flex-col gap-6 items-start bg-white w-96 p-12 rounded">
+            <Title>Attention !</Title>
 
-        {question.questionType === 'textualQuestion' && (
-          <TextualQuestion
-            question={question as IQuestion<ITextualQuestion>}
-            handleSubmit={handleSubmit}
-            long={verificationType?.slug === 'manuel'}
-          />
-        )}
+            <p className="text-gray-700">
+              Vous avez quitté trop de fois la page, vous ne pouvez donc plus participer au test jusqu&apos;à ce qu&apos;un professeur vous y
+              autorise.
+            </p>
+          </div>
+        </div>
+      )}
 
-        {question.questionType === 'numericQuestion' && (
-          <NumericQuestion question={question as IQuestion<INumericQuestion>} handleSubmit={handleSubmit} />
-        )}
+      <StudentDashboard hideMenu>
+        <Container title={question.title} subtitle={question.description} badge={getBadge()}>
+          <Bar />
 
-        {question.questionType === 'choiceQuestion' && (
-          <ChoiceQuestion question={question as IQuestion<IChoiceQuestion>} handleSubmit={handleSubmit} />
-        )}
-      </Container>
-    </StudentDashboard>
+          {question.questionType === 'textualQuestion' && (
+            <TextualQuestion
+              question={question as IQuestion<ITextualQuestion>}
+              handleSubmit={handleSubmit}
+              long={verificationType?.slug === 'manuel'}
+              strict={quiz.strict}
+            />
+          )}
+
+          {question.questionType === 'numericQuestion' && (
+            <NumericQuestion question={question as IQuestion<INumericQuestion>} handleSubmit={handleSubmit} strict={quiz.strict} />
+          )}
+
+          {question.questionType === 'choiceQuestion' && (
+            <ChoiceQuestion question={question as IQuestion<IChoiceQuestion>} handleSubmit={handleSubmit} strict={quiz.strict} />
+          )}
+        </Container>
+      </StudentDashboard>
+    </>
   ) : (
     <StudentDashboard>
       <p className="m-auto">Ce test ne contient aucune question.</p>
