@@ -3,6 +3,8 @@ import { ChangeEvent, ReactElement } from 'react';
 import React from 'react';
 import clsx from 'clsx';
 
+import useAutoFocus from '@hooks/useAutoFocus';
+
 interface IProps {
   placeholder?: string;
   label: string;
@@ -11,6 +13,7 @@ interface IProps {
 
   maxLength?: number;
   readonly?: boolean;
+  autofocus?: boolean;
 
   className?: string;
 
@@ -18,11 +21,23 @@ interface IProps {
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Input = ({ label, error = false, placeholder, className, value, setValue, note, maxLength, readonly = false }: IProps): ReactElement => {
+const Input = ({
+  label,
+  error = false,
+  placeholder,
+  className,
+  value,
+  setValue,
+  note,
+  maxLength,
+  readonly = false,
+  autofocus = false,
+}: IProps): ReactElement => {
+  const input = useAutoFocus(autofocus);
+
   const onChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setValue(e.target.value);
   };
-
   return (
     <div className={clsx(['form-control flex flex-col w-80', className])}>
       <label className="text-sm font-semibold text-gray-900">
@@ -39,6 +54,7 @@ const Input = ({ label, error = false, placeholder, className, value, setValue, 
           autoComplete="off"
           maxLength={maxLength}
           readOnly={readonly}
+          ref={input}
         />
 
         {maxLength && (

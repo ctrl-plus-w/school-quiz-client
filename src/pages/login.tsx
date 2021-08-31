@@ -71,7 +71,14 @@ const Login: FunctionComponent = () => {
             <Route to="/password-lost">Mot de passe oublié ?</Route>
           </Col>
 
-          <Input label="Nom d'utilisateur" placeholder="jdupont" value={username} setValue={setUsername} error={errors.includes('username')} />
+          <Input
+            label="Nom d'utilisateur"
+            placeholder="jdupont"
+            value={username}
+            setValue={setUsername}
+            error={errors.includes('username')}
+            autofocus
+          />
           <PasswordInput label="Mot de passe" placeholder="****" value={password} setValue={setPassword} error={errors.includes('password')} />
           <Button submit>Se connecter</Button>
         </FormGroup>
