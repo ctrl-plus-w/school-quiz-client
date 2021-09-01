@@ -39,6 +39,7 @@ import useAppDispatch from '@hooks/useAppDispatch';
 import useAppSelector from '@hooks/useAppSelector';
 import useValidation from '@hooks/useValidation';
 import useLoading from '@hooks/useLoading';
+import useSocket from '@hooks/useSocket';
 
 import { nameMapper, nameSlugMapper, shuffle, sortById } from '@util/mapper.utils';
 import { incrementSeconds } from '@util/date.utils';
@@ -252,6 +253,8 @@ const Quiz = (): ReactElement => {
   const event = useAppSelector(selectTempEvent);
   const question = useAppSelector(selectTempQuestion) as IQuestion<TypedQuestion>;
 
+  const socket = useSocket(token);
+
   useEffect(() => {
     if (!event) return;
 
@@ -307,6 +310,12 @@ const Quiz = (): ReactElement => {
 
     runEvent();
   };
+
+  useEffect(() => {
+    if (!event || !socket) return;
+
+    socket.emit('user:join', { eventId: event.id });
+  }, [event, socket]);
 
   if (loading)
     return (
