@@ -351,6 +351,8 @@ export const isInFuture = (date: Date): boolean => {
  * @returns An array reprensenting the amount of [days, hours, minutes, seconds]
  */
 export const getTimeFromMs = (ms: number): [number, number, number, number] => {
+  if (ms <= 0) return [0, 0, 0, 0];
+
   const DAY_AS_MS = 24 * 60 * 60 * 1000;
   const HOUR_AS_MS = 60 * 60 * 1000;
   const MIN_AS_MS = 60 * 1000;

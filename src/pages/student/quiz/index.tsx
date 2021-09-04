@@ -30,6 +30,7 @@ import FormGroupSkeleton from '@skeleton/FormGroupSkeleton';
 import ButtonSkeleton from '@skeleton/ButtonSkeleton';
 import InputSkeleton from '@skeleton/InputSkeleton';
 import FormSkeleton from '@skeleton/FormSkeleton';
+import Countdown from '@element/Countdown';
 
 import useLoadStudentQuestion from '@hooks/useLoadStudentQuestion';
 import useLoadStudentEvent from '@hooks/useLoadStudentEvent';
@@ -312,10 +313,10 @@ const Quiz = (): ReactElement => {
   };
 
   useEffect(() => {
-    if (!event || !socket) return;
+    if (!socket || !event) return;
 
-    socket.emit('user:join', { eventId: event.id });
-  }, [event, socket]);
+    socket.emit('user:join');
+  }, [socket, event]);
 
   if (loading)
     return (
@@ -347,6 +348,15 @@ const Quiz = (): ReactElement => {
     return (
       <StudentDashboard>
         <p className="m-auto">Fin du test...</p>
+      </StudentDashboard>
+    );
+
+  if (event && event.inFuture)
+    return (
+      <StudentDashboard>
+        <div className="flex flex-col m-auto text-4xl">
+          <Countdown until={incrementSeconds(new Date(event.start), 10)} cb={runEvent} />
+        </div>
       </StudentDashboard>
     );
 
