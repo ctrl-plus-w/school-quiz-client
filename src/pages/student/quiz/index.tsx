@@ -340,14 +340,20 @@ const Quiz = (): ReactElement => {
   if (!event || !quiz)
     return (
       <StudentDashboard>
-        <p className="m-auto">Aucun événement trouvé ...</p>
+        <div className="flex flex-col items-center m-auto">
+          <Title>Aucun test disponible !</Title>
+          <p className="mt-4">Vous n&apos;avez aucun tests auquels vous pouvez participer.</p>
+        </div>
       </StudentDashboard>
     );
 
   if (event && finished)
     return (
       <StudentDashboard>
-        <p className="m-auto">Fin du test...</p>
+        <div className="flex flex-col items-center m-auto">
+          <Title>Terminé !</Title>
+          <p className="mt-4">Vous avez terminé le test.</p>
+        </div>
       </StudentDashboard>
     );
 
