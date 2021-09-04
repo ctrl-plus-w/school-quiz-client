@@ -11,7 +11,8 @@ interface IUser extends DefaultModelProperties {
   password: string;
   gender: boolean | null;
   groups: Array<IGroup>;
-  role?: Role;
+  role?: IRole;
+  state?: IState;
 }
 
 interface IGroup extends DefaultModelProperties {
@@ -56,6 +57,7 @@ interface IEvent extends DefaultModelProperties {
   collaborators: Array<IUser>;
   quiz?: IQuiz;
   group?: IGroup;
+  users?: Array<IUser>;
 
   blocked?: boolean;
   remainingQuestions?: number;
