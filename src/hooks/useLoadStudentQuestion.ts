@@ -55,7 +55,6 @@ const useLoadStudentQuestion = (config?: { notFoundRedirect?: string; doNotRefet
       if (cbs) for (const cb of cbs) cb();
 
       setLoading(false);
-      console.log('Set the loading to false');
       setRunner(false);
     })();
   }, [runner]);
