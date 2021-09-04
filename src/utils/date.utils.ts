@@ -344,3 +344,28 @@ export const getTimeArrayFromDifference = (date: Date, date1: Date): [string, st
 export const isInFuture = (date: Date): boolean => {
   return date.valueOf() > setTime(new Date(), 24, 0, 0, 0).valueOf();
 };
+
+/**
+ * Get the amount of days, hours, minutes and seconds contained in the amount of milliseconds
+ * @param ms The amount of milliseconds
+ * @returns An array reprensenting the amount of [days, hours, minutes, seconds]
+ */
+export const getTimeFromMs = (ms: number): [number, number, number, number] => {
+  const DAY_AS_MS = 24 * 60 * 60 * 1000;
+  const HOUR_AS_MS = 60 * 60 * 1000;
+  const MIN_AS_MS = 60 * 1000;
+  const SEC_AS_MS = 1000;
+
+  const days = Math.floor(ms / DAY_AS_MS);
+  const daysMs = days * DAY_AS_MS;
+
+  const hours = Math.floor((ms - daysMs) / HOUR_AS_MS);
+  const hoursMs = hours * HOUR_AS_MS;
+
+  const mins = Math.floor((ms - daysMs - hoursMs) / MIN_AS_MS);
+  const minsMs = mins * MIN_AS_MS;
+
+  const secs = Math.floor((ms - daysMs - hoursMs - minsMs) / SEC_AS_MS);
+
+  return [days, hours, mins, secs];
+};
