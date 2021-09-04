@@ -60,6 +60,7 @@ interface IEvent extends DefaultModelProperties {
   blocked?: boolean;
   remainingQuestions?: number;
   answeredQuestions?: number;
+  inFuture?: boolean;
 }
 
 interface IQuiz extends DefaultModelProperties {
