@@ -28,6 +28,7 @@ const useLoadQuiz = (quizId: number, config?: { notFoundRedirect?: string; refet
   const run = () => {
     setRunner(true);
     setLoading(true);
+    clearTempQuiz();
   };
 
   useEffect(() => {

@@ -28,6 +28,7 @@ const useLoadStudentQuestion = (config?: { notFoundRedirect?: string; doNotRefet
   const run = () => {
     setRunner(true);
     setLoading(true);
+    clearTempQuestion();
   };
 
   useEffect(() => {

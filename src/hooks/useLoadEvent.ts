@@ -28,6 +28,7 @@ const useLoadEvent = (eventId: number, config?: { notFoundRedirect: string }): I
   const run = () => {
     setRunner(true);
     setLoading(true);
+    clearTempEvent();
   };
 
   useEffect(() => {

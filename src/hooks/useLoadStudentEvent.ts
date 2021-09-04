@@ -29,6 +29,7 @@ const useLoadStudentEvent = (config?: { notFoundRedirect?: string; doNotRefetch?
   const run = () => {
     setRunner(true);
     setLoading(true);
+    clearTempEvent();
   };
 
   useEffect(() => {

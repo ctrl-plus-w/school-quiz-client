@@ -7,7 +7,7 @@ import useAppDispatch from '@hooks/useAppDispatch';
 
 import { getQuestion } from '@api/questions';
 
-import { clearQuestions, setTempQuestion } from '@redux/questionSlice';
+import { clearQuestions, clearTempQuestion, setTempQuestion } from '@redux/questionSlice';
 import { selectToken } from '@redux/authSlice';
 
 interface IReturnProperties {
@@ -27,6 +27,7 @@ const useLoadQuestion = (quizId: number, questionId: number, config?: { notFound
   const run = () => {
     setRunner(true);
     setLoading(true);
+    clearTempQuestion();
   };
 
   useEffect(() => {
