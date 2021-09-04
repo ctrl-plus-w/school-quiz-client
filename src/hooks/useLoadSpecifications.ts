@@ -24,7 +24,10 @@ const useLoadSpecifications = (config?: { refetch?: boolean }): IReturnPropertie
 
   const token = useAppSelector(selectToken);
 
-  const run = () => setRunner(true);
+  const run = () => {
+    setRunner(true);
+    setLoading(true);
+  };
 
   useEffect(() => {
     const fail = () => Router.push('/login');

@@ -24,7 +24,10 @@ const useLoadQuestion = (quizId: number, questionId: number, config?: { notFound
 
   const token = useAppSelector(selectToken);
 
-  const run = () => setRunner(true);
+  const run = () => {
+    setRunner(true);
+    setLoading(true);
+  };
 
   useEffect(() => {
     const fail = () => Router.push('/login');

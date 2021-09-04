@@ -24,7 +24,10 @@ const useLoadQuestions = (quizId: number, config?: { refetch?: boolean }): IRetu
 
   const token = useAppSelector(selectToken);
 
-  const run = () => setRunner(true);
+  const run = () => {
+    setRunner(true);
+    setLoading(true);
+  };
 
   useEffect(() => {
     const fail = () => Router.push('/login');

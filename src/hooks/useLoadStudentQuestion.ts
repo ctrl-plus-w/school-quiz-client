@@ -25,7 +25,10 @@ const useLoadStudentQuestion = (config?: { notFoundRedirect?: string; doNotRefet
   const token = useAppSelector(selectToken);
   const question = useAppSelector(selectTempQuestion);
 
-  const run = () => setRunner(true);
+  const run = () => {
+    setRunner(true);
+    setLoading(true);
+  };
 
   useEffect(() => {
     const fail = () => Router.push('/login');

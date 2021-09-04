@@ -28,7 +28,10 @@ const useLoadQuizzes = (refetch = false): IReturnProperties => {
   const token = useAppSelector(selectToken);
   const user = useAppSelector(selectUser);
 
-  const run = () => setRunner(true);
+  const run = () => {
+    setRunner(true);
+    setLoading(true);
+  };
 
   useEffect(() => {
     if (!runner) return;

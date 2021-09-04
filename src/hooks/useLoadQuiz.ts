@@ -25,7 +25,10 @@ const useLoadQuiz = (quizId: number, config?: { notFoundRedirect?: string; refet
   const token = useAppSelector(selectToken);
   const user = useAppSelector(selectUser);
 
-  const run = () => setRunner(true);
+  const run = () => {
+    setRunner(true);
+    setLoading(true);
+  };
 
   useEffect(() => {
     const fail = () => Router.push('/login');

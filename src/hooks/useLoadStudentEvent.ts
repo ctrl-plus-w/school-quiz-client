@@ -26,7 +26,10 @@ const useLoadStudentEvent = (config?: { notFoundRedirect?: string; doNotRefetch?
   const user = useAppSelector(selectUser);
   const event = useAppSelector(selectTempEvent);
 
-  const run = () => setRunner(true);
+  const run = () => {
+    setRunner(true);
+    setLoading(true);
+  };
 
   useEffect(() => {
     const fail = () => Router.push('/login');
