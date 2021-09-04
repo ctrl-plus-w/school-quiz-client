@@ -1,3 +1,5 @@
+import { ReactElement } from 'react';
+
 interface ILink {
   name: string;
   path: string;
@@ -49,6 +51,6 @@ type Choice = {
   checked: boolean;
 };
 
-type MapperFunction = (value: any) => string;
+type MapperFunction = (value: any) => string | ReactElement;
 
 type BadgeType = 'DEFAULT' | 'WARNING' | 'ERROR' | 'SUCCESS' | 'INFO';

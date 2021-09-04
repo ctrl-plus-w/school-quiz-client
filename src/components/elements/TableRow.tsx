@@ -25,10 +25,11 @@ import database from '@database/database';
 import { selectToken } from '@redux/authSlice';
 import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
 
+type MapperFunction = (value: any) => string | ReactElement;
 interface IProps<T, K> {
   instance: T;
 
-  apiName: string;
+  apiName?: string;
 
   attributes: Array<[name: string, attribute: K, mapper?: MapperFunction]>;
 
@@ -113,31 +114,33 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
         </td>
       ))}
 
-      <td className="relative cursor-pointer w-6 text-gray-500 text-sm border-t border-gray-300 group-hover:bg-gray-200 transition-all duration-100">
-        <div className="relative py-3 flex justify-center items-center w-full hover:bg-red-100 transition-all duration-100" onClick={handleDelete}>
-          <TrashIcon className="text-red-500 w-5 h-5" />
-        </div>
+      {apiName && (
+        <td className="relative cursor-pointer w-6 text-gray-500 text-sm border-t border-gray-300 group-hover:bg-gray-200 transition-all duration-100">
+          <div className="relative py-3 flex justify-center items-center w-full hover:bg-red-100 transition-all duration-100" onClick={handleDelete}>
+            <TrashIcon className="text-red-500 w-5 h-5" />
+          </div>
 
-        <form
-          className={clsx([
-            'error-validation z-10 w-72 flex items-start flex-col py-5 px-4 rounded border cursor-default',
-            'absolute top-full -left-72',
-            'bg-white border-gray-400 shadow-2xl',
-            'ring ring-gray-300',
-            shownElement === instance.id ? 'visible' : 'invisible',
-          ])}
-          ref={container}
-          onSubmit={deleteInstance}
-        >
-          <Title level={4}>Êtes vous sur ?</Title>
+          <form
+            className={clsx([
+              'error-validation z-10 w-72 flex items-start flex-col py-5 px-4 rounded border cursor-default',
+              'absolute top-full -left-72',
+              'bg-white border-gray-400 shadow-2xl',
+              'ring ring-gray-300',
+              shownElement === instance.id ? 'visible' : 'invisible',
+            ])}
+            ref={container}
+            onSubmit={deleteInstance}
+          >
+            <Title level={4}>Êtes vous sur ?</Title>
 
-          <p className="text-gray-800 font-normal">Cette action est irréversible.</p>
+            <p className="text-gray-800 font-normal">Cette action est irréversible.</p>
 
-          <Button full={false} className="mt-6" submit={true} type="error">
-            Supprimer
-          </Button>
-        </form>
-      </td>
+            <Button full={false} className="mt-6" submit={true} type="error">
+              Supprimer
+            </Button>
+          </form>
+        </td>
+      )}
     </tr>
   );
 };

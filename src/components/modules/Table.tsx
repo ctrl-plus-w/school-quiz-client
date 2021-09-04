@@ -8,13 +8,13 @@ import clsx from 'clsx';
 
 import TableRow from '@element/TableRow';
 
-type MapperFunction = (value: any) => string;
+type MapperFunction = (value: any) => string | ReactElement;
 
 interface IProps<T, K> {
   data: Array<T>;
   attributes: Array<[name: string, attribute: K, mapper?: MapperFunction]>;
 
-  apiName: string;
+  apiName?: string;
 
   removeFromStore?: ActionCreatorWithPayload<any, any>;
 
@@ -42,7 +42,7 @@ const Table = <T extends { id: number }, K extends keyof T>({
               {name}
             </td>
           ))}
-          <td className="w-2/24 px-4 py-3 text-black border-t border-gray-300 text-sm"></td>
+          {apiName && <td className="w-2/24 px-4 py-3 text-black border-t border-gray-300 text-sm"></td>}
         </tr>
       </thead>
 
