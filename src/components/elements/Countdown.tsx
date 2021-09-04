@@ -1,4 +1,4 @@
-import { ReactElement, useState } from 'react';
+import { ReactElement, useEffect, useState } from 'react';
 
 import clsx from 'clsx';
 import React from 'react';
@@ -8,6 +8,7 @@ import { formatNumber } from '@util/mapper.utils';
 
 interface IProps {
   until: Date;
+  cb?: () => void;
 
   className?: string;
 }
@@ -16,14 +17,21 @@ const getTimeFromMsFormated = (date: Date) => {
   return getTimeFromMs(date.valueOf() - Date.now()).map(formatNumber);
 };
 
-const Countdown = ({ until, className }: IProps): ReactElement => {
+const Countdown = ({ until, className, cb }: IProps): ReactElement => {
+  const [finished, setFinished] = useState(false);
   const [diff, setDiff] = useState(getTimeFromMsFormated(until));
 
-  const updateDiff = () => {
-    setDiff(getTimeFromMsFormated(until));
-  };
+  const { clear } = useInterval(() => setDiff(getTimeFromMsFormated(until)), 1000);
 
-  useInterval(updateDiff, 1000);
+  useEffect(() => {
+    if (finished) return;
+
+    if (diff.every((el) => el === '00')) {
+      cb && cb();
+      setFinished(true);
+      clear();
+    }
+  }, [diff]);
 
   return (
     <div className={clsx('flex flex-row gap-3', className)}>
