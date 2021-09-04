@@ -80,8 +80,8 @@ export const collaboratorsMapper = (user: IUser): IBasicModel => {
 };
 
 export const formatNumber = (num: string | number): string => {
-  if (typeof num === 'string') return parseInt(num) < 10 ? `0${parseInt(num)}` : `${num}`;
-  return num < 10 ? `0${num}` : `${num}`;
+  if (typeof num === 'string') return parseInt(num) < 10 ? `0${Math.abs(parseInt(num))}` : `${num}`;
+  return num < 10 ? `0${Math.abs(num)}` : `${num}`;
 };
 
 export const shuffle = <T>(arr: Array<T>): Array<T> => {
