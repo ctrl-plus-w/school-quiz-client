@@ -29,6 +29,14 @@ const addUsersReducer = (state: IUserState, action: PayloadAction<Array<IUser>>)
   state.users = state.users.concat(newUsers);
 };
 
+const replaceOrAddUserReducer = (state: IUserState, action: PayloadAction<IUser>) => {
+  if (state.users.some((user) => user.id === action.payload.id)) {
+    state.users = state.users.filter((user) => user.id != action.payload.id).concat(action.payload);
+  } else {
+    state.users = state.users.concat(action.payload);
+  }
+};
+
 const clearUsersReducer = (state: IUserState) => {
   state.users = [];
 };
@@ -50,13 +58,14 @@ const userSlice = createSlice({
   reducers: {
     setUser: setUserReducer,
     addUsers: addUsersReducer,
+    replaceOrAddUser: replaceOrAddUserReducer,
     clearUsers: clearUsersReducer,
     addProfessors: addProfessorsReducer,
     clearProfessors: clearProfessorsReducer,
   },
 });
 
-export const { setUser, addProfessors, addUsers, clearProfessors, clearUsers } = userSlice.actions;
+export const { setUser, addProfessors, addUsers, clearProfessors, clearUsers, replaceOrAddUser } = userSlice.actions;
 
 export const selectUser = (state: RootState): IUser | null => state.user.user;
 export const selectUsers = (state: RootState): Array<IUser> => state.user.users;
