@@ -15,6 +15,11 @@ export const getStudentEvent = async (token: string): Promise<APIResponse<IEvent
   return getApiCall(endpoint, token, { errors: { '404': "L'événement n'a pas été trouvé." } });
 };
 
+export const getProfessorEvent = async (token: string): Promise<APIResponse<IEvent>> => {
+  const endpoint = '/api/events/event';
+  return getApiCall(endpoint, token, { errors: { '404': "L'événement n'a pas été trouvé." } });
+};
+
 export const createEvent = async (creationAttributes: EventCreationAttributes, token: string): Promise<APIResponse<IEvent>> => {
   const endpoint = '/api/events';
   return postApiCall(endpoint, token, { data: creationAttributes, errors: { '409': 'Cet événement existe déja.' } });
