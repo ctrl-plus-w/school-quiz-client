@@ -50,11 +50,12 @@ const useLoadStudentQuestion = (config?: { notFoundRedirect?: string; doNotRefet
         if (question) dispatch(setTempQuestion(question));
       };
 
-      if (!config || (config.doNotRefetch === true && !question) || !config?.doNotRefetch) compute();
+      if (!config || (config.doNotRefetch === true && !question) || !config?.doNotRefetch) await compute();
 
       if (cbs) for (const cb of cbs) cb();
 
       setLoading(false);
+      console.log('Set the loading to false');
       setRunner(false);
     })();
   }, [runner]);

@@ -51,7 +51,7 @@ const useLoadStudentEvent = (config?: { notFoundRedirect?: string; doNotRefetch?
         if (event) dispatch(setTempEvent(event));
       };
 
-      if (!config || (config.doNotRefetch === true && !event) || !config?.doNotRefetch) compute();
+      if (!config || (config.doNotRefetch === true && !event) || !config?.doNotRefetch) await compute();
 
       if (cbs) for (const cb of cbs) cb();
 
