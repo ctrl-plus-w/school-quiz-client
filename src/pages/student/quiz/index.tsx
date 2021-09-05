@@ -320,6 +320,10 @@ const Quiz = (): ReactElement => {
     socket.on('quiz:blocked', () => {
       setBlocked(true);
     });
+
+    socket.on('event:start', () => {
+      runEvent();
+    });
   }, [socket, event]);
 
   if (loading)

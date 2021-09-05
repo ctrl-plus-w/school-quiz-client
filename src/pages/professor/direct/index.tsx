@@ -12,6 +12,11 @@ import ProfessorDashboardLayout from '@layout/ProfessorDashboard';
 import Container from '@module/Container';
 import Table from '@module/Table';
 
+import Subtitle from '@element/Subtitle';
+import Button from '@element/Button';
+import Title from '@element/Title';
+import Bar from '@element/Bar';
+
 import useLoadProfessorEvent from '@hooks/useLoadProfessorEvent';
 import useAuthentication from '@hooks/useAuthentication';
 import useAppSelector from '@hooks/useAppSelector';
@@ -96,6 +101,10 @@ const Direct = (): ReactElement => {
     if (!event || !socket) return;
 
     socket.emit('user:join');
+
+    socket.on('event:start', () => {
+      runEvent();
+    });
   }, [socket, event]);
 
   if (loading) return <ProfessorDashboardSkeleton></ProfessorDashboardSkeleton>;
@@ -112,16 +121,34 @@ const Direct = (): ReactElement => {
   return (
     <ProfessorDashboardLayout>
       <Container title="Test en direct" subtitle={quiz.title}>
-        <Table
-          data={[...users].sort((a, b) => a.id - b.id)}
-          attributes={[
-            ["Nom d'utilisateur", 'username'],
-            ['Nom', 'lastName'],
-            ['État', 'state', stateMapper],
-            ['Alertes', 'eventWarns', warnMapper],
-          ]}
-          handleClick={() => null}
-        />
+        <Bar />
+
+        {/* Temporary code for testing */}
+        <div className="flex flex-col items-start">
+          <p>{event.inFuture ? 'Événement à venir' : 'Événement commencé'}</p>
+
+          <div className="flex mt-4">
+            <Button onClick={() => socket && socket.emit('quiz:start')} disabled={!event.inFuture}>
+              Lancer le test
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-col items-start min-h-full mt-16">
+          <Title level={2}>Élèves</Title>
+          <Subtitle className="flex-grow-0 mt-2">Liste des élèves.</Subtitle>
+
+          <Table
+            data={[...users].sort((a, b) => a.id - b.id)}
+            attributes={[
+              ["Nom d'utilisateur", 'username'],
+              ['Nom', 'lastName'],
+              ['État', 'state', stateMapper],
+              ['Alertes', 'eventWarns', warnMapper],
+            ]}
+            handleClick={() => null}
+          />
+        </div>
       </Container>
     </ProfessorDashboardLayout>
   );
