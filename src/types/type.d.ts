@@ -1,5 +1,3 @@
-import { ReactElement } from 'react';
-
 interface ILink {
   name: string;
   path: string;

@@ -13,6 +13,7 @@ interface IUser extends DefaultModelProperties {
   groups: Array<IGroup>;
   role?: IRole;
   state?: IState;
+  eventWarns?: Array<IWarn>;
 }
 
 interface IGroup extends DefaultModelProperties {
@@ -46,6 +47,10 @@ interface IRole extends DefaultModelProperties {
   name: string;
   slug: string;
   permission: number;
+}
+
+interface IWarn {
+  amount: number;
 }
 
 interface IEvent extends DefaultModelProperties {
