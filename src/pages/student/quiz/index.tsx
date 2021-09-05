@@ -133,14 +133,21 @@ const NumericQuestion = ({ question, handleSubmit, strict }: INumericQuestionPro
   const [answer, setAnswer] = useState('');
   const [dateAnswer, setDateAnswer] = useState(new Date());
 
-  const { valid } = useValidation(() => true, [answer], [answer]);
+  const { valid } = useValidation(
+    () => {
+      if (specification && specification.slug !== 'date') return answer !== '';
+      return true;
+    },
+    [answer],
+    []
+  );
 
   const onSubmit = async (e: FormEvent): Promise<void> => {
     e.preventDefault();
 
     if (!valid) return;
 
-    handleSubmit(specification?.slug === 'date' ? { answer: dateAnswer.valueOf().toString() } : { answer });
+    handleSubmit(specification?.slug === 'date' ? { answer: dateAnswer.toISOString() } : { answer });
   };
 
   const getInput = (): ReactElement => {
