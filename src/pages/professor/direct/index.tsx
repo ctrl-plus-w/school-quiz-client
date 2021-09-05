@@ -1,6 +1,10 @@
-import { ReactElement, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
+import { useEffect } from 'react';
+
+import type { ReactElement } from 'react';
 
 import React from 'react';
+import clsx from 'clsx';
 
 import ProfessorDashboardSkeleton from '@layout/ProfessorDashboardSkeleton';
 import ProfessorDashboardLayout from '@layout/ProfessorDashboard';
@@ -14,6 +18,8 @@ import useAppSelector from '@hooks/useAppSelector';
 import useAppDispatch from '@hooks/useAppDispatch';
 import useLoading from '@hooks/useLoading';
 import useSocket from '@hooks/useSocket';
+
+import { generateArray } from '@util/generate.utils';
 
 import { addUsers, clearUsers, replaceOrAddUser, selectUsers } from '@redux/userSlice';
 import { selectTempQuiz, setTempQuiz } from '@redux/quizSlice';
@@ -53,14 +59,43 @@ const Direct = (): ReactElement => {
     return <span className="bg-red-600 text-white py-1 px-4 rounded">{'Inactif'}</span>;
   };
 
-  useEffect(() => {
-    if (!socket || !event) return;
+  const warnMapper = (warns?: Array<IWarn>): ReactElement => {
+    const amount = warns && warns[0] ? Math.min(warns[0].amount, 3) : 0;
 
-    socket.emit('user:join');
+    return (
+      <div className="flex gap-2">
+        {generateArray(amount, 0).map((_, index) => (
+          <div className={clsx(['w-4 h-4 rounded-full', index < 2 && 'bg-yellow-500', index === 2 && 'bg-red-600'])} key={uuidv4()}></div>
+        ))}
+
+        {generateArray(3 - amount, 0).map(() => (
+          <div className="w-4 h-4 bg-gray-400 rounded-full" key={uuidv4()}></div>
+        ))}
+      </div>
+    );
+  };
+
+  // Socket io user:events
+  useEffect(() => {
+    if (!socket) return;
 
     socket.on('user:update', (user: IUser) => {
       dispatch(replaceOrAddUser(user));
     });
+
+    socket.on('user:warn', (userId: number, amount: number) => {
+      const user = users.find(({ id }) => id === userId);
+      if (!user) return;
+
+      dispatch(replaceOrAddUser({ ...user, eventWarns: [{ amount }] }));
+    });
+  }, [socket, users]);
+
+  // Socket io join:event
+  useEffect(() => {
+    if (!event || !socket) return;
+
+    socket.emit('user:join');
   }, [socket, event]);
 
   if (loading) return <ProfessorDashboardSkeleton></ProfessorDashboardSkeleton>;
@@ -78,11 +113,12 @@ const Direct = (): ReactElement => {
     <ProfessorDashboardLayout>
       <Container title="Test en direct" subtitle={quiz.title}>
         <Table
-          data={users}
+          data={[...users].sort((a, b) => a.id - b.id)}
           attributes={[
             ["Nom d'utilisateur", 'username'],
             ['Nom', 'lastName'],
             ['État', 'state', stateMapper],
+            ['Alertes', 'eventWarns', warnMapper],
           ]}
           handleClick={() => null}
         />
