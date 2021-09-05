@@ -46,7 +46,6 @@ import { nameMapper, nameSlugMapper, shuffle, sortById } from '@util/mapper.util
 import { incrementSeconds } from '@util/date.utils';
 
 import { answerQuestion } from '@api/questions';
-import { warn } from '@api/events';
 
 import { addErrorNotification } from '@redux/notificationSlice';
 import { selectTempQuiz, setTempQuiz } from '@redux/quizSlice';
@@ -275,16 +274,17 @@ const Quiz = (): ReactElement => {
   }, [question]);
 
   const onBlur = async () => {
-    if (!event || !event.quiz || !event.quiz.strict || !token || finished || blocked) return;
+    if (!event || !event.quiz || !event.quiz.strict || !token || !socket || finished || blocked) return;
+
+    // If the quiz is inFuture, do not send warn
+    if (event.inFuture) return;
 
     // Prevent from having too much warns in a short time (3 secs interval)
     if (incrementSeconds(lastWarn, 3).valueOf() > Date.now()) return;
 
     setLastWarn(new Date());
 
-    const [data] = await warn(token);
-
-    if (data && data.blocked) setBlocked(true);
+    socket.emit('user:warn');
 
     dispatch(addErrorNotification('Vous ne devez pas quitter la page sous peine de sanction.'));
   };
@@ -316,6 +316,10 @@ const Quiz = (): ReactElement => {
     if (!socket || !event) return;
 
     socket.emit('user:join');
+
+    socket.on('quiz:blocked', () => {
+      setBlocked(true);
+    });
   }, [socket, event]);
 
   if (loading)
