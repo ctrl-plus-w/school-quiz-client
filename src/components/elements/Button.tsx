@@ -14,6 +14,8 @@ interface IProps {
   submit?: boolean;
   disabled?: boolean;
   full?: boolean;
+
+  onClick?: (e: MouseEvent) => void;
 }
 
 const Button: FunctionComponent<IProps> = ({
@@ -24,6 +26,7 @@ const Button: FunctionComponent<IProps> = ({
   primary = true,
   disabled = false,
   type = 'info',
+  onClick,
 }: IProps) => {
   const getSecondaryStyle = () => {
     switch (type) {
@@ -52,6 +55,8 @@ const Button: FunctionComponent<IProps> = ({
       e.preventDefault();
       e.stopPropagation();
     }
+
+    onClick && onClick(e);
   };
 
   return (
