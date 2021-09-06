@@ -68,6 +68,9 @@ interface IEvent extends DefaultModelProperties {
   remainingQuestions?: number;
   answeredQuestions?: number;
   inFuture?: boolean;
+
+  started?: boolean;
+  startedAt?: Date;
 }
 
 interface IQuiz extends DefaultModelProperties {
