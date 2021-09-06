@@ -182,4 +182,5 @@ interface IChoice extends DefaultModelProperties {
 interface IUserAnswer extends DefaultModelProperties {
   user?: IUser;
   question?: Question;
+  answerContent: string;
 }
