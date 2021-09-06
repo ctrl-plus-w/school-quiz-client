@@ -54,9 +54,9 @@ const Button: FunctionComponent<IProps> = ({
     if (disabled) {
       e.preventDefault();
       e.stopPropagation();
+    } else {
+      onClick && onClick(e);
     }
-
-    onClick && onClick(e);
   };
 
   return (
