@@ -12,7 +12,9 @@ import ProfessorDashboardLayout from '@layout/ProfessorDashboard';
 import Container from '@module/Container';
 import Table from '@module/Table';
 
+import Countdown from '@element/Countdown';
 import Subtitle from '@element/Subtitle';
+import Counter from '@element/Counter';
 import Button from '@element/Button';
 import Title from '@element/Title';
 import Bar from '@element/Bar';
@@ -80,6 +82,13 @@ const Direct = (): ReactElement => {
     );
   };
 
+  const getBadge = (): { type: BadgeType; content: string } | undefined => {
+    if (!event) return undefined;
+
+    if (!event.inFuture) return { content: 'En direct', type: 'ERROR' };
+    return { content: 'À venir', type: 'SUCCESS' };
+  };
+
   // Socket io user:events
   useEffect(() => {
     if (!socket) return;
@@ -120,12 +129,18 @@ const Direct = (): ReactElement => {
 
   return (
     <ProfessorDashboardLayout>
-      <Container title="Test en direct" subtitle={quiz.title}>
+      <Container title="Test en direct" subtitle={quiz.title} badge={getBadge()}>
         <Bar />
 
         {/* Temporary code for testing */}
         <div className="flex flex-col items-start">
-          <p>{event.inFuture ? 'Événement à venir' : 'Événement commencé'}</p>
+          <div className="text-4xl mb-4">
+            {event.inFuture ? (
+              <Countdown until={new Date(event.start)} />
+            ) : (
+              <Counter startDate={new Date(event.started && event.startedAt ? event.startedAt : event.start)} />
+            )}
+          </div>
 
           <div className="flex mt-4">
             <Button onClick={() => socket && socket.emit('quiz:start')} disabled={!event.inFuture}>
