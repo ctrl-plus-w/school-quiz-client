@@ -5,7 +5,7 @@ import clsx from 'clsx';
 
 interface IProps {
   children?: React.ReactNode;
-  className: string;
+  className?: string;
 }
 
 const Subtitle: FunctionComponent<IProps> = ({ children, className }: IProps) => {
