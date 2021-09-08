@@ -5,6 +5,16 @@ export const getQuestions = async (quizId: number, token: string): Promise<APIRe
   return getApiCall(endpoint, token);
 };
 
+export const getQuestionsToCorrect = async (eventId: number, token: string): Promise<APIResponse<Array<Question>>> => {
+  const endpoint = `/api/events/${eventId}/questionsToCorrect`;
+  return getApiCall(endpoint, token);
+};
+
+export const getQuestionToCorrect = async (eventId: number, questionId: number, token: string): Promise<APIResponse<Question>> => {
+  const endpoint = `/api/events/${eventId}/questionsToCorrect/${questionId}`;
+  return getApiCall(endpoint, token);
+};
+
 export const getQuestion = async (quizId: number, questionId: number, token: string): Promise<APIResponse<Question>> => {
   const endpoint = `/api/quizzes/${quizId}/questions/${questionId}`;
   return getApiCall(endpoint, token, { errors: { '404': "Cette question n'existe pas." } });
@@ -42,6 +52,17 @@ export const updateNumericQuestion = updateQuestion<AllOptional<NumericQuestionC
 
 export const createChoiceQuestion = createQuestion<ChoiceQuestionCreationAttributes>('choiceQuestion');
 export const updateChoiceQuestion = updateQuestion<AllOptional<ChoiceQuestionCreationAttributes>>();
+
+export const updateUserAnswerValidity = async (
+  eventId: number,
+  questionId: number,
+  userAnswerId: number,
+  valid: boolean,
+  token: string
+): Promise<APIResponse<Array<IChoice>>> => {
+  const endpoint = `/api/events/${eventId}/questionsToCorrect/${questionId}/userAnswers/${userAnswerId}`;
+  return postApiCall(endpoint, token, { data: { valid } });
+};
 
 export const addChoices = async (
   quizId: number,
