@@ -52,3 +52,18 @@ type Choice = {
 type MapperFunction = (value: any) => string | ReactElement;
 
 type BadgeType = 'DEFAULT' | 'WARNING' | 'ERROR' | 'SUCCESS' | 'INFO';
+
+type VoidFunction = () => void;
+
+interface ILoadHookConfig {
+  notFoundRedirect?: string;
+  doNotRefetch?: boolean;
+}
+
+interface ILoadHookReturnProperties {
+  state: 'LOADING' | 'FULFILLED';
+
+  run: () => void;
+}
+
+type ILoadHookRedirectFunction = (path?: string) => void;
