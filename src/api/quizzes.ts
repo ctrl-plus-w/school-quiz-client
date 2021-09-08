@@ -1,7 +1,7 @@
 import { deleteApiCall, getApiCall, postApiCall, updateApiCall } from '@api/index';
 
-export const getQuizzes = async (token: string): Promise<APIResponse<Array<IQuiz>>> => {
-  const endpoint = '/api/quizzes';
+export const getQuizzes = async (token: string, userId?: number): Promise<APIResponse<Array<IQuiz>>> => {
+  const endpoint = `/api/quizzes${userId ? `?userId=${userId}` : ''}`;
   return getApiCall(endpoint, token);
 };
 
