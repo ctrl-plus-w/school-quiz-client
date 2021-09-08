@@ -9,6 +9,7 @@ import ProfessorDashboard from '@layout/ProfessorDashboard';
 import FormButtons from '@module/FormButtons';
 import FormGroup from '@module/FormGroup';
 import Container from '@module/Container';
+import Table from '@module/Table';
 import Form from '@module/Form';
 import Row from '@module/Row';
 
@@ -16,6 +17,7 @@ import CalendarInput from '@element/CalendarInput';
 import SearchInput from '@element/SearchInput';
 import TimeInput from '@element/TimeInput';
 import Dropdown from '@element/Dropdown';
+import Subtitle from '@element/Subtitle';
 import Title from '@element/Title';
 import Bar from '@element/Bar';
 
@@ -26,6 +28,7 @@ import InputSkeleton from '@skeleton/InputSkeleton';
 import TitleSkeleton from '@skeleton/TitleSkeleton';
 import FormSkeleton from '@skeleton/FormSkeleton';
 
+import useLoadQuestionsToCorrect from '@hooks/useLoadQuestionsToCorrect';
 import useAuthentication from '@hooks/useAuthentication';
 import useLoadQuizzes from '@hooks/useLoadQuizzes';
 import useAppSelector from '@hooks/useAppSelector';
@@ -47,17 +50,18 @@ import {
   isSameTime,
   setTime,
 } from '@util/date.utils';
-import { collaboratorsMapper, slugMapper } from '@util/mapper.utils';
+import { collaboratorsMapper, questionTypeMapper, slugMapper } from '@util/mapper.utils';
 import { areArraysEquals } from '@util/condition.utils';
 import { getLength } from '@util/object.utils';
 
 import { addCollaborators, removeCollaborators, updateEvent } from '@api/events';
 
 import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
-import { selectTempEvent } from '@redux/eventSlice';
 import { selectProfessors, selectUser } from '@redux/userSlice';
-import { selectGroups } from '@redux/groupSlice';
+import { selectQuestions } from '@redux/questionSlice';
+import { selectTempEvent } from '@redux/eventSlice';
 import { selectQuizzes } from '@redux/quizSlice';
+import { selectGroups } from '@redux/groupSlice';
 import { selectToken } from '@redux/authSlice';
 
 import ROLES from '@constant/roles';
@@ -72,10 +76,11 @@ const Event = (): ReactElement => {
   const { state: quizState, run: runQuizzes } = useLoadQuizzes();
   const { state: groupState, run: runGroups } = useLoadGroups();
   const { state: userState, run: runUsers } = useLoadUsers('professeur');
+  const { state: questionState, run: runQuestions } = useLoadQuestionsToCorrect(parseInt(id as string));
   const { state: eventState, run: runEvents } = useLoadEvent(parseInt(id as string));
-  const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [runEvents, runGroups, runQuizzes, runUsers]);
+  const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [runEvents, runGroups, runQuizzes, runUsers, runQuestions]);
 
-  const { loading } = useLoading([authState, eventState, groupState, quizState, userState]);
+  const { loading } = useLoading([authState, eventState, groupState, quizState, userState, questionState]);
 
   const user = useAppSelector(selectUser);
   const token = useAppSelector(selectToken);
@@ -83,6 +88,7 @@ const Event = (): ReactElement => {
   const groups = useAppSelector(selectGroups);
   const quizzes = useAppSelector(selectQuizzes);
   const professors = useAppSelector(selectProfessors);
+  const questions = useAppSelector(selectQuestions);
 
   const [formFilled, setFormFilled] = useState(false);
 
@@ -151,6 +157,11 @@ const Event = (): ReactElement => {
 
     setFormFilled(true);
   }, [event, user]);
+
+  const handleQuestionRedirect = (instance: Question) => {
+    console.log(instance);
+    router.push({ pathname: `${router.pathname}/questions/${instance.id}`, query: { id: instance.id } });
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -291,6 +302,22 @@ const Event = (): ReactElement => {
 
           {isOwner && !isNoMoreEditable && <FormButtons href="/professor/events" valid={valid} update />}
         </Form>
+
+        <div className="flex flex-col items-start min-h-full mt-16">
+          <Title level={2}>Questions à vérifier</Title>
+          <Subtitle>Voici les question dont vous devez vérifier la validitée.</Subtitle>
+
+          <Table<Question, keyof Question>
+            attributes={[
+              ['ID', 'id'],
+              ['Titre', 'title'],
+              ['Description', 'description'],
+              ['Type de question', 'questionType', questionTypeMapper],
+            ]}
+            data={questions}
+            handleClick={handleQuestionRedirect}
+          />
+        </div>
       </Container>
     </ProfessorDashboard>
   );
