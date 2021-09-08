@@ -8,12 +8,15 @@ import Layout from '@layout/Default';
 import Menu from '@module/Menu';
 
 import PROFESSOR_MENU from '@constant/professorMenu';
+import clsx from 'clsx';
 
 interface IProps {
   children?: React.ReactNode;
+
+  scroll?: boolean;
 }
 
-const ProfessorDashboardLayout: FunctionComponent<IProps> = ({ children }: IProps) => {
+const ProfessorDashboardLayout: FunctionComponent<IProps> = ({ children, scroll }: IProps) => {
   const router = useRouter();
 
   const linkMapper = (links: ILink[]) =>
@@ -27,7 +30,7 @@ const ProfessorDashboardLayout: FunctionComponent<IProps> = ({ children }: IProp
     <Layout title="Professor Dashboard" display="row">
       <Menu logoutButton={true} links={linkMapper(PROFESSOR_MENU.links)} />
 
-      <div className="flex flex-col flex-grow overflow-y-scroll">{children}</div>
+      <div className={clsx(['flex flex-col flex-grow', scroll && 'overflow-y-scroll'])}>{children}</div>
     </Layout>
   );
 };

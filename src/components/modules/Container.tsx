@@ -49,7 +49,7 @@ const Container: FunctionComponent<IProps> = ({ children, title, subtitle, bread
   };
 
   return (
-    <div className="relative flex flex-col py-12 px-12 h-full">
+    <div className="relative flex flex-col py-12 px-12 h-full overflow-y-scroll">
       <div className="flex flex-col items-start">
         {getBreadcrumbElement()}
 

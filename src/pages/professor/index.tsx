@@ -34,7 +34,7 @@ const Professor = (): ReactElement => {
       </div>
     </ProfessorDashboardSkeleton>
   ) : (
-    <ProfessorDashboard>
+    <ProfessorDashboard scroll>
       <div className="flex flex-col py-12 px-12">
         <Title>Bienvenue, {user.firstName} !</Title>
 
