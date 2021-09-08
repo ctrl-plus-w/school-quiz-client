@@ -1,66 +1,38 @@
-import { useEffect, useState } from 'react';
-
-import Router from 'next/router';
-
 import useAppSelector from '@hooks/useAppSelector';
 import useAppDispatch from '@hooks/useAppDispatch';
-
-import { getProfessorEvent } from '@api/events';
 
 import { clearTempEvent, selectTempEvent, setTempEvent } from '@redux/eventSlice';
 import { selectToken } from '@redux/authSlice';
 import { selectUser } from '@redux/userSlice';
 
-interface IReturnProperties {
-  state: 'LOADING' | 'FULFILLED';
-  run: () => void;
-}
+import useLoad from '@hooks/useLoad';
+import { getProfessorEvent } from '@api/events';
 
-const useLoadProfessorEvent = (config?: { notFoundRedirect?: string; doNotRefetch?: boolean }, cbs?: Array<() => void>): IReturnProperties => {
+const useLoadProfessorEvent = (config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILoadHookReturnProperties => {
   const dispatch = useAppDispatch();
-
-  const [runner, setRunner] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   const token = useAppSelector(selectToken);
   const user = useAppSelector(selectUser);
   const event = useAppSelector(selectTempEvent);
 
-  const run = () => {
-    setRunner(true);
-    setLoading(true);
-    clearTempEvent();
-  };
+  return useLoad(
+    async (fail: VoidFunction, redirect: ILoadHookRedirectFunction) => {
+      if (!token || !user) return fail();
 
-  useEffect(() => {
-    const fail = () => Router.push('/login');
+      dispatch(clearTempEvent());
 
-    (async () => {
-      if (!runner) return;
+      const [event, error] = await getProfessorEvent(token);
 
-      const compute = async () => {
-        if (!token || !user) return fail();
+      if (error || !event) {
+        if (error && error.status === 404) return redirect(config?.notFoundRedirect);
+        return fail();
+      }
 
-        dispatch(clearTempEvent());
-
-        const [event, error] = await getProfessorEvent(token);
-
-        if (error && error.status === 404 && config && config.notFoundRedirect) return Router.push(config.notFoundRedirect);
-        else if (error && error.status !== 404) return fail();
-
-        if (event) dispatch(setTempEvent(event));
-      };
-
-      if (!config || (config.doNotRefetch === true && !event) || !config?.doNotRefetch) await compute();
-
-      if (cbs) for (const cb of cbs) cb();
-
-      setLoading(false);
-      setRunner(false);
-    })();
-  }, [runner]);
-
-  return { state: loading ? 'LOADING' : 'FULFILLED', run };
+      dispatch(setTempEvent(event));
+    },
+    cbs,
+    { ...config, refetchNullValuesToCheck: [event] }
+  );
 };
 
 export default useLoadProfessorEvent;

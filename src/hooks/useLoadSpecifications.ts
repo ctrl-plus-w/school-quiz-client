@@ -1,60 +1,31 @@
-import { useEffect, useState } from 'react';
-
-import Router from 'next/router';
-
 import useAppSelector from '@hooks/useAppSelector';
 import useAppDispatch from '@hooks/useAppDispatch';
+import useLoad from '@hooks/useLoad';
 
 import { getSpecifications } from '@api/questions';
 
 import { addSpecifications, clearSpecifications } from '@redux/questionSlice';
 import { selectToken } from '@redux/authSlice';
 
-interface IReturnProperties {
-  state: 'LOADING' | 'FULFILLED';
-  run: () => void;
-}
-
-const useLoadSpecifications = (config?: { refetch?: boolean }): IReturnProperties => {
-  const [runner, setRunner] = useState(false);
-
-  const [loading, setLoading] = useState(true);
-
+const useLoadSpecifications = (config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILoadHookReturnProperties => {
   const dispatch = useAppDispatch();
 
   const token = useAppSelector(selectToken);
 
-  const run = () => {
-    setRunner(true);
-    setLoading(true);
-  };
+  return useLoad(
+    async (fail: VoidFunction) => {
+      if (!token) return fail();
 
-  useEffect(() => {
-    const fail = () => Router.push('/login');
+      dispatch(clearSpecifications());
 
-    (async () => {
-      if (!runner) return;
+      const [specifications, error] = await getSpecifications(token);
 
-      const compute = async () => {
-        if (!token) return fail();
-
-        dispatch(clearSpecifications());
-
-        const [specifications, error] = await getSpecifications(token);
-
-        if (error || !specifications) fail();
-
-        if (!specifications) return;
-
-        dispatch(addSpecifications(specifications));
-        setLoading(false);
-      };
-
-      compute();
-    })();
-  }, [runner]);
-
-  return { state: loading ? 'LOADING' : 'FULFILLED', run };
+      if (error || !specifications) return fail();
+      dispatch(addSpecifications(specifications));
+    },
+    cbs,
+    config
+  );
 };
 
 export default useLoadSpecifications;

@@ -1,62 +1,41 @@
-import { useEffect, useState } from 'react';
-
-import Router from 'next/router';
-
 import useAppSelector from '@hooks/useAppSelector';
 import useAppDispatch from '@hooks/useAppDispatch';
+import useLoad from '@hooks/useLoad';
 
-import { getEvent } from '@api/events';
-
-import { clearTempEvent, setTempEvent } from '@redux/eventSlice';
+import { clearTempEvent, selectTempEvent, setTempEvent } from '@redux/eventSlice';
 import { selectToken } from '@redux/authSlice';
 import { selectUser } from '@redux/userSlice';
 
-interface IReturnProperties {
-  state: 'LOADING' | 'FULFILLED';
-  run: () => void;
-}
+import { getEvent } from '@api/events';
 
-const useLoadEvent = (eventId: number, config?: { notFoundRedirect: string }): IReturnProperties => {
+const useLoadEvent = (eventId: number, config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILoadHookReturnProperties => {
   const dispatch = useAppDispatch();
-
-  const [runner, setRunner] = useState(false);
-  const [loading, setLoading] = useState(true);
 
   const token = useAppSelector(selectToken);
   const user = useAppSelector(selectUser);
+  const event = useAppSelector(selectTempEvent);
+
+  const { state, run: _run } = useLoad(
+    async (fail: VoidFunction) => {
+      if (!user || !token) return fail();
+
+      dispatch(clearTempEvent());
+
+      const [event, error] = await getEvent(eventId, token, user.id);
+
+      if (error || !event) return fail();
+      dispatch(setTempEvent(event));
+    },
+    cbs,
+    { ...config, refetchNullValuesToCheck: [event] }
+  );
 
   const run = () => {
-    setRunner(true);
-    setLoading(true);
-    clearTempEvent();
+    console.log('called');
+    _run();
   };
 
-  useEffect(() => {
-    const fail = () => Router.push('/login');
-
-    (async () => {
-      if (!runner || !eventId || isNaN(eventId)) return;
-
-      const compute = async () => {
-        if (!token || !user) return fail();
-
-        dispatch(clearTempEvent());
-
-        const [event, error] = await getEvent(eventId, token, user.id);
-
-        if (!event && config && config.notFoundRedirect) return Router.push(config.notFoundRedirect);
-
-        if (error || !event) return fail();
-
-        dispatch(setTempEvent(event));
-        setLoading(false);
-      };
-
-      compute();
-    })();
-  }, [runner, eventId]);
-
-  return { state: loading ? 'LOADING' : 'FULFILLED', run };
+  return { state, run };
 };
 
 export default useLoadEvent;

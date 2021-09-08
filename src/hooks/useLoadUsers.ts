@@ -1,63 +1,32 @@
-import { useEffect, useState } from 'react';
-
-import Router from 'next/router';
-
 import useAppDispatch from '@hooks/useAppDispatch';
 import useAppSelector from '@hooks/useAppSelector';
+import useLoad from '@hooks/useLoad';
 
-import { addProfessors, addUsers, clearProfessors, clearUsers } from '@redux/userSlice';
+import { addUsers, clearProfessors, clearUsers } from '@redux/userSlice';
 import { selectToken } from '@redux/authSlice';
 import { getUsers } from '@api/users';
 
-interface IReturnProperties {
-  state: 'LOADING' | 'FULFILLED';
-  run: () => void;
-}
-
-const useLoadUsers = (role?: 'professeur'): IReturnProperties => {
-  const [runner, setRunner] = useState(false);
-
-  const [loading, setLoading] = useState(true);
-
+const useLoadUsers = (role?: 'professeur', config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILoadHookReturnProperties => {
   const dispatch = useAppDispatch();
 
   const token = useAppSelector(selectToken);
 
-  const run = (): void => setRunner(true);
+  return useLoad(
+    async (fail: VoidFunction) => {
+      if (!token) return;
 
-  useEffect(() => {
-    const fail = () => Router.push('/login');
+      const isProfessor = role === 'professeur';
 
-    (async () => {
-      if (!runner) return;
+      dispatch(isProfessor ? clearProfessors() : clearUsers());
 
-      const compute = async () => {
-        if (!token) return fail();
+      const [users, error] = await getUsers(token, isProfessor ? 'professeur' : undefined);
 
-        if (role === 'professeur') {
-          dispatch(clearProfessors());
-
-          const [users, error] = await getUsers(token, 'professeur');
-
-          if (error || !users) fail();
-          else dispatch(addProfessors(users));
-        } else {
-          dispatch(clearUsers());
-
-          const [users, error] = await getUsers(token);
-
-          if (error || !users) fail();
-          else dispatch(addUsers(users));
-        }
-
-        setLoading(false);
-      };
-
-      compute();
-    })();
-  }, [runner]);
-
-  return { state: loading ? 'LOADING' : 'FULFILLED', run };
+      if (error || !users) fail();
+      else dispatch(addUsers(users));
+    },
+    cbs,
+    config
+  );
 };
 
 export default useLoadUsers;

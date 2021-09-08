@@ -1,65 +1,36 @@
-import { useEffect, useState } from 'react';
-
-import Router from 'next/router';
-
 import useAppSelector from '@hooks/useAppSelector';
 import useAppDispatch from '@hooks/useAppDispatch';
+import useLoad from '@hooks/useLoad';
 
 import { getStudentQuestion } from '@api/questions';
 
 import { clearTempQuestion, selectTempQuestion, setTempQuestion } from '@redux/questionSlice';
 import { selectToken } from '@redux/authSlice';
 
-interface IReturnProperties {
-  state: 'LOADING' | 'FULFILLED';
-  run: () => void;
-}
-
-const useLoadStudentQuestion = (config?: { notFoundRedirect?: string; doNotRefetch?: boolean }, cbs?: Array<() => void>): IReturnProperties => {
-  const [runner, setRunner] = useState(false);
-
-  const [loading, setLoading] = useState(true);
-
+const useLoadStudentQuestion = (config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILoadHookReturnProperties => {
   const dispatch = useAppDispatch();
 
   const token = useAppSelector(selectToken);
   const question = useAppSelector(selectTempQuestion);
 
-  const run = () => {
-    setRunner(true);
-    setLoading(true);
-    clearTempQuestion();
-  };
+  return useLoad(
+    async (fail: VoidFunction, redirect: ILoadHookRedirectFunction) => {
+      if (!token) return fail();
 
-  useEffect(() => {
-    const fail = () => Router.push('/login');
+      dispatch(clearTempQuestion());
 
-    (async () => {
-      if (!runner) return;
+      const [fetchedQuestion, error] = await getStudentQuestion(token);
 
-      const compute = async () => {
-        if (!token) return fail();
+      if (error || !fetchedQuestion) {
+        if (error && error.status === 404) return redirect(config?.notFoundRedirect);
+        return fail();
+      }
 
-        dispatch(clearTempQuestion());
-
-        const [question, error] = await getStudentQuestion(token);
-
-        if (error && error.status === 404 && config && config.notFoundRedirect) return Router.push(config.notFoundRedirect);
-        else if (error && error.status !== 404) return fail();
-
-        if (question) dispatch(setTempQuestion(question));
-      };
-
-      if (!config || (config.doNotRefetch === true && !question) || !config?.doNotRefetch) await compute();
-
-      if (cbs) for (const cb of cbs) cb();
-
-      setLoading(false);
-      setRunner(false);
-    })();
-  }, [runner]);
-
-  return { state: loading ? 'LOADING' : 'FULFILLED', run };
+      dispatch(setTempQuestion(fetchedQuestion));
+    },
+    cbs,
+    { ...config, refetchNullValuesToCheck: [question] }
+  );
 };
 
 export default useLoadStudentQuestion;

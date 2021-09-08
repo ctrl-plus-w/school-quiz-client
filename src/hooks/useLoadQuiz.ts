@@ -1,65 +1,36 @@
-import { useEffect, useState } from 'react';
-
-import Router from 'next/router';
-
 import useAppSelector from '@hooks/useAppSelector';
 import useAppDispatch from '@hooks/useAppDispatch';
+import useLoad from '@hooks/useLoad';
 
-import { clearTempQuiz, setTempQuiz } from '@redux/quizSlice';
+import { selectTempQuiz, setTempQuiz } from '@redux/quizSlice';
 import { selectToken } from '@redux/authSlice';
 import { selectUser } from '@redux/userSlice';
+
 import { getQuiz } from '@api/quizzes';
 
-interface IReturnProperties {
-  state: 'LOADING' | 'FULFILLED';
-  run: () => void;
-}
-
-const useLoadQuiz = (quizId: number, config?: { notFoundRedirect?: string; refetch?: boolean }): IReturnProperties => {
-  const [runner, setRunner] = useState(false);
-
-  const [loading, setLoading] = useState(true);
-
+const useLoadQuiz = (quizId: number, config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILoadHookReturnProperties => {
   const dispatch = useAppDispatch();
 
   const token = useAppSelector(selectToken);
   const user = useAppSelector(selectUser);
+  const quiz = useAppSelector(selectTempQuiz);
 
-  const run = () => {
-    setRunner(true);
-    setLoading(true);
-    clearTempQuiz();
-  };
+  return useLoad(
+    async (fail: VoidFunction, redirect: ILoadHookRedirectFunction) => {
+      if (!token || !user) return fail();
 
-  useEffect(() => {
-    const fail = () => Router.push('/login');
+      const [fetchedQuiz, error] = await getQuiz(quizId, token, user.id);
 
-    (async () => {
-      if (!runner || !quizId || isNaN(quizId)) return;
+      if (error || !fetchedQuiz) {
+        if (error && error.status === 404) return redirect(config?.notFoundRedirect);
+        return fail();
+      }
 
-      const compute = async () => {
-        if (!token || !user) return fail();
-
-        dispatch(clearTempQuiz());
-
-        const [quiz, error] = await getQuiz(quizId, token, user.id);
-
-        if (error) fail();
-
-        if (quiz) {
-          dispatch(setTempQuiz(quiz));
-          setLoading(false);
-        } else {
-          if (config && config.notFoundRedirect) Router.push(config.notFoundRedirect);
-          else fail();
-        }
-      };
-
-      compute();
-    })();
-  }, [runner, quizId]);
-
-  return { state: loading ? 'LOADING' : 'FULFILLED', run };
+      dispatch(setTempQuiz(fetchedQuiz));
+    },
+    cbs,
+    { ...config, refetchNullValuesToCheck: [quiz] }
+  );
 };
 
 export default useLoadQuiz;

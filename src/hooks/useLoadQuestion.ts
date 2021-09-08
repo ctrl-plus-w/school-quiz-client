@@ -1,64 +1,43 @@
-import { useEffect, useState } from 'react';
-
-import Router from 'next/router';
-
 import useAppSelector from '@hooks/useAppSelector';
 import useAppDispatch from '@hooks/useAppDispatch';
 
 import { getQuestion } from '@api/questions';
 
-import { clearQuestions, clearTempQuestion, setTempQuestion } from '@redux/questionSlice';
+import { clearTempQuestion, selectTempQuestion, setTempQuestion } from '@redux/questionSlice';
 import { selectToken } from '@redux/authSlice';
 
-interface IReturnProperties {
-  state: 'LOADING' | 'FULFILLED';
-  run: () => void;
-}
+import useLoad from '@hooks/useLoad';
 
-const useLoadQuestion = (quizId: number, questionId: number, config?: { notFoundRedirect?: string; refetch?: boolean }): IReturnProperties => {
-  const [runner, setRunner] = useState(false);
+const useLoadQuestion = (
+  quizId: number,
+  questionId: number,
 
-  const [loading, setLoading] = useState(true);
-
+  config?: ILoadHookConfig,
+  cbs?: Array<VoidFunction>
+): ILoadHookReturnProperties => {
   const dispatch = useAppDispatch();
 
   const token = useAppSelector(selectToken);
+  const question = useAppSelector(selectTempQuestion);
 
-  const run = () => {
-    setRunner(true);
-    setLoading(true);
-    clearTempQuestion();
-  };
+  return useLoad(
+    async (fail: VoidFunction, redirect: ILoadHookRedirectFunction) => {
+      if (!token) return fail();
 
-  useEffect(() => {
-    const fail = () => Router.push('/login');
+      dispatch(clearTempQuestion());
 
-    (async () => {
-      if (!runner || !quizId || !questionId || isNaN(quizId) || isNaN(questionId)) return;
+      const [fetchedQuestion, error] = await getQuestion(quizId, questionId, token);
 
-      const compute = async () => {
-        if (!token) return fail();
+      if (error || !fetchedQuestion) {
+        if (error && error.status === 404) return redirect(config?.notFoundRedirect);
+        return fail();
+      }
 
-        dispatch(clearQuestions());
-
-        const [question, error] = await getQuestion(quizId, questionId, token);
-
-        if (error) fail();
-
-        if (question) {
-          dispatch(setTempQuestion(question));
-          setLoading(false);
-        } else {
-          if (config && config.notFoundRedirect) Router.push(config.notFoundRedirect);
-          else fail();
-        }
-      };
-
-      compute();
-    })();
-  }, [runner]);
-
-  return { state: loading ? 'LOADING' : 'FULFILLED', run };
+      dispatch(setTempQuestion(fetchedQuestion));
+    },
+    cbs,
+    { ...config, refetchNullValuesToCheck: [question] }
+  );
 };
 
 export default useLoadQuestion;

@@ -1,61 +1,33 @@
-import { useEffect, useState } from 'react';
-
-import Router from 'next/router';
-
-import { getHeaders } from '@util/authentication.utils';
-
 import useAppSelector from '@hooks/useAppSelector';
 import useAppDispatch from '@hooks/useAppDispatch';
+import useLoad from '@hooks/useLoad';
 
-import database from '@database/database';
+import { getQuizzes } from '@api/quizzes';
 
 import { addQuizzes, clearQuizzes } from '@redux/quizSlice';
 import { selectToken } from '@redux/authSlice';
 import { selectUser } from '@redux/userSlice';
 
-interface IReturnProperties {
-  state: 'LOADING' | 'FULFILLED';
-  run: () => void;
-}
-
-const useLoadQuizzes = (refetch = false): IReturnProperties => {
-  const [runner, setRunner] = useState(false);
-
-  const [loading, setLoading] = useState(true);
-
+const useLoadQuizzes = (config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILoadHookReturnProperties => {
   const dispatch = useAppDispatch();
 
   const token = useAppSelector(selectToken);
   const user = useAppSelector(selectUser);
 
-  const run = () => {
-    setRunner(true);
-    setLoading(true);
-  };
-
-  useEffect(() => {
-    if (!runner) return;
-
-    const fail = () => {
-      Router.push('/login');
-    };
-
-    const compute = async () => {
+  return useLoad(
+    async (fail: VoidFunction) => {
       if (!token || !user) return fail();
 
       dispatch(clearQuizzes());
 
-      const { data: quizzes } = await database.get('/api/quizzes/', { ...getHeaders(token), params: { userId: user.id } });
-      if (!quizzes) return fail();
+      const [quizzes, error] = await getQuizzes(token, user.id);
 
+      if (error || !quizzes) return fail();
       dispatch(addQuizzes(quizzes));
-      setLoading(false);
-    };
-
-    compute();
-  }, [runner]);
-
-  return { state: loading ? 'LOADING' : 'FULFILLED', run };
+    },
+    cbs,
+    config
+  );
 };
 
 export default useLoadQuizzes;
