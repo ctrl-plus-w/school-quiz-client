@@ -256,9 +256,9 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
   const dispatch = useAppDispatch();
 
   const questionAnswers = question.answers as Array<IAnswer<IExactAnswer>>;
-  const questionAnswer = question.answers[0] as IAnswer<IComparisonAnswer>;
+  const questionAnswer = question.answers[0] as IAnswer<IComparisonAnswer> | null;
 
-  const firstAnswerType = questionAnswer.answerType === 'exactAnswer' ? 'exact' : 'comparison';
+  const firstAnswerType = questionAnswer && questionAnswer.answerType === 'exactAnswer' ? 'exact' : 'comparison';
 
   // Constants
 
@@ -282,8 +282,8 @@ const NumericQuestion = ({ quiz, question, questionSpecifications, token }: INum
   const [questionAnswerMin] = useState(specificationType === 'comparison' ? questionAnswer?.typedAnswer?.greaterThan?.toString() : '');
   const [questionAnswerMax] = useState(specificationType === 'comparison' ? questionAnswer?.typedAnswer?.lowerThan?.toString() : '');
 
-  const [answerMin, setAnswerMin] = useState(questionAnswerMin);
-  const [answerMax, setAnswerMax] = useState(questionAnswerMax);
+  const [answerMin, setAnswerMin] = useState(questionAnswerMin || '');
+  const [answerMax, setAnswerMax] = useState(questionAnswerMax || '');
 
   const { valid } = useValidation(
     () => {
