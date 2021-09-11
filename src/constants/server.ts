@@ -1,5 +1,5 @@
 const SERVER = {
-  ENDPOINT: 'http://localhost:3005',
+  ENDPOINT: <string>process.env.NEXT_PUBLIC_SERVER_ENDPOINT,
 };
 
 export default SERVER;
