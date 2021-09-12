@@ -913,7 +913,7 @@ module.exports = {
     fontFamily: ['responsive'],
     fontSize: ['responsive'],
     fontSmoothing: ['responsive'],
-    fontStyle: ['responsive'],
+    fontStyle: ['responsive', 'hover'],
     fontVariantNumeric: ['responsive'],
     fontWeight: ['responsive'],
     gap: ['responsive'],

@@ -8,7 +8,7 @@ interface IProps {
 
   className?: string;
 
-  type?: 'info' | 'success' | 'error';
+  type?: 'info' | 'success' | 'error' | 'black';
 
   primary?: boolean;
   submit?: boolean;
@@ -47,6 +47,8 @@ const Button: FunctionComponent<IProps> = ({
         return clsx(['bg-blue-800 text-white shadow', !disabled && 'hover:bg-blue-700 hover:ring hover:ring-blue-300']);
       case 'success':
         return clsx(['bg-green-700 text-white shadow', !disabled && 'hover:bg-green-600 hover:ring hover:ring-green-200']);
+      case 'black':
+        return clsx(['bg-black text-white shadow', !disabled && 'hover:bg-gray-900 hover:ring hover:ring-gray-300']);
     }
   };
 
