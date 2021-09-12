@@ -39,7 +39,11 @@ const useLoad = (
 
       if (!config || !config.doNotRefetch) {
         await compute();
-      } else if (config.doNotRefetch && config.refetchNullValuesToCheck && config.refetchNullValuesToCheck.every((value) => value === null)) {
+      } else if (
+        config.doNotRefetch &&
+        config.refetchNullValuesToCheck &&
+        config.refetchNullValuesToCheck.every((value) => value === null || (Array.isArray(value) && value.length === 0))
+      ) {
         await compute();
       }
 
