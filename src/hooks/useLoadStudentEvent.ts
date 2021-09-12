@@ -22,7 +22,10 @@ const useLoadStudentEvent = (config?: ILoadHookConfig, cbs?: Array<VoidFunction>
       const [fetchedEvent, error] = await getStudentEvent(token);
 
       if (error || !fetchedEvent) {
-        if (error && error.status === 404) return redirect(config?.notFoundRedirect);
+        if (error && error.status === 404) {
+          if (config?.onNotFoundDoNothing) return;
+          else return redirect(config?.notFoundRedirect);
+        }
         return fail();
       }
 

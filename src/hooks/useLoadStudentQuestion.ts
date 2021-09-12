@@ -22,7 +22,10 @@ const useLoadStudentQuestion = (config?: ILoadHookConfig, cbs?: Array<VoidFuncti
       const [fetchedQuestion, error] = await getStudentQuestion(token);
 
       if (error || !fetchedQuestion) {
-        if (error && error.status === 404) return redirect(config?.notFoundRedirect);
+        if (error && error.status === 404) {
+          if (config?.onNotFoundDoNothing) return;
+          else return redirect(config?.notFoundRedirect);
+        }
         return fail();
       }
 

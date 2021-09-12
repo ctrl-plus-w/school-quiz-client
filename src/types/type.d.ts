@@ -58,6 +58,7 @@ type VoidFunction = () => void;
 interface ILoadHookConfig {
   notFoundRedirect?: string;
   doNotRefetch?: boolean;
+  onNotFoundDoNothing?: boolean;
 }
 
 interface ILoadHookReturnProperties {

@@ -38,7 +38,7 @@ import ROLES from '@constant/roles';
 const Direct = (): ReactElement => {
   const dispatch = useAppDispatch();
 
-  const { state: eventState, run: runEvent } = useLoadProfessorEvent();
+  const { state: eventState, run: runEvent } = useLoadProfessorEvent({ onNotFoundDoNothing: true });
   const { state: authState } = useAuthentication(ROLES.PROFESSOR.PERMISSION, [runEvent]);
 
   const { loading } = useLoading([authState, eventState]);
