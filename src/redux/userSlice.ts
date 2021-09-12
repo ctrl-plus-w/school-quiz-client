@@ -37,8 +37,16 @@ const replaceOrAddUserReducer = (state: IUserState, action: PayloadAction<IUser>
   }
 };
 
+const removeUserReducer = (state: IUserState, action: PayloadAction<number>) => {
+  state.users = state.users.filter((user) => user.id !== action.payload);
+};
+
 const clearUsersReducer = (state: IUserState) => {
   state.users = [];
+};
+
+const clearUserReducer = (state: IUserState) => {
+  state.user = null;
 };
 
 const addProfessorsReducer = (state: IUserState, action: PayloadAction<Array<IUser>>) => {
@@ -58,14 +66,16 @@ const userSlice = createSlice({
   reducers: {
     setUser: setUserReducer,
     addUsers: addUsersReducer,
+    removeUser: removeUserReducer,
     replaceOrAddUser: replaceOrAddUserReducer,
     clearUsers: clearUsersReducer,
     addProfessors: addProfessorsReducer,
     clearProfessors: clearProfessorsReducer,
+    clearUser: clearUserReducer,
   },
 });
 
-export const { setUser, addProfessors, addUsers, clearProfessors, clearUsers, replaceOrAddUser } = userSlice.actions;
+export const { setUser, addProfessors, addUsers, clearProfessors, clearUsers, replaceOrAddUser, removeUser, clearUser } = userSlice.actions;
 
 export const selectUser = (state: RootState): IUser | null => state.user.user;
 export const selectUsers = (state: RootState): Array<IUser> => state.user.users;
