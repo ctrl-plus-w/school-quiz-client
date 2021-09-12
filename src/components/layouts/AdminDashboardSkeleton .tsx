@@ -6,7 +6,7 @@ import clsx from 'clsx';
 
 import Layout from '@layout/Default';
 
-import Menu from '@module/Menu';
+import MenuSkeleton from '@skeleton/MenuSkeleton';
 
 import ADMIN_MENUS from '@constant/adminMenu';
 
@@ -16,7 +16,7 @@ interface IProps {
   scroll?: boolean;
 }
 
-const AdminDashboard: FunctionComponent<IProps> = ({ children, scroll }: IProps) => {
+const AdminDashboardSkeleton: FunctionComponent<IProps> = ({ children, scroll }: IProps) => {
   const router = useRouter();
 
   const linkMapper = (links: ILink[]) =>
@@ -28,11 +28,11 @@ const AdminDashboard: FunctionComponent<IProps> = ({ children, scroll }: IProps)
 
   return (
     <Layout title="Admin Dashboard" display="row">
-      <Menu logoutButton={true} links={linkMapper(ADMIN_MENUS.links)} />
+      <MenuSkeleton logoutButton={true} links={linkMapper(ADMIN_MENUS.links)} />
 
       <div className={clsx(['flex flex-col flex-grow', scroll && 'overflow-y-scroll'])}>{children}</div>
     </Layout>
-  );  
+  );
 };
 
-export default AdminDashboard;
+export default AdminDashboardSkeleton;
