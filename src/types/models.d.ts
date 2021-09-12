@@ -14,6 +14,14 @@ interface IUser extends DefaultModelProperties {
   role?: IRole;
   state?: IState;
   eventWarns?: Array<IWarn>;
+  analytics: Array<IAnalytic>;
+}
+
+interface IAnalytic extends DefaultModelProperties {
+  startedAt: Date;
+  endedAt: Date;
+  score: number;
+  maxScore: number;
 }
 
 interface IGroup extends DefaultModelProperties {
