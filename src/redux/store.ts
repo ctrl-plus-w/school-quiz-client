@@ -7,6 +7,7 @@ import eventSlice from '@redux/eventSlice';
 import questionSlice from '@redux/questionSlice';
 import groupSlice from '@redux/groupSlice';
 import notificationSlice from './notificationSlice';
+import roleSlice from './roleSlice';
 
 const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ const store = configureStore({
     question: questionSlice,
     group: groupSlice,
     notification: notificationSlice,
+    role: roleSlice,
   },
 });
 

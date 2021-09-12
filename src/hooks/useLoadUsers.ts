@@ -2,14 +2,16 @@ import useAppDispatch from '@hooks/useAppDispatch';
 import useAppSelector from '@hooks/useAppSelector';
 import useLoad from '@hooks/useLoad';
 
-import { addUsers, clearProfessors, clearUsers } from '@redux/userSlice';
-import { selectToken } from '@redux/authSlice';
 import { getUsers } from '@api/users';
+
+import { addUsers, clearProfessors, clearUsers, selectUsers } from '@redux/userSlice';
+import { selectToken } from '@redux/authSlice';
 
 const useLoadUsers = (role?: 'professeur', config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILoadHookReturnProperties => {
   const dispatch = useAppDispatch();
 
   const token = useAppSelector(selectToken);
+  const users = useAppSelector(selectUsers);
 
   return useLoad(
     async (fail: VoidFunction) => {
@@ -19,13 +21,13 @@ const useLoadUsers = (role?: 'professeur', config?: ILoadHookConfig, cbs?: Array
 
       dispatch(isProfessor ? clearProfessors() : clearUsers());
 
-      const [users, error] = await getUsers(token, isProfessor ? 'professeur' : undefined);
+      const [fetchedUsers, error] = await getUsers(token, isProfessor ? 'professeur' : undefined);
 
-      if (error || !users) fail();
-      else dispatch(addUsers(users));
+      if (error || !fetchedUsers) fail();
+      else dispatch(addUsers(fetchedUsers));
     },
     cbs,
-    config
+    { ...config, refetchNullValuesToCheck: [users] }
   );
 };
 

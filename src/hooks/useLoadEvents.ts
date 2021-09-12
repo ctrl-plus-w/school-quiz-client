@@ -1,19 +1,19 @@
 import useAppSelector from '@hooks/useAppSelector';
 import useAppDispatch from '@hooks/useAppDispatch';
-
-import { addEvents, clearEvents } from '@redux/eventSlice';
-import { selectToken } from '@redux/authSlice';
-import { selectUser } from '@redux/userSlice';
+import useLoad from '@hooks/useLoad';
 
 import { getEvents } from '@api/events';
 
-import useLoad from '@hooks/useLoad';
+import { addEvents, clearEvents, selectEvents } from '@redux/eventSlice';
+import { selectToken } from '@redux/authSlice';
+import { selectUser } from '@redux/userSlice';
 
 const useLoadEvents = (config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILoadHookReturnProperties => {
   const dispatch = useAppDispatch();
 
   const user = useAppSelector(selectUser);
   const token = useAppSelector(selectToken);
+  const events = useAppSelector(selectEvents);
 
   return useLoad(
     async (fail: VoidFunction) => {
@@ -21,13 +21,13 @@ const useLoadEvents = (config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILo
 
       dispatch(clearEvents());
 
-      const [events, error] = await getEvents(user.id, token);
+      const [fetchedEvents, error] = await getEvents(user.id, token);
 
-      if (error || !events) return fail();
-      dispatch(addEvents(events));
+      if (error || !fetchedEvents) return fail();
+      dispatch(addEvents(fetchedEvents));
     },
     cbs,
-    config
+    { ...config, refetchNullValuesToCheck: [events] }
   );
 };
 

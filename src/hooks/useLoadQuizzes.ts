@@ -4,7 +4,7 @@ import useLoad from '@hooks/useLoad';
 
 import { getQuizzes } from '@api/quizzes';
 
-import { addQuizzes, clearQuizzes } from '@redux/quizSlice';
+import { addQuizzes, clearQuizzes, selectQuizzes } from '@redux/quizSlice';
 import { selectToken } from '@redux/authSlice';
 import { selectUser } from '@redux/userSlice';
 
@@ -13,6 +13,7 @@ const useLoadQuizzes = (config?: ILoadHookConfig, cbs?: Array<VoidFunction>): IL
 
   const token = useAppSelector(selectToken);
   const user = useAppSelector(selectUser);
+  const quizzes = useAppSelector(selectQuizzes);
 
   return useLoad(
     async (fail: VoidFunction) => {
@@ -20,13 +21,13 @@ const useLoadQuizzes = (config?: ILoadHookConfig, cbs?: Array<VoidFunction>): IL
 
       dispatch(clearQuizzes());
 
-      const [quizzes, error] = await getQuizzes(token, user.id);
+      const [fetchedQuizzes, error] = await getQuizzes(token, user.id);
 
-      if (error || !quizzes) return fail();
-      dispatch(addQuizzes(quizzes));
+      if (error || !fetchedQuizzes) return fail();
+      dispatch(addQuizzes(fetchedQuizzes));
     },
     cbs,
-    config
+    { ...config, refetchNullValuesToCheck: [quizzes] }
   );
 };
 

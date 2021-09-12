@@ -4,13 +4,14 @@ import useLoad from '@hooks/useLoad';
 
 import { getSpecifications } from '@api/questions';
 
-import { addSpecifications, clearSpecifications } from '@redux/questionSlice';
+import { addSpecifications, clearSpecifications, selectSpecifications } from '@redux/questionSlice';
 import { selectToken } from '@redux/authSlice';
 
 const useLoadSpecifications = (config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILoadHookReturnProperties => {
   const dispatch = useAppDispatch();
 
   const token = useAppSelector(selectToken);
+  const specifications = useAppSelector(selectSpecifications);
 
   return useLoad(
     async (fail: VoidFunction) => {
@@ -18,13 +19,13 @@ const useLoadSpecifications = (config?: ILoadHookConfig, cbs?: Array<VoidFunctio
 
       dispatch(clearSpecifications());
 
-      const [specifications, error] = await getSpecifications(token);
+      const [fetchedSpecifications, error] = await getSpecifications(token);
 
-      if (error || !specifications) return fail();
-      dispatch(addSpecifications(specifications));
+      if (error || !fetchedSpecifications) return fail();
+      dispatch(addSpecifications(fetchedSpecifications));
     },
     cbs,
-    config
+    { ...config, refetchNullValuesToCheck: [specifications] }
   );
 };
 

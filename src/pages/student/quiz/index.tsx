@@ -249,8 +249,8 @@ const Quiz = (): ReactElement => {
   const [verificationType, setVerificationType] = useState<IVerificationType | undefined>(undefined);
   const [finished, setFinished] = useState(false);
 
-  const { state: questionState, run: runQuestion } = useLoadStudentQuestion();
-  const { state: eventState, run: runEvent } = useLoadStudentEvent({}, [runQuestion]);
+  const { state: questionState, run: runQuestion } = useLoadStudentQuestion({ onNotFoundDoNothing: true });
+  const { state: eventState, run: runEvent } = useLoadStudentEvent({ onNotFoundDoNothing: true }, [runQuestion]);
   const { state: authState } = useAuthentication(ROLES.STUDENT.PERMISSION, [runEvent]);
 
   const { loading } = useLoading([authState, eventState, questionState]);

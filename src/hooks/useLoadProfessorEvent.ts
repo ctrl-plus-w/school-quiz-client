@@ -24,7 +24,10 @@ const useLoadProfessorEvent = (config?: ILoadHookConfig, cbs?: Array<VoidFunctio
       const [event, error] = await getProfessorEvent(token);
 
       if (error || !event) {
-        if (error && error.status === 404) return redirect(config?.notFoundRedirect);
+        if (error && error.status === 404) {
+          if (config?.onNotFoundDoNothing) return;
+          else return redirect(config?.notFoundRedirect);
+        }
         return fail();
       }
 

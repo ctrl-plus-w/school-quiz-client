@@ -3,7 +3,7 @@ import useAppDispatch from '@hooks/useAppDispatch';
 
 import { getGroups } from '@api/groups';
 
-import { addGroups, clearGroups } from '@redux/groupSlice';
+import { addGroups, clearGroups, selectGroups } from '@redux/groupSlice';
 import { selectToken } from '@redux/authSlice';
 
 import useLoad from '@hooks/useLoad';
@@ -12,6 +12,7 @@ const useLoadGroups = (config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILo
   const dispatch = useAppDispatch();
 
   const token = useAppSelector(selectToken);
+  const groups = useAppSelector(selectGroups);
 
   return useLoad(
     async (fail: VoidFunction) => {
@@ -19,13 +20,13 @@ const useLoadGroups = (config?: ILoadHookConfig, cbs?: Array<VoidFunction>): ILo
 
       dispatch(clearGroups());
 
-      const [groups, error] = await getGroups(token);
-      if (error || !groups) return fail();
+      const [fetchedGroups, error] = await getGroups(token);
+      if (error || !fetchedGroups) return fail();
 
-      dispatch(addGroups(groups));
+      dispatch(addGroups(fetchedGroups));
     },
     cbs,
-    config
+    { ...config, refetchNullValuesToCheck: [groups] }
   );
 };
 

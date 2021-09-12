@@ -94,3 +94,16 @@ export const shuffle = <T>(arr: Array<T>): Array<T> => {
 export const sortById = <T extends { id: number }>(arr: Array<T>): Array<T> => {
   return [...arr].sort((a, b) => b.id - a.id);
 };
+
+export const genderMapper = (gender: boolean | null, slug = false): string => {
+  switch (gender) {
+    case true:
+      return slug ? 'homme' : 'Homme';
+
+    case false:
+      return slug ? 'femme' : 'Femme';
+
+    default:
+      return slug ? 'indefini' : 'Indéfini';
+  }
+};
