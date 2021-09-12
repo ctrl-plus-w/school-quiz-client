@@ -27,6 +27,7 @@ import useLoading from '@hooks/useLoading';
 import useSocket from '@hooks/useSocket';
 
 import { generateArray } from '@util/generate.utils';
+import { str } from '@util/mapper.utils';
 
 import { addUsers, clearUsers, replaceOrAddUser, selectUsers } from '@redux/userSlice';
 import { selectTempQuiz, setTempQuiz } from '@redux/quizSlice';
@@ -80,6 +81,16 @@ const Direct = (): ReactElement => {
         ))}
       </div>
     );
+  };
+
+  const scoreMapper = (analytics?: Array<IAnalytic>): string => {
+    if (analytics && analytics[0] && analytics[0].score !== 0) return str(analytics[0].score);
+    return '-';
+  };
+
+  const maxScoreMapper = (analytics?: Array<IAnalytic>): string => {
+    if (analytics && analytics[0] && analytics[0].maxScore !== 0) return str(analytics[0].maxScore);
+    return '-';
   };
 
   const getBadge = (): { type: BadgeType; content: string } | undefined => {
@@ -160,6 +171,8 @@ const Direct = (): ReactElement => {
               ['Nom', 'lastName'],
               ['État', 'state', stateMapper],
               ['Alertes', 'eventWarns', warnMapper],
+              ['Points', 'analytics', scoreMapper],
+              ['Points Maximum', 'analytics', maxScoreMapper],
             ]}
             handleClick={() => null}
           />
