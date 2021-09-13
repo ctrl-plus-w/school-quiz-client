@@ -14,8 +14,7 @@ const ADMIN_MENUS: IMenu = {
     // { name: 'Rôles', path: '/admin/roles', icon: <></>, active: false },
     // { name: 'Vérification', path: '/admin/verificationTypes', icon: <></>, active: false },
     // { name: 'Spécification', path: '/admin/questionSpecifications', icon: <></>, active: false },
-    { name: 'Profile', path: '/professor/profile', icon: <UserCircleIcon className="w-6 h-6" />, active: false },
-    { name: 'Direct', path: '/professor/direct', icon: <VideoCameraIcon className="h-6 w-6" />, active: false },
+    { name: 'Profile', path: '/admin/profile', icon: <UserCircleIcon className="w-6 h-6" />, active: false },
   ],
 };
 
