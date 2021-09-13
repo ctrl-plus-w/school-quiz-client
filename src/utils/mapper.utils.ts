@@ -92,7 +92,7 @@ export const shuffle = <T>(arr: Array<T>): Array<T> => {
 };
 
 export const sortById = <T extends { id: number }>(arr: Array<T>): Array<T> => {
-  return [...arr].sort((a, b) => b.id - a.id);
+  return [...arr].sort((a, b) => a.id - b.id);
 };
 
 export const genderMapper = (gender: boolean | null, slug = false): string => {
