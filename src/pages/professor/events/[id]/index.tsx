@@ -50,7 +50,8 @@ import {
   isSameTime,
   setTime,
 } from '@util/date.utils';
-import { collaboratorsMapper, questionTypeMapper, slugMapper } from '@util/mapper.utils';
+import { collaboratorsMapper, eventEndedAtMapper, eventStartedAtMapper, questionTypeMapper, slugMapper, sortById } from '@util/mapper.utils';
+import { scoreMapper, maxScoreMapper } from '@util/mapper.utils';
 import { areArraysEquals } from '@util/condition.utils';
 import { getLength } from '@util/object.utils';
 
@@ -304,6 +305,25 @@ const Event = (): ReactElement => {
         </Form>
 
         <div className="flex flex-col items-start min-h-full mt-16">
+          <Title level={2}>Élèves.</Title>
+          <Subtitle>Liste des élèves.</Subtitle>
+
+          <Table<IUser, keyof IUser>
+            attributes={[
+              ['ID', 'id'],
+              ['Prénom', 'firstName'],
+              ['Nom', 'lastName'],
+              ['Score', 'analytics', scoreMapper],
+              ['Score max', 'analytics', maxScoreMapper],
+              ['Début', 'analytics', eventStartedAtMapper],
+              ['Fin', 'analytics', eventEndedAtMapper],
+            ]}
+            data={sortById(event?.users || [])}
+            handleClick={() => null}
+          />
+        </div>
+
+        <div className="flex flex-col items-start min-h-full mt-16">
           <Title level={2}>Questions à vérifier</Title>
           <Subtitle>Voici les question dont vous devez vérifier la validitée.</Subtitle>
 
@@ -312,7 +332,7 @@ const Event = (): ReactElement => {
               ['ID', 'id'],
               ['Titre', 'title'],
               ['Description', 'description'],
-              ['Type de question', 'questionType', questionTypeMapper],
+              ['Début', 'questionType', questionTypeMapper],
             ]}
             data={questions}
             handleClick={handleQuestionRedirect}

@@ -1,3 +1,5 @@
+import { formatDateTime } from '@util/date.utils';
+
 export const idNameSlugMapper = <T extends IBasicModel>(instance: T): IBasicModel => {
   return { id: instance.id, name: instance.name, slug: instance.slug };
 };
@@ -115,5 +117,15 @@ export const scoreMapper = (analytics?: Array<IAnalytic>): string => {
 
 export const maxScoreMapper = (analytics?: Array<IAnalytic>): string => {
   if (analytics && analytics[0] && analytics[0].maxScore !== 0) return str(analytics[0].maxScore);
+  return '-';
+};
+
+export const eventStartedAtMapper = (analytics?: Array<IAnalytic>): string => {
+  if (analytics && analytics[0] && analytics[0].startedAt) return formatDateTime(analytics[0].startedAt);
+  return '-';
+};
+
+export const eventEndedAtMapper = (analytics?: Array<IAnalytic>): string => {
+  if (analytics && analytics[0] && analytics[0].endedAt) return formatDateTime(analytics[0].endedAt);
   return '-';
 };
