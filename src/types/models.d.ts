@@ -71,6 +71,7 @@ interface IEvent extends DefaultModelProperties {
   quiz?: IQuiz;
   group?: IGroup;
   users?: Array<IUser>;
+  analytics?: Array<IAnalytic>;
 
   blocked?: boolean;
   remainingQuestions?: number;
