@@ -297,7 +297,7 @@ export const formatDate = (_date: Date | string): string => {
  */
 export const formatDateTime = (_date: Date | string): string => {
   const date = typeof _date === 'string' ? new Date(_date) : _date;
-  return `${formatDate(_date)} à ${date.getHours()}h${formatNumber(date.getMinutes())}`;
+  return `${formatDate(_date)} à ${formatNumber(date.getHours())}h${formatNumber(date.getMinutes())}`;
 };
 
 /**

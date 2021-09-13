@@ -129,3 +129,7 @@ export const eventEndedAtMapper = (analytics?: Array<IAnalytic>): string => {
   if (analytics && analytics[0] && analytics[0].endedAt) return formatDateTime(analytics[0].endedAt);
   return '-';
 };
+
+export const quizTitleMapper = (quiz?: IQuiz): string => {
+  return quiz ? quiz.title : '-';
+};
