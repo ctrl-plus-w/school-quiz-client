@@ -107,3 +107,13 @@ export const genderMapper = (gender: boolean | null, slug = false): string => {
       return slug ? 'indefini' : 'Indéfini';
   }
 };
+
+export const scoreMapper = (analytics?: Array<IAnalytic>): string => {
+  if (analytics && analytics[0] && analytics[0].score !== 0) return str(analytics[0].score);
+  return '-';
+};
+
+export const maxScoreMapper = (analytics?: Array<IAnalytic>): string => {
+  if (analytics && analytics[0] && analytics[0].maxScore !== 0) return str(analytics[0].maxScore);
+  return '-';
+};

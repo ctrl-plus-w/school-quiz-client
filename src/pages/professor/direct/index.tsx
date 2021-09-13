@@ -1,10 +1,8 @@
-import { v4 as uuidv4 } from 'uuid';
 import { useEffect } from 'react';
 
 import type { ReactElement } from 'react';
 
 import React from 'react';
-import clsx from 'clsx';
 
 import ProfessorDashboardSkeleton from '@layout/ProfessorDashboardSkeleton';
 import ProfessorDashboardLayout from '@layout/ProfessorDashboard';
@@ -26,8 +24,8 @@ import useAppDispatch from '@hooks/useAppDispatch';
 import useLoading from '@hooks/useLoading';
 import useSocket from '@hooks/useSocket';
 
-import { generateArray } from '@util/generate.utils';
-import { str } from '@util/mapper.utils';
+import { scoreMapper, maxScoreMapper } from '@util/mapper.utils';
+import { warnMapper } from '@util/reactMapper.utils';
 
 import { addUsers, clearUsers, replaceOrAddUser, selectUsers } from '@redux/userSlice';
 import { selectTempQuiz, setTempQuiz } from '@redux/quizSlice';
@@ -65,32 +63,6 @@ const Direct = (): ReactElement => {
     if (state && state.slug === 'pret') return <span className="bg-yellow-600 text-white py-1 px-4 rounded">{state.name}</span>;
 
     return <span className="bg-red-600 text-white py-1 px-4 rounded">{'Inactif'}</span>;
-  };
-
-  const warnMapper = (warns?: Array<IWarn>): ReactElement => {
-    const amount = warns && warns[0] ? Math.min(warns[0].amount, 3) : 0;
-
-    return (
-      <div className="flex gap-2">
-        {generateArray(amount, 0).map((_, index) => (
-          <div className={clsx(['w-4 h-4 rounded-full', index < 2 && 'bg-yellow-500', index === 2 && 'bg-red-600'])} key={uuidv4()}></div>
-        ))}
-
-        {generateArray(3 - amount, 0).map(() => (
-          <div className="w-4 h-4 bg-gray-400 rounded-full" key={uuidv4()}></div>
-        ))}
-      </div>
-    );
-  };
-
-  const scoreMapper = (analytics?: Array<IAnalytic>): string => {
-    if (analytics && analytics[0] && analytics[0].score !== 0) return str(analytics[0].score);
-    return '-';
-  };
-
-  const maxScoreMapper = (analytics?: Array<IAnalytic>): string => {
-    if (analytics && analytics[0] && analytics[0].maxScore !== 0) return str(analytics[0].maxScore);
-    return '-';
   };
 
   const getBadge = (): { type: BadgeType; content: string } | undefined => {
