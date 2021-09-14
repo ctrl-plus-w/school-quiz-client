@@ -8,7 +8,7 @@ interface IProps {
 
   className?: string;
 
-  type?: 'info' | 'success' | 'error' | 'black';
+  type?: 'info' | 'success' | 'error' | 'black' | string;
 
   primary?: boolean;
   submit?: boolean;
