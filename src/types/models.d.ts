@@ -17,6 +17,14 @@ interface IUser extends DefaultModelProperties {
   analytics: Array<IAnalytic>;
 }
 
+interface IUserCreationAttributes {
+  username: string;
+  firstName: string;
+  lastName: string;
+  password: string;
+  gender?: boolean;
+}
+
 interface IAnalytic extends DefaultModelProperties {
   startedAt: Date;
   endedAt: Date;

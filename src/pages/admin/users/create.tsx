@@ -1,8 +1,9 @@
-import React from 'react';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 
 import type { FormEvent, ReactElement } from 'react';
 
-import { useState } from 'react';
+import React from 'react';
 
 import AdminDashboard from '@layout/AdminDashboard';
 import AdminDashboardSkeleton from '@layout/AdminDashboardSkeleton ';
@@ -29,6 +30,7 @@ import FormSkeleton from '@skeleton/FormSkeleton';
 
 import useAuthentication from '@hooks/useAuthentication';
 import useAppSelector from '@hooks/useAppSelector';
+import useAppDispatch from '@hooks/useAppDispatch';
 import useLoadGroups from '@hooks/useLoadGroups';
 import useValidation from '@hooks/useValidation';
 import useLoadRoles from '@hooks/useLoadRoles';
@@ -36,13 +38,20 @@ import useLoading from '@hooks/useLoading';
 
 import { nameSlugMapper } from '@util/mapper.utils';
 
+import { addUserGroups, createUser, updateUserRole } from '@api/users';
+
+import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
 import { selectGroups } from '@redux/groupSlice';
 import { selectRoles } from '@redux/roleSlice';
-
-import ROLES from '@constant/roles';
 import { selectToken } from '@redux/authSlice';
 
+import ROLES from '@constant/roles';
+
 const CreateUser = (): ReactElement => {
+  const router = useRouter();
+
+  const dispatch = useAppDispatch();
+
   const { state: rolesState, run: runRoles } = useLoadRoles();
   const { state: groupsState, run: runGroups } = useLoadGroups();
   const { state: authState } = useAuthentication(ROLES.ADMIN.PERMISSION, [runGroups, runRoles]);
@@ -63,16 +72,61 @@ const CreateUser = (): ReactElement => {
   const [userRole, setUserRole] = useState('');
   const [userGroups, setUserGroups] = useState<Array<IBasicModel>>([]);
 
-  const { valid } = useValidation(() => false, [firstName, lastName, username, userRole, gender], [firstName, lastName, username, userRole, gender]);
+  const { valid } = useValidation(() => true, [firstName, lastName, username, userRole, gender], [firstName, lastName, username, userRole]);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!valid || !token) return;
 
-    //  TODO : Make the create user computations.
+    const genderAssociations: { [index: string]: boolean } = {
+      homme: true,
+      femme: false,
+    };
 
-    alert(1);
+    const userCreationAttributes: IUserCreationAttributes = { firstName, lastName, username, password, gender: genderAssociations[gender] };
+    const [user, createUserError] = await createUser(userCreationAttributes, token);
+
+    if (createUserError || !user) {
+      if (!user || (createUserError && createUserError.status === 403))
+        dispatch(addErrorNotification(createUserError?.message || 'Une erreur est survenue'));
+
+      if (createUserError && createUserError.status === 403) router.push('/login');
+
+      return;
+    }
+
+    const role = roles.find((role) => role.slug === userRole);
+
+    if (role) {
+      const [updated, updateRoleError] = await updateUserRole(user.id, role.id, token);
+
+      if (updateRoleError || !updated) {
+        if (!user || (updateRoleError && updateRoleError.status === 403))
+          dispatch(addErrorNotification(updateRoleError?.message || 'Une erreur est survenue'));
+
+        if (updateRoleError && updateRoleError.status === 403) router.push('/login');
+
+        return;
+      }
+    }
+
+    if (userGroups.length > 0) {
+      const groupsId = groups.filter(({ slug }) => userGroups.some(({ slug: _slug }) => slug === _slug)).map(({ id }) => id);
+      const [added, addGroupsError] = await addUserGroups(user.id, groupsId, token);
+
+      if (addGroupsError || !added) {
+        if (!user || (addGroupsError && addGroupsError.status === 403))
+          dispatch(addErrorNotification(addGroupsError?.message || 'Une erreur est survenue'));
+
+        if (addGroupsError && addGroupsError.status === 403) router.push('/login');
+
+        return;
+      }
+    }
+
+    dispatch(addSuccessNotification("L'utilisateur à bien été créé."));
+    router.push('/admin/users');
   };
 
   return loading ? (
