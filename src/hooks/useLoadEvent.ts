@@ -15,7 +15,7 @@ const useLoadEvent = (eventId: number, config?: ILoadHookConfig, cbs?: Array<Voi
   const user = useAppSelector(selectUser);
   const event = useAppSelector(selectTempEvent);
 
-  const { state, run: _run } = useLoad(
+  const { state, run } = useLoad(
     async (fail: VoidFunction) => {
       if (!user || !token) return fail();
 
@@ -29,11 +29,6 @@ const useLoadEvent = (eventId: number, config?: ILoadHookConfig, cbs?: Array<Voi
     cbs,
     { ...config, refetchNullValuesToCheck: [event] }
   );
-
-  const run = () => {
-    console.log('called');
-    _run();
-  };
 
   return { state, run };
 };

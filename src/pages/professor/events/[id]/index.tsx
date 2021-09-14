@@ -160,7 +160,6 @@ const Event = (): ReactElement => {
   }, [event, user]);
 
   const handleQuestionRedirect = (instance: Question) => {
-    console.log(instance);
     router.push({ pathname: `${router.pathname}/questions/${instance.id}`, query: { id: instance.id } });
   };
 
