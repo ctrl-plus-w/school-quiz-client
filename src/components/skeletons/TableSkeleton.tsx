@@ -12,9 +12,10 @@ import { generateArray } from '@util/generate.utils';
 
 interface IProps {
   attributes: Array<[name: string, attribute: string]>;
+  action?: boolean;
 }
 
-const TableSkeleton = ({ attributes }: IProps): ReactElement => {
+const TableSkeleton = ({ attributes, action }: IProps): ReactElement => {
   return (
     <table className="table-fixed w-full mt-14">
       <thead>
@@ -24,7 +25,7 @@ const TableSkeleton = ({ attributes }: IProps): ReactElement => {
               {slug === 'id' ? <TextSkeleton width={12} height={5} /> : <TextSkeleton width={32} height={5} />}
             </td>
           ))}
-          <td className="w-2/24 px-4 py-3 text-black border-t border-gray-300 text-sm"></td>
+          {action && <td className="w-2/24 px-4 py-3 text-black border-t border-gray-300 text-sm"></td>}
         </tr>
       </thead>
 
@@ -37,11 +38,13 @@ const TableSkeleton = ({ attributes }: IProps): ReactElement => {
               </td>
             ))}
 
-            <td className="px-4 py-3 text-black border-t border-gray-300 text-sm" key={uuidv4()}>
-              <div className="flex justify-center w-full">
-                <IconSkeleton size={5} color="red" />
-              </div>
-            </td>
+            {action && (
+              <td className="px-4 py-3 text-black border-t border-gray-300 text-sm" key={uuidv4()}>
+                <div className="flex justify-center w-full">
+                  <IconSkeleton size={5} color="red" />
+                </div>
+              </td>
+            )}
           </tr>
         ))}
       </tbody>

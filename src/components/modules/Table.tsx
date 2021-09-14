@@ -1,34 +1,90 @@
-import { ReactElement, useState } from 'react';
+import { useRouter } from 'next/router';
 import { v4 as uuidv4 } from 'uuid';
+import { useState } from 'react';
 
-import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
+import type { PayloadActionCreator } from '@reduxjs/toolkit';
+import type { FormEvent, ReactElement } from 'react';
+import type { AxiosError } from 'axios';
 
 import React from 'react';
 import clsx from 'clsx';
 
-import TableRow from '@element/TableRow';
+import { TrashIcon } from '@heroicons/react/outline';
 
-type MapperFunction = (value: any) => string | ReactElement;
+import TableRow from '@element/TableRow';
+import database from '@database/database';
+
+import useAppSelector from '@hooks/useAppSelector';
+import useAppDispatch from '@hooks/useAppDispatch';
+
+import { getHeaders } from '@util/authentication.utils';
+
+import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
+import { selectToken } from '@redux/authSlice';
+
+type DeleteRowAction = {
+  apiName: string;
+  removeFromStoreReducer: PayloadActionCreator<any, any>;
+};
 
 interface IProps<T, K> {
   data: Array<T>;
   attributes: Array<[name: string, attribute: K, mapper?: MapperFunction]>;
 
-  apiName?: string;
-
-  removeFromStore?: ActionCreatorWithPayload<any, any>;
+  action?: RowAction<T>;
+  deleteAction?: DeleteRowAction;
 
   handleClick?: (instance: T) => void;
 }
 
-const Table = <T extends { id: number }, K extends keyof T>({
-  attributes,
-  data,
-  apiName,
-  handleClick,
-  removeFromStore,
-}: IProps<T, K>): ReactElement => {
+const Table = <T extends { id: number }, K extends keyof T>({ attributes, data, action, deleteAction, handleClick }: IProps<T, K>): ReactElement => {
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+
   const [shownElement, setShownElement] = useState(-1);
+
+  const token = useAppSelector(selectToken);
+
+  const deleteInstance = async (_event: FormEvent, instance: T) => {
+    if (!deleteAction || !token) return;
+
+    try {
+      const request = await database.delete(`/api/${deleteAction.apiName}/${instance.id}`, getHeaders(token));
+
+      if (request.status === 200) {
+        dispatch(addSuccessNotification('Élément supprimé !'));
+        if (deleteAction.removeFromStoreReducer) dispatch(deleteAction.removeFromStoreReducer(instance.id));
+        else router.reload();
+      }
+    } catch (_err: any) {
+      const err = _err as AxiosError;
+      if (!err.response) {
+        dispatch(addErrorNotification('Une erreur est survenue.'));
+        return;
+      }
+
+      if (err.response.status === 404) dispatch(addErrorNotification("Cet élément n'existe pas."));
+      if (err.response.status === 403) router.push('/login');
+    }
+  };
+
+  const getActionObject = (): RowAction<T> | undefined => {
+    if (!action && !deleteAction) return undefined;
+
+    if (deleteAction)
+      return {
+        type: 'ERROR',
+
+        icon: <TrashIcon className="text-red-500 w-5 h-5" />,
+
+        validate: true,
+        validateButton: 'Supprimer',
+
+        cb: deleteInstance,
+      };
+
+    return action;
+  };
 
   return data.length > 0 ? (
     <table className="table-fixed w-full mt-14 whitespace-nowrap">
@@ -42,7 +98,8 @@ const Table = <T extends { id: number }, K extends keyof T>({
               {name}
             </td>
           ))}
-          {apiName && <td className="w-2/24 px-4 py-3 text-black border-t border-gray-300 text-sm"></td>}
+
+          {(action || deleteAction) && <td className="w-2/24 px-4 py-3 text-black border-t border-gray-300 text-sm"></td>}
         </tr>
       </thead>
 
@@ -54,9 +111,8 @@ const Table = <T extends { id: number }, K extends keyof T>({
             key={uuidv4()}
             shownElement={shownElement}
             setShownElement={setShownElement}
-            apiName={apiName}
             handleClick={handleClick}
-            removeFromStore={removeFromStore}
+            action={getActionObject()}
           />
         ))}
       </tbody>

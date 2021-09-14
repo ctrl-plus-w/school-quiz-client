@@ -3,33 +3,21 @@ import { v4 as uuidv4 } from 'uuid';
 
 import type { Dispatch, FormEvent, ReactElement, SetStateAction } from 'react';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
-import type { AxiosError } from 'axios';
 
 import { useSelector } from 'react-redux';
 
 import React from 'react';
 import clsx from 'clsx';
 
-import { TrashIcon } from '@heroicons/react/outline';
-
 import Button from '@element/Button';
 import Title from '@element/Title';
 
-import useAppDispatch from '@hooks/useAppDispatch';
 import useClickOutside from '@hooks/useClickOutside';
 
-import { getHeaders } from '@util/authentication.utils';
-
-import database from '@database/database';
-
 import { selectToken } from '@redux/authSlice';
-import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
 
-type MapperFunction = (value: any) => string | ReactElement;
 interface IProps<T, K> {
   instance: T;
-
-  apiName?: string;
 
   attributes: Array<[name: string, attribute: K, mapper?: MapperFunction]>;
 
@@ -38,6 +26,8 @@ interface IProps<T, K> {
 
   removeFromStore?: ActionCreatorWithPayload<any, any>;
 
+  action?: RowAction<T>;
+
   handleClick?: (instance: T) => void;
 }
 
@@ -45,14 +35,11 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
   instance,
   attributes,
   shownElement,
-  apiName,
   setShownElement,
   handleClick,
-  removeFromStore,
+  action,
 }: IProps<T, K>): ReactElement => {
   const router = useRouter();
-
-  const dispatch = useAppDispatch();
 
   const token = useSelector(selectToken);
 
@@ -68,40 +55,41 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
     router.push({ pathname: `${router.pathname}/[id]`, query: { id: instance.id } });
   };
 
-  const handleDelete = () => {
-    setShownElement(instance.id);
-  };
-
-  const deleteInstance = async (e: FormEvent) => {
-    e.preventDefault();
-
-    if (!token) return;
-
-    try {
-      const request = await database.delete(`/api/${apiName}/${instance.id}`, getHeaders(token));
-
-      if (request.status === 200) {
-        dispatch(addSuccessNotification('Élément supprimé !'));
-
-        if (removeFromStore) dispatch(removeFromStore(instance.id));
-        else router.reload();
-      }
-    } catch (_err: any) {
-      const err = _err as AxiosError;
-
-      if (!err.response) {
-        dispatch(addErrorNotification('Une erreur est survenue.'));
-        return;
-      }
-
-      if (err.response.status === 404) dispatch(addErrorNotification("Cet élément n'existe pas."));
-
-      if (err.response.status === 403) return router.push('/login');
-    } finally {
-      setShownElement(-1);
+  const handleShowValidation = (event: FormEvent) => {
+    if (!action || action?.validate) {
+      setShownElement(instance.id);
+    } else {
+      action.cb(event, instance);
     }
   };
 
+  const handleActionClick = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (!token) return;
+    if (action) action.cb(e, instance);
+
+    setShownElement(-1);
+  };
+
+  const getActionColor = (): string => {
+    switch (action?.type) {
+      case 'ERROR':
+        return 'hover:bg-red-100';
+
+      case 'INFO':
+        return 'hover:bg-blue-100';
+
+      case 'SUCCESS':
+        return 'hover:bg-green-100';
+
+      case 'WARNING':
+        return 'hover:bg-yellow-100';
+
+      default:
+        return 'hover:bg-gray-100';
+    }
+  };
   return (
     <tr key={uuidv4()} className="group">
       {attributes.map(([_name, attribute, mapper]) => (
@@ -114,10 +102,13 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
         </td>
       ))}
 
-      {apiName && (
+      {action && (
         <td className="relative cursor-pointer w-6 text-gray-500 text-sm border-t border-gray-300 group-hover:bg-gray-200 transition-all duration-100">
-          <div className="relative py-3 flex justify-center items-center w-full hover:bg-red-100 transition-all duration-100" onClick={handleDelete}>
-            <TrashIcon className="text-red-500 w-5 h-5" />
+          <div
+            className={clsx(['relative py-3 flex justify-center items-center w-full transition-all duration-100', getActionColor()])}
+            onClick={handleShowValidation}
+          >
+            {action.icon}
           </div>
 
           <form
@@ -129,14 +120,14 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
               shownElement === instance.id ? 'visible' : 'invisible',
             ])}
             ref={container}
-            onSubmit={deleteInstance}
+            onSubmit={handleActionClick}
           >
             <Title level={4}>Êtes vous sur ?</Title>
 
             <p className="text-gray-800 font-normal">Cette action est irréversible.</p>
 
-            <Button full={false} className="mt-6" submit={true} type="error">
-              Supprimer
+            <Button full={false} className="mt-6" submit={true} type={action ? action.type.toLowerCase() : 'error'}>
+              {action.validateButton || 'Valider'}
             </Button>
           </form>
         </td>

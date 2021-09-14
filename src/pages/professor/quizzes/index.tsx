@@ -43,6 +43,7 @@ const ProfessorQuizzes = (): ReactElement => {
             ['Strict', 'strict'],
             ['Mélanger les questions', 'shuffle'],
           ]}
+          action
         />
       </ContainerSkeleton>
     </ProfessorDashboardSkeleton>
@@ -50,7 +51,6 @@ const ProfessorQuizzes = (): ReactElement => {
     <ProfessorDashboard>
       <Container title="Tests" subtitle={{ name: 'Créer un test', path: '/professor/quizzes/create' }}>
         <Table<IQuiz, keyof IQuiz>
-          apiName="quizzes"
           attributes={[
             ['ID', 'id'],
             ['Title', 'title'],
@@ -59,7 +59,7 @@ const ProfessorQuizzes = (): ReactElement => {
             ['Mélanger les questions', 'shuffle', booleanMapper],
           ]}
           data={quizzes}
-          removeFromStore={removeQuiz}
+          deleteAction={{ apiName: 'quizzes', removeFromStoreReducer: removeQuiz }}
         />
       </Container>
     </ProfessorDashboard>

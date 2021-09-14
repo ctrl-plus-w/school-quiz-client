@@ -220,6 +220,7 @@ const Quiz = (): ReactElement => {
               ['Description', 'description'],
               ['Type de question', 'questionType'],
             ]}
+            action
           />
         </div>
       </ContainerSkeleton>
@@ -282,9 +283,8 @@ const Quiz = (): ReactElement => {
               ['Type de question', 'questionType', questionTypeMapper],
             ]}
             data={questions}
-            apiName={`quizzes/${quiz.id}/questions`}
             handleClick={handleClick}
-            removeFromStore={removeQuestion}
+            deleteAction={{ apiName: `quizzes/${quiz.id}/questions`, removeFromStoreReducer: removeQuestion }}
           />
         </div>
       </Container>

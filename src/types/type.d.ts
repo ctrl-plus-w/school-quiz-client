@@ -68,3 +68,14 @@ interface ILoadHookReturnProperties {
 }
 
 type ILoadHookRedirectFunction = (path?: string) => void;
+
+type RowAction<T> = {
+  type: 'SUCCESS' | 'WARNING' | 'ERROR' | 'INFO';
+
+  icon: ReactElement;
+
+  cb: (event: FormEvent, instance: T) => Promise<void>;
+
+  validate?: boolean;
+  validateButton?: string;
+};

@@ -31,7 +31,7 @@ const ProfessorEvents = (): ReactElement => {
 
   const events = useAppSelector(selectEvents);
 
-  return loading || !events  ? (
+  return loading || !events ? (
     <ProfessorDashboardSkeleton>
       <ContainerSkeleton subtitle>
         <TableSkeleton
@@ -41,6 +41,7 @@ const ProfessorEvents = (): ReactElement => {
             ['Fin', 'end'],
             ['Décompte', 'countdown'],
           ]}
+          action
         />
       </ContainerSkeleton>
     </ProfessorDashboardSkeleton>
@@ -48,7 +49,6 @@ const ProfessorEvents = (): ReactElement => {
     <ProfessorDashboard>
       <Container title="Événements" subtitle={{ name: 'Créer un événement', path: '/professor/events/create' }}>
         <Table<IEvent, keyof IEvent>
-          apiName="events"
           attributes={[
             ['ID', 'id'],
             ['Début', 'start', formatDateTime],
@@ -56,7 +56,7 @@ const ProfessorEvents = (): ReactElement => {
             ['Décompte', 'countdown'],
           ]}
           data={events}
-          removeFromStore={removeEvent}
+          deleteAction={{ apiName: 'events', removeFromStoreReducer: removeEvent }}
         />
       </Container>
     </ProfessorDashboard>

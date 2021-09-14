@@ -4,6 +4,8 @@ import type { ReactElement } from 'react';
 
 import React from 'react';
 
+import { RefreshIcon } from '@heroicons/react/outline';
+
 import ProfessorDashboardSkeleton from '@layout/ProfessorDashboardSkeleton';
 import ProfessorDashboardLayout from '@layout/ProfessorDashboard';
 
@@ -99,6 +101,10 @@ const Direct = (): ReactElement => {
     });
   }, [socket, event]);
 
+  const unlockUser = async () => {
+    null;
+  };
+
   if (loading) return <ProfessorDashboardSkeleton></ProfessorDashboardSkeleton>;
 
   if (!event || !quiz)
@@ -136,7 +142,7 @@ const Direct = (): ReactElement => {
           <Title level={2}>Élèves</Title>
           <Subtitle className="flex-grow-0 mt-2">Liste des élèves.</Subtitle>
 
-          <Table
+          <Table<IUser, keyof IUser>
             data={[...users].sort((a, b) => a.id - b.id)}
             attributes={[
               ["Nom d'utilisateur", 'username'],
@@ -147,6 +153,16 @@ const Direct = (): ReactElement => {
               ['Points Maximum', 'analytics', maxScoreMapper],
             ]}
             handleClick={() => null}
+            action={{
+              type: 'SUCCESS',
+
+              icon: <RefreshIcon className="text-green-600 h-5 w-5 " />,
+
+              validate: true,
+              validateButton: 'Réinitialiser',
+
+              cb: unlockUser,
+            }}
           />
         </div>
       </Container>

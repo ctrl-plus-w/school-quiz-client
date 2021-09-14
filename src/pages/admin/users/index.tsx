@@ -37,6 +37,7 @@ const Users = (): ReactElement => {
             ["Nom d'utilisateur", 'username'],
             ['Sexe', 'gender'],
           ]}
+          action
         />
       </ContainerSkeleton>
     </AdminDashboardSkeleton>
@@ -52,8 +53,7 @@ const Users = (): ReactElement => {
             ['Sexe', 'gender', genderMapper],
           ]}
           data={users}
-          apiName="users"
-          removeFromStore={removeUser}
+          deleteAction={{ apiName: 'users', removeFromStoreReducer: removeUser }}
         />
       </Container>
     </AdminDashboard>
