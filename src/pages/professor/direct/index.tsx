@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { FormEvent, useEffect } from 'react';
 
 import type { ReactElement } from 'react';
 
@@ -88,6 +88,13 @@ const Direct = (): ReactElement => {
 
       dispatch(replaceOrAddUser({ ...user, eventWarns: [{ amount }] }));
     });
+
+    socket.on('user:unblock', (userId: number) => {
+      const user = users.find(({ id }) => id === userId);
+      if (!user) return;
+
+      dispatch(replaceOrAddUser({ ...user, eventWarns: [{ amount: 0 }] }));
+    });
   }, [socket, users]);
 
   // Socket io join:event
@@ -101,8 +108,15 @@ const Direct = (): ReactElement => {
     });
   }, [socket, event]);
 
-  const unlockUser = async () => {
-    null;
+  const unlockUser = async (_event: FormEvent, instance: IUser) => {
+    if (!socket) return;
+
+    socket.emit('user:unblock', instance.id);
+
+    const user = users.find(({ id }) => id === instance.id);
+    if (!user) return;
+
+    dispatch(replaceOrAddUser({ ...user, eventWarns: [{ amount: 0 }] }));
   };
 
   if (loading) return <ProfessorDashboardSkeleton></ProfessorDashboardSkeleton>;
