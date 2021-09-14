@@ -54,6 +54,7 @@ import { selectTempEvent } from '@redux/eventSlice';
 import { selectToken } from '@redux/authSlice';
 
 import ROLES from '@constant/roles';
+import { selectUser } from '@redux/userSlice';
 
 interface IFormLayoutProps {
   children: ReactElement;
@@ -255,6 +256,7 @@ const Quiz = (): ReactElement => {
 
   const { loading } = useLoading([authState, eventState, questionState]);
 
+  const user = useAppSelector(selectUser);
   const token = useAppSelector(selectToken);
   const quiz = useAppSelector(selectTempQuiz);
   const event = useAppSelector(selectTempEvent);
@@ -326,6 +328,10 @@ const Quiz = (): ReactElement => {
 
     socket.on('quiz:blocked', () => {
       setBlocked(true);
+    });
+
+    socket.on('user:unblock', (userId: number) => {
+      if (user && user.id === userId) setBlocked(false);
     });
 
     socket.on('event:start', () => {
