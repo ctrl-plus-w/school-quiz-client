@@ -1,20 +1,26 @@
-import ROLES from '@constant/roles';
-import useAppSelector from '@hooks/useAppSelector';
-import useAuthentication from '@hooks/useAuthentication';
-import useDebug from '@hooks/useDebug';
-import useLoading from '@hooks/useLoading';
-import useLoadUsers from '@hooks/useLoadUsers';
-import AdminDashboard from '@layout/AdminDashboard';
-import AdminDashboardSkeleton from '@layout/AdminDashboardSkeleton ';
-import Container from '@module/Container';
-import Table from '@module/Table';
-import { removeUser, selectUsers } from '@redux/userSlice';
-import ContainerSkeleton from '@skeleton/ContainerSkeleton';
-import TableSkeleton from '@skeleton/TableSkeleton';
-import { genderMapper } from '@util/mapper.utils';
 import type { ReactElement } from 'react';
 
 import React from 'react';
+
+import AdminDashboardSkeleton from '@layout/AdminDashboardSkeleton ';
+import AdminDashboard from '@layout/AdminDashboard';
+
+import Container from '@module/Container';
+import Table from '@module/Table';
+
+import ContainerSkeleton from '@skeleton/ContainerSkeleton';
+import TableSkeleton from '@skeleton/TableSkeleton';
+
+import useAuthentication from '@hooks/useAuthentication';
+import useAppSelector from '@hooks/useAppSelector';
+import useLoadUsers from '@hooks/useLoadUsers';
+import useLoading from '@hooks/useLoading';
+
+import { genderMapper } from '@util/mapper.utils';
+
+import { removeUser, selectUsers } from '@redux/userSlice';
+
+import ROLES from '@constant/roles';
 
 const Users = (): ReactElement => {
   const { state: usersState, run: runUsers } = useLoadUsers();
@@ -23,8 +29,6 @@ const Users = (): ReactElement => {
   const { loading } = useLoading([authState, usersState]);
 
   const users = useAppSelector(selectUsers);
-
-  useDebug(users);
 
   return loading ? (
     <AdminDashboardSkeleton>
