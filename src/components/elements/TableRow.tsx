@@ -4,8 +4,6 @@ import { v4 as uuidv4 } from 'uuid';
 import type { Dispatch, FormEvent, ReactElement, SetStateAction } from 'react';
 import type { ActionCreatorWithPayload } from '@reduxjs/toolkit';
 
-import { useSelector } from 'react-redux';
-
 import React from 'react';
 import clsx from 'clsx';
 
@@ -13,6 +11,7 @@ import Button from '@element/Button';
 import Title from '@element/Title';
 
 import useClickOutside from '@hooks/useClickOutside';
+import useAppSelector from '@hooks/useAppSelector';
 
 import { selectToken } from '@redux/authSlice';
 
@@ -41,7 +40,7 @@ const TableRow = <T extends { id: number }, K extends keyof T>({
 }: IProps<T, K>): ReactElement => {
   const router = useRouter();
 
-  const token = useSelector(selectToken);
+  const token = useAppSelector(selectToken);
 
   const updateShownElement = () => {
     if (shownElement === instance.id) {

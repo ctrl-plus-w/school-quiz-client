@@ -1,5 +1,3 @@
-import { useSelector } from 'react-redux';
-
 import type { ReactElement } from 'react';
 
 import React from 'react';
@@ -16,14 +14,15 @@ import TitleSkeleton from '@skeleton/TitleSkeleton';
 import TextSkeleton from '@skeleton/TextSkeleton';
 
 import useAuthentication from '@hooks/useAuthentication';
+import useAppSelector from '@hooks/useAppSelector';
 import useLoadEvents from '@hooks/useLoadEvents';
 import useLoading from '@hooks/useLoading';
 
 import { maxScoreMapper, quizTitleMapper, scoreMapper } from '@util/mapper.utils';
 import { formatDateTime } from '@util/date.utils';
 
+import { selectLoggedUser } from '@redux/authSlice';
 import { selectEvents } from '@redux/eventSlice';
-import { selectUser } from '@redux/userSlice';
 
 import ROLES from '@constant/roles';
 
@@ -33,8 +32,8 @@ const Student = (): ReactElement => {
 
   const { loading } = useLoading([authState, eventsState]);
 
-  const user = useSelector(selectUser);
-  const events = useSelector(selectEvents);
+  const user = useAppSelector(selectLoggedUser);
+  const events = useAppSelector(selectEvents);
 
   return loading || !user ? (
     <StudentDashboardSkeleton>

@@ -1,5 +1,3 @@
-import { useSelector } from 'react-redux';
-
 import type { ReactElement } from 'react';
 
 import React from 'react';
@@ -14,6 +12,7 @@ import Table from '@module/Table';
 import { booleanMapper } from '@util/mapper.utils';
 
 import useAuthentication from '@hooks/useAuthentication';
+import useAppSelector from '@hooks/useAppSelector';
 import useLoadQuizzes from '@hooks/useLoadQuizzes';
 import useLoading from '@hooks/useLoading';
 
@@ -30,7 +29,7 @@ const ProfessorQuizzes = (): ReactElement => {
 
   const { loading } = useLoading([quizzesState, authState]);
 
-  const quizzes = useSelector(selectQuizzes);
+  const quizzes = useAppSelector(selectQuizzes);
 
   return loading || !quizzes ? (
     <ProfessorDashboardSkeleton>
