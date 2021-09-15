@@ -392,7 +392,6 @@ const CreateQuizQuestion = (): ReactElement => {
                     label="Type de vérification"
                     values={[
                       { name: 'Automatique', slug: 'automatique' },
-                      { name: 'Hybride', slug: 'hybride' },
                       { name: 'Manuel', slug: 'manuel' },
                     ]}
                     value={verificationType}

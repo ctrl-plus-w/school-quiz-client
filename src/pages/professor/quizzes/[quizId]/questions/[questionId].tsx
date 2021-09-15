@@ -222,7 +222,6 @@ const TextualQuestion = ({ quiz, question, questionSpecifications, token }: ITex
             label="Type de vérification"
             values={[
               { name: 'Automatique', slug: 'automatique' },
-              { name: 'Hybride', slug: 'hybride' },
               { name: 'Manuel', slug: 'manuel' },
             ]}
             value={verificationType}

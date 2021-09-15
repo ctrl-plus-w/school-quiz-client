@@ -130,7 +130,7 @@ interface IComparisonAnswer extends DefaultModelProperties {
 
 type TypedQuestion = INumericQuestion | ITextualQuestion | IChoiceQuestion;
 
-type VerificationType = 'hybride' | 'automatique' | 'manuel';
+type VerificationType = 'automatique' | 'manuel';
 type QuestionType = 'numericQuestion' | 'textualQuestion' | 'choiceQuestion';
 
 type Question = DefaultModelProperties & {
