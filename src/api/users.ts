@@ -1,4 +1,4 @@
-import { getApiCall, postApiCall, updateApiCall } from '@api/index';
+import { deleteApiCall, getApiCall, postApiCall, updateApiCall } from '@api/index';
 
 export const getUsers = async (token: string, role?: 'professeur' | 'admin' | 'eleve'): Promise<APIResponse<Array<IUser>>> => {
   const endpoint = role ? `/api/users?role=${role}&self=false` : '/api/users';
@@ -23,4 +23,18 @@ export const updateUserRole = async (userId: number, roleId: number, token: stri
 export const addUserGroups = async (userId: number, groupsId: number[], token: string): Promise<APIResponse<UpdateResponse>> => {
   const endpoint = `/api/users/${userId}/groups`;
   return postApiCall(endpoint, token, { data: { groupIds: groupsId } });
+};
+
+export const removeUserGroup = async (userId: number, groupId: number, token: string): Promise<APIResponse<DeleteResponse>> => {
+  const endpoint = `/api/users/${userId}/groups/${groupId}`;
+  return deleteApiCall(endpoint, token);
+};
+
+export const updateUser = async (
+  userId: number,
+  props: AllOptional<IUserCreationAttributes>,
+  token: string
+): Promise<APIResponse<UpdateResponse>> => {
+  const endpoint = `/api/users/${userId}`;
+  return updateApiCall(endpoint, token, { data: props });
 };
