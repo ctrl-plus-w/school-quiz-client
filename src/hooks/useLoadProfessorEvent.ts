@@ -2,8 +2,7 @@ import useAppSelector from '@hooks/useAppSelector';
 import useAppDispatch from '@hooks/useAppDispatch';
 
 import { clearTempEvent, selectTempEvent, setTempEvent } from '@redux/eventSlice';
-import { selectToken } from '@redux/authSlice';
-import { selectUser } from '@redux/userSlice';
+import { selectLoggedUser, selectToken } from '@redux/authSlice';
 
 import useLoad from '@hooks/useLoad';
 import { getProfessorEvent } from '@api/events';
@@ -12,7 +11,7 @@ const useLoadProfessorEvent = (config?: ILoadHookConfig, cbs?: Array<VoidFunctio
   const dispatch = useAppDispatch();
 
   const token = useAppSelector(selectToken);
-  const user = useAppSelector(selectUser);
+  const user = useAppSelector(selectLoggedUser);
   const event = useAppSelector(selectTempEvent);
 
   return useLoad(

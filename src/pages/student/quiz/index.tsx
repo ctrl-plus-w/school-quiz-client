@@ -47,14 +47,13 @@ import { incrementSeconds } from '@util/date.utils';
 
 import { answerQuestion } from '@api/questions';
 
-import { addErrorNotification } from '@redux/notificationSlice';
+import { selectLoggedUser, selectToken } from '@redux/authSlice';
 import { selectTempQuiz, setTempQuiz } from '@redux/quizSlice';
+import { addErrorNotification } from '@redux/notificationSlice';
 import { selectTempQuestion } from '@redux/questionSlice';
 import { selectTempEvent } from '@redux/eventSlice';
-import { selectToken } from '@redux/authSlice';
 
 import ROLES from '@constant/roles';
-import { selectUser } from '@redux/userSlice';
 
 interface IFormLayoutProps {
   children: ReactElement;
@@ -256,7 +255,7 @@ const Quiz = (): ReactElement => {
 
   const { loading } = useLoading([authState, eventState, questionState]);
 
-  const user = useAppSelector(selectUser);
+  const user = useAppSelector(selectLoggedUser);
   const token = useAppSelector(selectToken);
   const quiz = useAppSelector(selectTempQuiz);
   const event = useAppSelector(selectTempEvent);

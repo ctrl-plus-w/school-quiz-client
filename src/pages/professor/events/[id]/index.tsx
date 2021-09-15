@@ -58,12 +58,12 @@ import { getLength } from '@util/object.utils';
 import { addCollaborators, removeCollaborators, updateEvent } from '@api/events';
 
 import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
-import { selectProfessors, selectUser } from '@redux/userSlice';
+import { selectLoggedUser, selectToken } from '@redux/authSlice';
+import { selectProfessors } from '@redux/userSlice';
 import { selectQuestions } from '@redux/questionSlice';
 import { selectTempEvent } from '@redux/eventSlice';
 import { selectQuizzes } from '@redux/quizSlice';
 import { selectGroups } from '@redux/groupSlice';
-import { selectToken } from '@redux/authSlice';
 
 import ROLES from '@constant/roles';
 
@@ -83,7 +83,7 @@ const Event = (): ReactElement => {
 
   const { loading } = useLoading([authState, eventState, groupState, quizState, userState, questionState]);
 
-  const user = useAppSelector(selectUser);
+  const user = useAppSelector(selectLoggedUser);
   const token = useAppSelector(selectToken);
   const event = useAppSelector(selectTempEvent);
   const groups = useAppSelector(selectGroups);

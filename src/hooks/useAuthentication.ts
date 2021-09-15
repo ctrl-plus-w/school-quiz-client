@@ -10,8 +10,7 @@ import useAppSelector from '@hooks/useAppSelector';
 
 import database from '@database/database';
 
-import { selectToken, setToken } from '@redux/authSlice';
-import { selectUser, setUser } from '@redux/userSlice';
+import { selectLoggedUser, selectToken, setLoggedUser, setToken } from '@redux/authSlice';
 
 interface IReturnProperties {
   state: 'LOADING' | 'FULFILLED';
@@ -24,7 +23,7 @@ const useAuthentication = (permission: number, cbs?: (() => void)[]): IReturnPro
 
   const [loading, setLoading] = useState(true);
 
-  const user = useAppSelector(selectUser);
+  const user = useAppSelector(selectLoggedUser);
   const reduxToken = useAppSelector(selectToken);
 
   useEffect(() => {
@@ -51,7 +50,7 @@ const useAuthentication = (permission: number, cbs?: (() => void)[]): IReturnPro
             if (!fetchedUser) fail();
 
             // Store the user into redux
-            dispatch(setUser(fetchedUser));
+            dispatch(setLoggedUser(fetchedUser));
           }
         } catch (err) {
           fail();

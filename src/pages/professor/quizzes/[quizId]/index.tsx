@@ -49,9 +49,9 @@ import useLoading from '@hooks/useLoading';
 import { addErrorNotification, addSuccessNotification } from '@redux/notificationSlice';
 
 import { removeQuestion, selectQuestions } from '@redux/questionSlice';
-import { selectProfessors, selectUser } from '@redux/userSlice';
+import { selectLoggedUser, selectToken } from '@redux/authSlice';
+import { selectProfessors } from '@redux/userSlice';
 import { selectTempQuiz } from '@redux/quizSlice';
-import { selectToken } from '@redux/authSlice';
 
 import ROLES from '@constant/roles';
 
@@ -69,7 +69,7 @@ const Quiz = (): ReactElement => {
 
   const { loading } = useLoading([usersState, quizState, questionState, authState]);
 
-  const user = useAppSelector(selectUser);
+  const user = useAppSelector(selectLoggedUser);
   const questions = useAppSelector(selectQuestions);
   const quiz = useAppSelector(selectTempQuiz);
   const token = useAppSelector(selectToken);

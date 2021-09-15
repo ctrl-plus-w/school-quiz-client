@@ -3,8 +3,7 @@ import useAppDispatch from '@hooks/useAppDispatch';
 import useLoad from '@hooks/useLoad';
 
 import { selectTempQuiz, setTempQuiz } from '@redux/quizSlice';
-import { selectToken } from '@redux/authSlice';
-import { selectUser } from '@redux/userSlice';
+import { selectLoggedUser, selectToken } from '@redux/authSlice';
 
 import { getQuiz } from '@api/quizzes';
 
@@ -12,7 +11,7 @@ const useLoadQuiz = (quizId: number, config?: ILoadHookConfig, cbs?: Array<VoidF
   const dispatch = useAppDispatch();
 
   const token = useAppSelector(selectToken);
-  const user = useAppSelector(selectUser);
+  const user = useAppSelector(selectLoggedUser);
   const quiz = useAppSelector(selectTempQuiz);
 
   return useLoad(
