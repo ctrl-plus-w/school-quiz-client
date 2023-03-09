@@ -52,6 +52,7 @@ const Login: FunctionComponent = () => {
 
     try {
       const { data } = await database.post('/auth/login', { username, password });
+      console.log(data);
 
       setCookie('user', data.token, { path: '/', maxAge: 3600, sameSite: true });
 
@@ -67,7 +68,7 @@ const Login: FunctionComponent = () => {
       <Form onSubmit={handleSubmit}>
         <FormGroup>
           <Col>
-            <Title>Connection</Title>
+            <Title>Connextion</Title>
             <Route to="/password-lost">Mot de passe oublié ?</Route>
           </Col>
 

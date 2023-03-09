@@ -33,13 +33,17 @@ const useAuthentication = (permission: number, cbs?: (() => void)[]): IReturnPro
       const cookieToken = cookies.user;
 
       if (!cookieToken && !reduxToken) fail();
+      console.log('Passed stage 1 (retrieved the cookie or redux token)');
 
       if (cookieToken) {
         // Validate the token
         try {
+          console.log('Getting authentified by the token');
           const { data: tokenValidation } = await database.post('/auth/validateToken', {}, getHeaders(cookieToken));
           if (!tokenValidation.valid) fail();
           if (tokenValidation.rolePermission !== permission) fail();
+
+          console.log('Got authentified');
 
           // Store the token into redux
           dispatch(setToken(cookieToken));

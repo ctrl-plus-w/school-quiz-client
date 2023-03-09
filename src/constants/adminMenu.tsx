@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { UserCircleIcon, VideoCameraIcon, HomeIcon, UsersIcon } from '@heroicons/react/outline';
+import { HomeIcon, UsersIcon } from '@heroicons/react/outline';
 
 const ADMIN_MENUS: IMenu = {
   title: 'Général',
@@ -14,7 +14,7 @@ const ADMIN_MENUS: IMenu = {
     // { name: 'Rôles', path: '/admin/roles', icon: <></>, active: false },
     // { name: 'Vérification', path: '/admin/verificationTypes', icon: <></>, active: false },
     // { name: 'Spécification', path: '/admin/questionSpecifications', icon: <></>, active: false },
-    { name: 'Profile', path: '/admin/profile', icon: <UserCircleIcon className="w-6 h-6" />, active: false },
+    // { name: 'Profile', path: '/admin/profile', icon: <UserCircleIcon className="w-6 h-6" />, active: false },
   ],
 };
 

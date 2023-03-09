@@ -39,7 +39,7 @@ const LandingPage = ({ children }: IProps): ReactElement => {
 
         <Link href="/login" passHref={true}>
           <Button type="black" full={false}>
-            Connection
+            Connexion
           </Button>
         </Link>
       </nav>

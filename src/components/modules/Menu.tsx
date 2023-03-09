@@ -32,7 +32,7 @@ const Menu: FunctionComponent<IProps> = ({ links, logoutButton = false }: IProps
 
   const dispatch = useAppDispatch();
 
-  const [closed, setClosed] = useState(true);
+  const [closed, setClosed] = useState(false);
 
   const handleClick = () => {
     removeCookie('user');
