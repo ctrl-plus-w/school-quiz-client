@@ -71,7 +71,7 @@ const CreateEvent = (): ReactElement => {
 
   const { valid } = useValidation(
     () => {
-      if (areDatesEquals(date, new Date()) || date.valueOf() < new Date().valueOf()) return false;
+      if (/* areDatesEquals(date, new Date()) ||*/ date.valueOf() <= new Date().valueOf()) return false;
 
       if (parseInt(start[0]) === 0 && parseInt(start[1]) === 0) return false;
       if (parseInt(duration[0]) === 0 && parseInt(duration[1]) === 0) return false;
