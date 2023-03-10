@@ -34,7 +34,6 @@ import useValidation from '@hooks/useValidation';
 import useLoading from '@hooks/useLoading';
 
 import { incrementHours, incrementMinutes, setTime } from '@util/date.utils';
-import { areDatesEquals } from '@util/condition.utils';
 
 import { createEvent } from '@api/events';
 
